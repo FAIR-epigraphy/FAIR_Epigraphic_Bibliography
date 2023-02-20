@@ -1,0 +1,105 @@
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab"
+      aria-controls="home" aria-selected="true">Info</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab"
+      aria-controls="profile" aria-selected="false">Notes</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#tags" type="button" role="tab"
+      aria-controls="contact" aria-selected="false">Tags</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#relations" type="button" role="tab"
+      aria-controls="contact" aria-selected="false">Relations</button>
+  </li>
+</ul>
+
+<div class="tab-content" id="myTabContent" *ngIf="zoteroObject !== null">
+  <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="home-tab">
+    <div class="table-responsive">
+      <table class="table table-hover mt-2">
+        <tbody>
+          <tr *ngFor="let item of zoteroObject | keyvalue">
+            <td *ngIf="item.key !== 'creators' && item.key !=='tags' && item.key !=='relations' && item.key !=='url'">
+              {{ getColumnName(item.key) }}
+            </td>
+            <td *ngIf="item.key !== 'creators' && item.key !=='tags' && item.key !=='relations' && item.key !=='url'">
+              <span *ngIf="item.key !== 'shortTitle'">{{item.value}}</span>
+              <!-- <span *ngIf="item.key === 'shortTitle'">
+                {{ getFirstAbbr(item.value) }}
+                <i class="bi bi-plus-circle" title="Add Abbreviation" style="cursor: pointer;"
+                  (click)="showTextbox(item)"></i>
+              </span> -->
+              <ul *ngIf="item.key === 'shortTitle'" style="margin-left: -25px;">
+                <li *ngFor="let obj of getAbbr(item)"
+                  [ngStyle]="{'list-style-type': obj.abbr === '' ? 'none' : '\' - \''}">
+                  <span *ngIf="obj.abbr !== ''">{{ obj.abbr }} ({{obj.source }})</span>
+                  <form *ngIf="obj.abbr === ''" (submit)="addAbbreviation(item, $event)">
+                    <input type="text" required placeholder="Enter Abbreviation" autofocus />
+                  </form>
+                </li>
+              </ul>
+            </td>
+
+            <!-- with creators -->
+            <td colspan="2" *ngIf="item.key === 'creators' && getCreators(item.value).length > 0">
+              <div class="row w-100" *ngFor="let c of getCreators(item.value);">
+                <div class="col-md-2 offset-md-2">{{c.creatorType}}</div>
+                <div class="col-md-6 text-start text-dark">
+                  {{c.getFullName(c)}}
+                  <span *ngIf="c.VIAF !==undefined && c.VIAF !== ''"> | {{ c.VIAF }}</span>
+                  <i *ngIf="c.VIAF === undefined" class="bi bi-plus-circle" title="Add VIAF" style="cursor: pointer;"
+                    (click)="showTextbox(c)"></i>
+                  <form *ngIf="c.VIAF === ''" (submit)="addVIAF(c, $event)">
+                    <input type="text" required placeholder="Enter VIAF" autofocus />
+                  </form>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="profile-tab">
+    <div class="mt-2" *ngIf="zoteroObject !== null">
+      {{getNotes(zoteroObject).length}} notes
+    </div>
+    <ul class="list-group list-group-flush mt-2" *ngIf="zoteroObject !== null">
+      <li class="list-group-item" *ngFor="let n of getNotes(zoteroObject)" [innerHTML]="n">
+      </li>
+    </ul>
+  </div>
+  <div class="tab-pane fade" id="tags" role="tabpanel" aria-labelledby="contact-tab">
+    <div class="mt-2" *ngIf="zoteroObject !== null">
+      {{zoteroObject.tags.length}} tags
+    </div>
+    <ul class="list-group list-group-flush mt-2" *ngIf="zoteroObject !== null">
+      <li class="list-group-item" *ngFor="let t of zoteroObject.tags" [innerHTML]="t.tag">
+      </li>
+    </ul>
+  </div>
+  <div class="tab-pane fade" id="relations" role="tabpanel" aria-labelledby="contact-tab">
+    <div class="mt-2" *ngIf="zoteroObject !== null">
+      {{getRelationURIs().length}} relations
+      <button class="btn btn-primary" (click)="showTextbox(zoteroObject)">Add</button>
+
+      <form (submit)="addRelations(zoteroObject, $event)">
+        <input type="url" class="form-control mt-3" *ngIf="zoteroObject.relations.added === false"
+          placeholder="Enter URI" autofocus required />
+      </form>
+    </div>
+
+    <ul class="list-group list-group-flush mt-2" *ngIf="zoteroObject !== null">
+      <li class="list-group-item" *ngFor="let rel of getRelationURIs()">
+        {{ rel }}
+        <a href="{{rel}}" *ngIf="rel !== ''" target="_blank">
+          <i class='bi bi-box-arrow-up-right'></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>

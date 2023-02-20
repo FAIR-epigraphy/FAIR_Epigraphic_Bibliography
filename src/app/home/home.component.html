@@ -1,0 +1,36 @@
+<div class="container-fluid py-3">
+    <div class="row my-3 border-top border-bottom">
+      <div class="col-md-2">
+        <app-item-list [libraryName]="libraryName"></app-item-list>
+      </div>
+      <div class="col-md-7 border-start border-end">
+        <app-biblio-item-list [biblioData]="allBiblioData"
+                              [loading]="loading" 
+                              [biblioItemInfoComp]="biblioItemMore1"
+                              [canActive]="canActive">
+        </app-biblio-item-list>
+      </div>
+      <div class="col-md-3">
+        <app-biblio-item-more-info #biblioItemMore1></app-biblio-item-more-info>
+      </div>
+    </div>
+  
+    <!-- Button trigger modal -->
+    <button id="btnOpenModal" type="button" style="display: none;" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+    </button>
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+      aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Detail</h5>
+            <button type="button" class="btn-close" (click)="closeModal()" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <app-biblio-item-more-info #biblioItemMore2></app-biblio-item-more-info>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
