@@ -9,7 +9,7 @@ import { AuthService } from './_service/auth.service';
 })
 export class AppComponent implements OnInit {
   title = 'fair-biblio';
-  isUserLoggedIn = false;
+  loginUser = null;
   keysPressed: any = {};
 
   constructor(
@@ -18,15 +18,15 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     if (this.authService.isAuthenticate())
-      this.isUserLoggedIn = true
+      this.loginUser = JSON.parse(this.authService.getToken() || '{}')
     else
-      this.isUserLoggedIn = false;
+      this.loginUser = null;
   }
 
   @HostListener('document:keydown', ['$event'])
   @HostListener('document:keyup', ['$event'])
   handleKeyEvents(event: KeyboardEvent) {
-    console.log(event)
+    //console.log(event)
     if (event.type === 'keydown') {
       if (event.key === 'Shift' || event.key === 'C' || event.key === 'R')
         this.keysPressed[event.key] = true;

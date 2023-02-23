@@ -47,6 +47,25 @@ export class BiblioItemMoreInfoComponent {
 
   }
 
+  itemHasValue(obj:any)
+  {
+    let retVal = false;
+    if(obj!==null)
+      if(typeof obj === 'string')
+      {
+        if(obj !== '')
+          retVal = true;
+      }
+      else if(typeof obj === 'object')
+      {
+        if(obj !== null)
+          if(Array.from(obj).length > 0)
+          retVal = true;
+      }
+      
+    return retVal;
+  }
+
   getColumnName(key: any) {
     let colName = key.replace(/([a-z])([A-Z])/g, '$1 $2');
     // if(colName.split(' ').length < 1)

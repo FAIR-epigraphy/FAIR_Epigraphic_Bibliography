@@ -29,19 +29,27 @@ export class LoginComponent implements OnInit {
   }
 
   onClickSubmit(data: any) {
-    this.userName = data.userName;
-    this.password = data.password;
+    if (data.userName !== '' && data.password !== '') {
+      this.userName = data.userName;
+      this.password = data.password;
 
-    console.log("Login page: " + this.userName);
-    console.log("Login page: " + this.password);
+      this.authService.login(this.userName, this.password)
+        .subscribe(data => {
+          //console.log("Is Login Success: " + data);
 
-    this.authService.login(this.userName, this.password)
-      .subscribe(data => {
-        console.log("Is Login Success: " + data);
-
-        if (data) this.router.navigate(['/']).then(() => {
-          window.location.reload();
+          if (data) this.router.navigate(['/']).then(() => {
+            window.location.reload();
+          });
+          else
+            this.showToast();
         });
-      });
+    }
+  }
+
+  showToast() {
+    document.getElementById('divError')?.classList.add('show')
+    setTimeout(() => {
+      document.getElementById('divError')?.classList.remove('show')
+    }, 3000);
   }
 }
