@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Creator } from '../../_models/creator.model';
 import { ZoteroItem } from '../../_models/zotero-item.model';
-import { BiblAbbrService } from '../../_service/bibl-abbr.service'
+import { BiblApiService } from '../../_service/bibl-api.service'
+import { AuthService } from '../../_service/auth.service'
 
 //const { default: api } = require('zotero-api-client');
 
@@ -13,29 +14,36 @@ import { BiblAbbrService } from '../../_service/bibl-abbr.service'
 export class BiblioItemMoreInfoComponent {
   //myapi = api('4Rti1M1IB3Cw2993pop81f5v').library('group', 4858485);
 
-  constructor(private abbrsService: BiblAbbrService) { }
+  constructor(
+    private apiService: BiblApiService,
+    private authService: AuthService
+  ) { }
 
   zoteroObject: any = null;
-
+  user: any = null;
+  hasPermission = false;
   isOpenTextbox = false;
 
   getSpecificData(obj: ZoteroItem) {
     //console.log(obj)
-    if (localStorage.getItem(`ZoteroItem_${obj.key}`) !== undefined && localStorage.getItem(`ZoteroItem_${obj.key}`) !== null) {
-      let item = JSON.parse(localStorage.getItem(`ZoteroItem_${obj.key}`) || '{}') as ZoteroItem;
-      obj = item;
-    }
+    // if (localStorage.getItem(`ZoteroItem_${obj.key}`) !== undefined && localStorage.getItem(`ZoteroItem_${obj.key}`) !== null) {
+    //   let item = JSON.parse(localStorage.getItem(`ZoteroItem_${obj.key}`) || '{}') as ZoteroItem;
+    //   obj = item;
+    // }
 
-    this.abbrsService.getSEGAbbrByAIEGL(obj.shortTitle[0]['abbr']).subscribe(resp => {
+    this.user = JSON.parse(this.authService.getToken() || '{}');
+    if (this.user.role_name === 'Admin' || this.user.role_name === 'Editor') this.hasPermission = true;
+
+    this.apiService.getSEGAbbrByAIEGL(obj.shortTitle[0]['abbr']).subscribe(resp => {
       if (resp !== null) {
         if (resp.length > 0) {
           for (let d of resp) {
             if (d.seg1_abbr !== null) {
-              if (obj.shortTitle.filter(x => x.abbr === d.seg1_abbr).length === 0)
+              if (obj.shortTitle.filter(x => x.abbr === d.seg1_abbr && x.source === 'SEG 1').length === 0)
                 obj.shortTitle.push({ abbr: d.seg1_abbr, source: 'SEG 1' })
             }
             else if (d.seg2_abbr !== null) {
-              if (obj.shortTitle.filter(x => x.abbr === d.seg2_abbr).length === 0)
+              if (obj.shortTitle.filter(x => x.abbr === d.seg2_abbr && x.source === 'SEG 2').length === 0)
                 obj.shortTitle.push({ abbr: d.seg2_abbr, source: 'SEG 2' })
             }
           }
@@ -47,22 +55,19 @@ export class BiblioItemMoreInfoComponent {
 
   }
 
-  itemHasValue(obj:any)
-  {
+  itemHasValue(obj: any) {
     let retVal = false;
-    if(obj!==null)
-      if(typeof obj === 'string')
-      {
-        if(obj !== '')
+    if (obj !== null)
+      if (typeof obj === 'string') {
+        if (obj !== '')
           retVal = true;
       }
-      else if(typeof obj === 'object')
-      {
-        if(obj !== null)
-          if(Array.from(obj).length > 0)
-          retVal = true;
+      else if (typeof obj === 'object') {
+        if (obj !== null)
+          if (Array.from(obj).length > 0)
+            retVal = true;
       }
-      
+
     return retVal;
   }
 

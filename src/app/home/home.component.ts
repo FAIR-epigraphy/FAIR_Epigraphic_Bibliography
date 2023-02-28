@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, Input, Host } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+// import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ZoteroItem } from '../_models/zotero-item.model';
 const { default: api } = require('zotero-api-client');
 import { AuthService } from '../_service/auth.service';
@@ -24,7 +24,8 @@ export class HomeComponent implements OnInit {
   callNumber: string = '';
   canActive: boolean = false;
 
-  constructor(private modalService: NgbModal,
+  constructor(
+    //private modalService: NgbModal,
     private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService
@@ -43,7 +44,7 @@ export class HomeComponent implements OnInit {
 
   getBibloItemInfo() {
     const id = window.location.href.split('/')[window.location.href.split('/').length - 1]
-    if (id !== null) {
+    if (id !== null && id !== '') {
       let obj = this.allBiblioData.filter(x => x.callNumber === id);
       if (obj.length > 0) {
         this.zoteroObject = obj[0] as ZoteroItem;

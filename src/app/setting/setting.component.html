@@ -19,16 +19,16 @@
                             href="#list-password" role="tab" aria-controls="list-password">
                             <i class="bi bi-lock"></i> Password
                         </a>
-                        <a class="list-group-item list-group-item-action" id="list-users-list" data-bs-toggle="list"
-                            href="#list-users" role="tab" aria-controls="list-users">
+                        <a *ngIf="user && user.role_name === 'Admin'" class="list-group-item list-group-item-action" id="list-users-list" data-bs-toggle="list"
+                            href="#list-users" role="tab" aria-controls="list-users" (click)="reInit()">
                             <i class="bi bi-person-up"></i> Manage Users
                         </a>
-                        <a class="list-group-item list-group-item-action" id="list-roles-list" data-bs-toggle="list"
-                            href="#list-roles" role="tab" aria-controls="list-roles">
+                        <a *ngIf="user && user.role_name === 'Admin'" class="list-group-item list-group-item-action" id="list-roles-list" data-bs-toggle="list"
+                            href="#list-roles" role="tab" aria-controls="list-roles" (click)="reInit()">
                             <i class="bi bi-people"></i> Manage Roles
                         </a>
-                        <a class="list-group-item list-group-item-action" id="list-bibtypes-list" data-bs-toggle="list"
-                            href="#list-bibtypes" role="tab" aria-controls="list-bibtypes">
+                        <a *ngIf="user && user.role_name === 'Admin'" class="list-group-item list-group-item-action" id="list-bibtypes-list" data-bs-toggle="list"
+                            href="#list-bibtypes" role="tab" aria-controls="list-bibtypes" (click)="reInit()">
                             <i class="bi bi-list-nested"></i> Manage Biblio Types
                         </a>
                     </div>
@@ -37,23 +37,32 @@
                     <div class="tab-content p-3" id="nav-tabContent">
                         <div class="tab-pane fade show active" id="list-account" role="tabpanel"
                             aria-labelledby="list-account-list">
-                            Account
+                            <div class="row" *ngIf="user!==null">
+                                <div class="col-md-6 mb-3">
+                                    <label for="formGroupExampleInput" class="form-label">Username/Email</label>
+                                    <input type="text" class="form-control" disabled id="formGroupExampleInput"
+                                        placeholder="Username" value="{{ user['username'] }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="formGroupExampleInput2" class="form-label">Role</label>
+                                    <input type="text" class="form-control" disabled id="formGroupExampleInput2"
+                                        placeholder="User Role" value="{{ user['role_name'] }}">
+                                </div>
+                            </div>
                         </div>
                         <div class="tab-pane fade" id="list-password" role="tabpanel"
                             aria-labelledby="list-password-list">
                             Password
                         </div>
-                        <div class="tab-pane fade" id="list-users" role="tabpanel"
-                            aria-labelledby="list-users-list">
-                            Manage users
+                        <div *ngIf="user && user.role_name === 'Admin'" class="tab-pane fade" id="list-users" role="tabpanel" aria-labelledby="list-users-list">
+                           <app-manage-user *ngIf="isShown"></app-manage-user>
                         </div>
-                        <div class="tab-pane fade" id="list-roles" role="tabpanel"
-                            aria-labelledby="list-roles-list">
-                            Manage Roles
+                        <div *ngIf="user && user.role_name === 'Admin'" class="tab-pane fade" id="list-roles" role="tabpanel" aria-labelledby="list-roles-list">
+                            <app-manage-role *ngIf="isShown"></app-manage-role>
                         </div>
-                        <div class="tab-pane fade" id="list-bibtypes" role="tabpanel"
+                        <div *ngIf="user && user.role_name === 'Admin'" class="tab-pane fade" id="list-bibtypes" role="tabpanel"
                             aria-labelledby="list-bibtypes-list">
-                            Manage Biblio Types
+                            <app-manage-biblio-item-category *ngIf="isShown"></app-manage-biblio-item-category>
                         </div>
                     </div>
                 </div>

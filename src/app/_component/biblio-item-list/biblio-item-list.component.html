@@ -1,94 +1,99 @@
 <div class="border-bottom">
-    <i class="bi bi-diagram-3" style="font-size: 24px;cursor: pointer;" *ngIf="canActive"
-        id="btnOpenModal" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-    </i>
-    <i class="bi bi-upload ms-3" title="Export" style="font-size: 20px;cursor: pointer;"></i>
-    <i class="bi bi-blockquote-left ms-2" title="Create Citation" style="font-size: 24px;cursor: pointer;"></i>
-    <!-- <i class="bi bi-diagram-3" style="font-size: 24px;cursor: pointer;"></i> -->
+  <i class="bi bi-diagram-3" style="font-size: 24px;cursor: pointer;" *ngIf="canActive" id="btnOpenModal" type="button"
+    data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+  </i>
+  <i class="bi bi-upload ms-3" title="Export" style="font-size: 20px;cursor: pointer;"></i>
+  <i class="bi bi-blockquote-left ms-2" title="Create Citation" style="font-size: 24px;cursor: pointer;"></i>
+  <!-- <i class="bi bi-diagram-3" style="font-size: 24px;cursor: pointer;"></i> -->
 
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-      aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog modal-fullscreen">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel">Epigraphic Bibliography Parent-Child Relation</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <app-biblio-parentchild-rel [biblioData]="biblioData"></app-biblio-parentchild-rel>
-          </div>
+  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Epigraphic Bibliography Parent-Child Relation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <app-biblio-parentchild-rel [biblioData]="biblioData"></app-biblio-parentchild-rel>
         </div>
       </div>
     </div>
-</div>
-  <div class="table-responsive" (scroll)="onScroll($event)">
-    <table class="table" *ngIf="loading">
-      <thead class="bg-light text-dark">
-        <tr>
-          <!-- <th scope="col">#</th> -->
-          <th scope="col" style="width: 40%;">Title</th>
-          <th scope="col">Date</th>
-          <th scope="col">Creator</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let number of [0,1,2]">
-          <td>
-            <span class="loading"></span>
-          </td>
-          <td>
-            <span class="loading"></span>
-          </td>
-          <td>
-            <span class="loading"></span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <table class="table table-striped table-hover" *ngIf="biblioData.length>0">
-      <thead class="sticky-top bg-light text-dark">
-        <tr>
-          <!-- <th scope="col">#</th> -->
-          <th scope="col" style="width: 50%;">Title</th>
-          <th scope="col">Date</th>
-          <th scope="col">Creator</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let data of biblioData" style="cursor: pointer;" (click)="getSpecificData(data)"
-          [class.highlighted]="currentSelectedRecord !== null && data.title === currentSelectedRecord.title">
-          <td title="{{data.title}}">
-            <p *ngIf="data.title.length < 50">
-              {{data.title}}
-            </p>
-            <p *ngIf="data.title.length > 50">
-              {{data.title | slice:0:50}}...
-            </p>
-          </td>
-          <td>
-            {{ data.date }}
-          </td>
-          <td>
-            <!-- <span *ngFor="let creator of data.creators"> -->
-            {{ data.getCreators() }}
-            <!-- </span> -->
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <table class="table" *ngIf="loadingEnd">
-      <tbody>
-        <tr *ngFor="let number of [0,1,2]">
-          <td>
-            <span class="loading"></span>
-          </td>
-          <td>
-            <span class="loading"></span>
-          </td>
-          <td>
-            <span class="loading"></span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
   </div>
+</div>
+<div class="table-responsive" (scroll)="onScroll($event)">
+  <table class="table" *ngIf="loading">
+    <thead class="bg-light text-dark">
+      <tr>
+        <!-- <th scope="col">#</th> -->
+        <th scope="col" style="width: 40%;">Title</th>
+        <th scope="col">Date</th>
+        <th scope="col">Creator</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let number of [0,1,2]">
+        <td>
+          <span class="loading"></span>
+        </td>
+        <td>
+          <span class="loading"></span>
+        </td>
+        <td>
+          <span class="loading"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="table table-striped table-hover" *ngIf="biblioData.length>0">
+    <thead class="sticky-top bg-light text-dark">
+      <tr>
+        <!-- <th scope="col">#</th> -->
+        <th scope="col" style="width: 50%;">Title</th>
+        <th scope="col">Date</th>
+        <th scope="col">Creator</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of biblioData" style="cursor: pointer;" (click)="getSpecificData(data)"
+        [class.highlighted]="currentSelectedRecord !== null && data.title === currentSelectedRecord.title && data.date === currentSelectedRecord.date">
+        <td title="{{data.title}}">
+          <p *ngIf="data.title.length < 50">
+            {{data.title}}
+          </p>
+          <p *ngIf="data.title.length >= 50">
+            {{data.title | slice:0:50}}...
+          </p>
+        </td>
+        <td>
+          {{ data.date }}
+        </td>
+        <td title="{{data.getCreators()}}">
+          <!-- <span *ngFor="let creator of data.creators"> -->
+          <span *ngIf="data.getCreators().length < 30">
+            {{ data.getCreators() }}
+          </span>
+          <span *ngIf="data.getCreators().length >= 30">
+            {{ data.getCreators() | slice:0:30 }}...
+          </span>
+          <!-- </span> -->
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="table" *ngIf="loadingEnd">
+    <tbody>
+      <tr *ngFor="let number of [0,1,2]">
+        <td>
+          <span class="loading"></span>
+        </td>
+        <td>
+          <span class="loading"></span>
+        </td>
+        <td>
+          <span class="loading"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

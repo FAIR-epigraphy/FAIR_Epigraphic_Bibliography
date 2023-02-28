@@ -37,7 +37,7 @@
                 <li *ngFor="let obj of getAbbr(item)"
                   [ngStyle]="{'list-style-type': obj.abbr === '' ? 'none' : '\' - \''}">
                   <span *ngIf="obj.abbr !== ''">{{ obj.abbr }} ({{obj.source }})</span>
-                  <form *ngIf="obj.abbr === ''" (submit)="addAbbreviation(item, $event)">
+                  <form *ngIf="obj.abbr === '' && hasPermission" (submit)="addAbbreviation(item, $event)">
                     <input type="text" required placeholder="Enter Abbreviation" autofocus />
                   </form>
                 </li>
@@ -51,7 +51,7 @@
                 <div class="col-md-6 text-start text-dark">
                   {{c.getFullName(c)}}
                   <span *ngIf="c.VIAF !==undefined && c.VIAF !== ''"> | {{ c.VIAF }}</span>
-                  <i *ngIf="c.VIAF === undefined" class="bi bi-plus-circle" title="Add VIAF" style="cursor: pointer;"
+                  <i *ngIf="c.VIAF === undefined && hasPermission" class="bi bi-plus-circle" title="Add VIAF" style="cursor: pointer;"
                     (click)="showTextbox(c)"></i>
                   <form *ngIf="c.VIAF === ''" (submit)="addVIAF(c, $event)">
                     <input type="text" required placeholder="Enter VIAF" autofocus />

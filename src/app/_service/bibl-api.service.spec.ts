@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { BiblAbbrService } from './bibl-abbr.service';
+import { BiblApiService } from './bibl-api.service';
 
-describe('BiblAbbrService', () => {
-  let service: BiblAbbrService;
+describe('BiblApiService', () => {
+  let service: BiblApiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(BiblAbbrService);
+    service = TestBed.inject(BiblApiService);
   });
 
   it('should be created', () => {

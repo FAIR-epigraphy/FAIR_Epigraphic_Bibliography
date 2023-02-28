@@ -16,6 +16,9 @@ import { LogoutComponent } from './logout/logout.component';
 import { BiblioParentchildRelComponent } from './_component/biblio-parentchild-rel/biblio-parentchild-rel.component';
 import { CustomFilterPipe } from './_pipes/custom-filter.pipe';
 import { SettingComponent } from './setting/setting.component';
+import { ManageUserComponent } from './setting/manage-user/manage-user.component';
+import { ManageRoleComponent } from './setting/manage-role/manage-role.component';
+import { ManageBiblioItemCategoryComponent } from './setting/manage-biblio-item-category/manage-biblio-item-category.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +32,9 @@ import { SettingComponent } from './setting/setting.component';
     BiblioParentchildRelComponent,
     CustomFilterPipe,
     SettingComponent,
+    ManageUserComponent,
+    ManageRoleComponent,
+    ManageBiblioItemCategoryComponent,
   ],
   imports: [
     BrowserModule,
