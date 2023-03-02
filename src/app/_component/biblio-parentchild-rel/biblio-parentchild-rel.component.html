@@ -3,8 +3,7 @@
         <div class="input-group mb-3">
             <input type="text" class="form-control" placeholder="Filter..." [(ngModel)]="searchTextParent" />
             <i class="bi bi-x" style="margin-left: -25px; z-index: 100;font-size: 25px;cursor: pointer;"
-                *ngIf="searchTextParent.length > 0"
-                (click)="searchTextParent = ''"></i>
+                *ngIf="searchTextParent.length > 0" (click)="searchTextParent = ''"></i>
             <i class="input-group-text bi bi-search" id="basic-addon2"></i>
         </div>
 
@@ -15,7 +14,7 @@
                         <!-- <th scope="col">#</th> -->
                         <th scope="col" style="width: 50%;">Title</th>
                         <th scope="col">Date</th>
-                        <th scope="col">Creator</th>
+                        <th scope="col" style="width: 30%;">Creator</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -33,15 +32,17 @@
                         <td>
                             {{ data.date }}
                         </td>
-                        <td>
-                            <!-- <span *ngFor="let creator of data.creators"> -->
-                            {{ data.getCreators() }}
-                            <!-- </span> -->
+                        <td title="{{data.getCreators()}}">
+                            <span *ngIf="data.getCreators().length < 17">
+                                {{ data.getCreators() }}
+                            </span>
+                            <span *ngIf="data.getCreators().length >= 17">
+                                {{ data.getCreators() | slice:0:17}}...
+                            </span>
                         </td>
                     </tr>
                 </tbody>
             </table>
-
         </div>
     </div>
     <!-- Arrow Buttons -->
@@ -85,6 +86,12 @@
                     <button type="button" class="list-group-item list-group-item-action"
                         *ngFor="let selBib of selectedChildBiblio" (click)="selectChildFromList(selBib, $event)">
                         {{ selBib.title | slice:0:25 }}, {{ selBib.date }}, {{ selBib.getCreators() }}
+                        <select class="form-select" [(ngModel)]="selBib.sel_cat">
+                            <option [ngValue]="undefined" disabled>Select category</option>
+                            <option *ngFor="let cat of categories" [ngValue]="cat.id">
+                                {{ cat.cat_name }}
+                            </option>
+                        </select>
                     </button>
                     <button type="button" class="list-group-item list-group-item-action"
                         *ngIf="selectedChildBiblio.length === 0">
@@ -113,8 +120,7 @@
         <div class="input-group mb-3">
             <input type="text" class="form-control" placeholder="Filter..." [(ngModel)]="searchTextChild" />
             <i class="bi bi-x" style="margin-left: -25px; z-index: 100;font-size: 25px;cursor: pointer;"
-                *ngIf="searchTextChild.length > 0"
-                (click)="searchTextChild = ''"></i>
+                *ngIf="searchTextChild.length > 0" (click)="searchTextChild = ''"></i>
             <i class="input-group-text bi bi-search" id="basic-addon2"></i>
         </div>
 
@@ -142,10 +148,13 @@
                         <td>
                             {{ data.date }}
                         </td>
-                        <td>
-                            <!-- <span *ngFor="let creator of data.creators"> -->
-                            {{ data.getCreators() }}
-                            <!-- </span> -->
+                        <td title="{{data.getCreators()}}">
+                            <span *ngIf="data.getCreators().length < 17">
+                                {{ data.getCreators() }}
+                            </span>
+                            <span *ngIf="data.getCreators().length >= 17">
+                                {{ data.getCreators() | slice:0:17}}...
+                            </span>
                         </td>
                     </tr>
                 </tbody>
@@ -160,8 +169,22 @@
     <div class="col-md-12">
         <hr />
         <button class="btn btn-primary float-end me-5" *ngIf="selectedParentBiblio !== null && 
-                      selectedChildBiblio.length > 0">
+                      selectedChildBiblio.length > 0"
+                      (click)="addParentChildRel()">
             Apply
         </button>
+    </div>
+</div>
+
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <div id="divError" style="width: auto;" class="toast align-items-center text-white border-0 mt-3" role="alert"
+        aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                {{ errorMessage }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
+        </div>
     </div>
 </div>

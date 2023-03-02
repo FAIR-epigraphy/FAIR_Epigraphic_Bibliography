@@ -3,6 +3,7 @@ import { Creator } from '../../_models/creator.model';
 import { ZoteroItem } from '../../_models/zotero-item.model';
 import { BiblApiService } from '../../_service/bibl-api.service'
 import { AuthService } from '../../_service/auth.service'
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 //const { default: api } = require('zotero-api-client');
 
@@ -14,23 +15,37 @@ import { AuthService } from '../../_service/auth.service'
 export class BiblioItemMoreInfoComponent {
   //myapi = api('4Rti1M1IB3Cw2993pop81f5v').library('group', 4858485);
 
-  constructor(
-    private apiService: BiblApiService,
-    private authService: AuthService
-  ) { }
-
   zoteroObject: any = null;
   user: any = null;
   hasPermission = false;
   isOpenTextbox = false;
+  formVIAF: FormGroup;
+  formLink: FormGroup
+
+  constructor(
+    private apiService: BiblApiService,
+    private authService: AuthService
+  ) {
+    this.formVIAF = new FormGroup({
+      VIAF: new FormControl('', [
+        Validators.required,
+        Validators.pattern("^[1-9]{1,22}$")
+      ]),
+    });
+
+    this.formLink = new FormGroup({
+      link: new FormControl('', [
+        Validators.required,
+        Validators.pattern('(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?')
+      ]),
+    });
+  }
+
+  resetForm(form: FormGroup) {
+    form.reset();
+  }
 
   getSpecificData(obj: ZoteroItem) {
-    //console.log(obj)
-    // if (localStorage.getItem(`ZoteroItem_${obj.key}`) !== undefined && localStorage.getItem(`ZoteroItem_${obj.key}`) !== null) {
-    //   let item = JSON.parse(localStorage.getItem(`ZoteroItem_${obj.key}`) || '{}') as ZoteroItem;
-    //   obj = item;
-    // }
-
     this.user = JSON.parse(this.authService.getToken() || '{}');
     if (this.user.role_name === 'Admin' || this.user.role_name === 'Editor') this.hasPermission = true;
 
@@ -50,8 +65,23 @@ export class BiblioItemMoreInfoComponent {
         }
       }
       this.zoteroObject = obj;
+
+      this.apiService.getVIAFByCreator(this.zoteroObject.creators).subscribe(respList => {
+        for (let resp of respList) {
+          if (resp.length > 0) {
+            let index = this.zoteroObject.creators.findIndex((x: Creator) => x.firstName === resp[0].first_name &&
+              x.lastName === resp[0].last_name
+            );
+            if (index > -1)
+              this.zoteroObject.creators[index].VIAF = resp[0].VIAF;
+          }
+        }
+      });
+
+      this.getRelations(this.zoteroObject);
       //console.log(resp)
     })
+
 
   }
 
@@ -85,7 +115,18 @@ export class BiblioItemMoreInfoComponent {
   }
 
   getRelations(obj: ZoteroItem) {
-    return Object.entries(obj.relations).filter(([key]) => !key.includes('added'))
+    //return Object.entries(obj.relations).filter(([key]) => !key.includes('added'))
+    this.apiService.getAllBiblioItemLinks(obj.callNumber).subscribe(resp => {
+      let rels = this.zoteroObject.url.split(',')
+      if (resp.length > 0) {
+        for (let r of resp) {
+          if (rels.findIndex((x: any) => x === r.link) === -1)
+          {
+            this.zoteroObject.url += ',' + r.link;
+          }
+        }
+      }
+    });
   }
 
   getRelationURIs() {
@@ -108,31 +149,34 @@ export class BiblioItemMoreInfoComponent {
     }
   }
 
-  addRelations(obj: any, event: any) {
-    let target = event.currentTarget || event.target;
-
-    //obj.relations['owl:sameAs'] = 'http://zotero.org/groups/1/items/JKLM6543'; // with this object, it is running
-    obj.url += obj.url !== '' ? ',' + target.children[0].value : target.children[0].value;
-
-    if (obj.url !== '') {
-      // (async () => {
-      //   delete obj.relations.added;
-      //   delete obj.relations['owl:sameAs'];
-      //   //const itemsResponse = await this.myapi.items(obj.key).put(obj, {});
-      //   //obj.relations.added = true;
-      // })();
-      delete obj.relations.added;
-      localStorage.setItem(`ZoteroItem_${this.zoteroObject.key}`, JSON.stringify(this.zoteroObject))
+  addRelations(obj: any) {
+    if (this.formLink.valid) {
+      this.apiService.addBiblioItemLink(obj.callNumber, this.formLink.value.link).subscribe(resp => {
+        delete obj.relations.added;
+        this.resetForm(this.formLink);
+        this.getRelations(this.zoteroObject);
+      })
     }
-
-    return false;
+    //return false;
   }
 
-  addVIAF(obj: Creator, event: any) {
-    let c = this.zoteroObject.creators.filter((x: any) => x.firstName === obj.firstName && x.lastName === obj.lastName && x.creatorType === obj.creatorType);
-    let target = event.currentTarget || event.target;
-    c[0].VIAF = target.children[0].value;
-    localStorage.setItem(`ZoteroItem_${this.zoteroObject.key}`, JSON.stringify(this.zoteroObject))
+  addVIAF(obj: Creator, formData: any, event: any) {
+    if (this.formVIAF.valid) {
+      let c = this.zoteroObject.creators.filter((x: any) => x.firstName === obj.firstName && x.lastName === obj.lastName && x.creatorType === obj.creatorType);
+      let target = event.currentTarget || event.target;
+      let objCreator: any = null;
+      objCreator = c[0];
+      objCreator.VIAF = formData.VIAF;
+      objCreator['callNumber'] = this.zoteroObject.callNumber;
+
+      this.apiService.addCreatorVIAF(objCreator).subscribe(resp => {
+        if (resp !== null) {
+          c[0].VIAF = target.children[0].value;
+          this.resetForm(this.formVIAF);
+          //alert('added.')
+        }
+      })
+    }
   }
 
   getAbbr(item: any) {
@@ -158,5 +202,9 @@ export class BiblioItemMoreInfoComponent {
       creators.push(new Creator(c));
     }
     return creators;
+  }
+
+  trackByIdFn(item: any): number {
+    return item.firstName;
   }
 }

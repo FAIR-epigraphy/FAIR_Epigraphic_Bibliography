@@ -23,6 +23,7 @@ export class HomeComponent implements OnInit {
   parentComp: any = null;
   callNumber: string = '';
   canActive: boolean = false;
+  @Input() searchText: string = '';
 
   constructor(
     //private modalService: NgbModal,

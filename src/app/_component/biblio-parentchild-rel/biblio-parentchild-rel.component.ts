@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Creator } from '../../_models/creator.model';
+import { AuthService } from 'src/app/_service/auth.service';
+import { BiblApiService } from 'src/app/_service/bibl-api.service';
 import { ZoteroItem } from '../../_models/zotero-item.model';
+const { default: api } = require('zotero-api-client');
 
 @Component({
   selector: 'app-biblio-parentchild-rel',
@@ -9,6 +11,7 @@ import { ZoteroItem } from '../../_models/zotero-item.model';
 })
 export class BiblioParentchildRelComponent implements OnInit {
 
+  myapi = api('4Rti1M1IB3Cw2993pop81f5v').library('group', 4858485);
   @Input() biblioData: Array<ZoteroItem> = new Array();
   biblioDataParent: Array<ZoteroItem> = new Array();
   biblioDataChild: Array<ZoteroItem> = new Array();
@@ -27,13 +30,47 @@ export class BiblioParentchildRelComponent implements OnInit {
   selectedChildBiblio: Array<any> = [];
   selectedChildBiblioObj: any = null
 
+  categories: any = [];
+  errorMessage = '';
+  lastestCallNumber = '';
+  added_by = 0;
+
+  constructor(
+    private apiService: BiblApiService,
+    private authService: AuthService,
+  ) {
+
+  }
+
   ngOnInit(): void {
     if (this.biblioData.length > 0) {
       this.biblioDataParent = this.biblioData.map(a => Object.assign(new ZoteroItem(a), a));
       this.biblioDataChild = this.biblioData.map(a => Object.assign(new ZoteroItem(a), a));
 
       //this.biblioDataParent[0].abstractNote = 'dfgdfgd'
+      this.getAllCategories();
+      this.getLatestCallNumber();
+
+      this.added_by = JSON.parse(this.authService.getToken() || '{}').id;
+      
     }
+  }
+
+  getAllCategories() {
+    this.apiService.getAllCategories().subscribe(resp => {
+      if (resp !== null) {
+        if (resp.length > 0) {
+          this.categories = resp;
+          //this.categories.unshift({ id: 0, cat_name: 'Select category' });
+        }
+        else {
+          this.categories = [];
+        }
+      }
+      else {
+        this.categories = [];
+      }
+    })
   }
   /////////////////////////////////////////////////////
   //////////// Parent Section Logic
@@ -90,25 +127,88 @@ export class BiblioParentchildRelComponent implements OnInit {
   }
 
   selectChildFromList(selBib: ZoteroItem, event: Event) {
-    Array.from((event.target as HTMLElement).parentElement?.children as HTMLCollection).forEach((e, i)=>{
-      if(e.nodeName.toLocaleLowerCase() === 'button')
-      {
+    Array.from((event.target as HTMLElement).parentElement?.children as HTMLCollection).forEach((e, i) => {
+      if (e.nodeName.toLocaleLowerCase() === 'button') {
         e.classList.remove('active')
       }
-  });
+    });
     (event.target as HTMLElement).classList.add('active')
     this.selectedChildBiblioObj = selBib
     this.btnChildRemove = true;
   }
 
   removeFromChildList() {
-    if(this.selectedChildBiblioObj !== null)
-    {
+    if (this.selectedChildBiblioObj !== null) {
       this.biblioDataChild.push(this.selectedChildBiblioObj)
-      let index = this.selectedChildBiblio.findIndex(x=>x.key === this.selectedChildBiblioObj.key)
+      let index = this.selectedChildBiblio.findIndex(x => x.key === this.selectedChildBiblioObj.key)
       this.selectedChildBiblio.splice(index, 1);
       this.selectedChildBiblioObj = null;
       this.btnChildRemove = false;
     }
+  }
+  ///////////////////////////////////////////////////////////
+  addParentChildRel() {
+    if (this.selectedChildBiblio.filter(x => x.sel_cat === undefined).length > 0) {
+      this.showToast('Please select category for all children', 'bg-danger');
+      return;
+    }
+
+    //set parent call number if it is not assigned
+    if (this.selectedParentBiblio.callNumber === '') {
+      let replaced = parseInt(this.lastestCallNumber.replace(/\D/g, ''));
+      replaced++;
+      this.lastestCallNumber = 'epig' + replaced;
+      this.selectedParentBiblio.callNumber = this.lastestCallNumber;
+    }
+
+    //set child call number if it is not assigned
+    for (let sel of this.selectedChildBiblio) {
+      if (sel.callNumber === '') {
+        let replaced = parseInt(this.lastestCallNumber.replace(/\D/g, ''));
+        replaced++;
+        this.lastestCallNumber = 'epig' + replaced;
+        sel.callNumber = this.lastestCallNumber;
+      }
+    }
+
+    this.apiService.addBiblioParentChildItem(this.selectedParentBiblio, this.selectedChildBiblio, this.added_by)
+      .subscribe(respList => { 
+        console.log(respList);
+      })
+    //console.log(this.selectedChildBiblio);
+  }
+
+  async getLatestCallNumber() {
+    // let filtered = this.biblioData.filter(x => x.callNumber !== '');
+    // let maxCallNumber = filtered.sort(function (a, b) {
+    //   try {
+    //     const nameA = a.callNumber.toUpperCase(); // ignore upper and lowercase
+    //     const nameB = b.callNumber.toUpperCase(); // ignore upper and lowercase
+    //     if (nameA > nameB) {
+    //       return -1;
+    //     }
+    //     if (nameA < nameB) {
+    //       return 1;
+    //     }
+    //   } catch (error) {
+    //     console.log(a, b)
+    //   }
+    //   // names must be equal
+    //   return 0;
+    // });
+
+    // this.lastestCallNumber = maxCallNumber[0].callNumber;
+    let itemsResponse = await this.myapi.items().get({ limit: 50, sort:'callNumber', direction:'desc', itemKey:'callNumber' });
+    console.log(itemsResponse.getData());
+  }
+
+  showToast(msg: any, color: any) {
+    document.getElementById('divError')?.classList.add('show')
+    document.getElementById('divError')?.classList.add(color)
+    this.errorMessage = msg;
+    setTimeout(() => {
+      document.getElementById('divError')?.classList.remove('show')
+      document.getElementById('divError')?.classList.remove(color)
+    }, 5000);
   }
 }

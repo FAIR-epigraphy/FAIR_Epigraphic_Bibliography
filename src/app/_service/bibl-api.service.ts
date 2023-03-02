@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, from } from 'rxjs';
+import { Observable, from, forkJoin } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -56,4 +56,44 @@ export class BiblApiService {
   deleteCategory(catId: any): Observable<any> {
     return this.http.post<any>(`${this.base_url}/categories/category.php`, { catId: catId, method: 'deleteCategory' });
   }
+
+  addCreatorVIAF(creator: any): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/creators/creator.php`, { creator: creator, method: 'addCreatorVIAF' });
+  }
+
+  getVIAFByCreator(creators: any): Observable<any> {
+    let requests = [];
+    for (let c of creators) {
+      requests.push(this.http.post<any>(`${this.base_url}/creators/creator.php`, { creator: c, method: 'getVIAFByCreator' }));
+    }
+    return forkJoin(requests);
+  }
+
+  getAllBiblioItemLinks(callNumber: any): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, method: 'getAllBiblioItemLinks' });
+  }
+
+  addBiblioItemLink(callNumber: any, link: any): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, link: link, method: 'addBiblioItemLink' });
+  }
+
+  addBiblioParentChildItem(bibParent: any, bibChild: any, added_by: any) {
+    let requests = [];
+    for (let sel of bibChild) {
+      requests.push(this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`,
+        {
+          parent_callNumber: bibParent.callNumber,
+          child_callNumber: sel.callNumber,
+          cat_id: sel.sel_cat,
+          added_by: added_by,
+          parent_zotero_item_key: bibParent.key,
+          child_zotero_item_key: sel.key,
+          method: 'addBiblioParentChildItem'
+        }
+      ));
+    }
+
+    return forkJoin(requests);
+  }
 }
+

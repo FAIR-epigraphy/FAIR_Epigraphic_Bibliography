@@ -67,7 +67,7 @@ export class ZoteroItem {
             this.issn = d.issn;
             this.archive = d.archive;
             this.archiveLocation = d.archiveLocation;
-            this.callNumber = d.callNumber;
+            this.callNumber = d.callNumber === undefined ? '' : d.callNumber;
             this.pages = d.pages;
             this.libraryCatalog = d.libraryCatalog;
             this.publicationTitle = d.publicationTitle;

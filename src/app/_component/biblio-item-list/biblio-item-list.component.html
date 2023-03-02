@@ -1,6 +1,6 @@
 <div class="border-bottom">
   <i class="bi bi-diagram-3" style="font-size: 24px;cursor: pointer;" *ngIf="canActive" id="btnOpenModal" type="button"
-    data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+    data-bs-toggle="modal" data-bs-target="#staticBackdrop" (click)="reInit()">
   </i>
   <i class="bi bi-upload ms-3" title="Export" style="font-size: 20px;cursor: pointer;"></i>
   <i class="bi bi-blockquote-left ms-2" title="Create Citation" style="font-size: 24px;cursor: pointer;"></i>
@@ -15,7 +15,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <app-biblio-parentchild-rel [biblioData]="biblioData"></app-biblio-parentchild-rel>
+          <app-biblio-parentchild-rel *ngIf="isShown" [biblioData]="biblioData"></app-biblio-parentchild-rel>
         </div>
       </div>
     </div>
@@ -55,7 +55,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let data of biblioData" style="cursor: pointer;" (click)="getSpecificData(data)"
+      <tr *ngFor="let data of biblioData | customFilter: mainSearchBar" style="cursor: pointer;" (click)="getSpecificData(data)"
         [class.highlighted]="currentSelectedRecord !== null && data.title === currentSelectedRecord.title && data.date === currentSelectedRecord.date">
         <td title="{{data.title}}">
           <p *ngIf="data.title.length < 50">

@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Creator } from '../../_models/creator.model';
 import { ZoteroItem } from '../../_models/zotero-item.model';
 //const { default: api } = require('zotero-api-client');
@@ -20,8 +20,22 @@ export class BiblioItemListComponent {
   totalRecord = 0;
   @Input() biblioItemInfoComp: any;
   @Input() canActive: boolean = false;
+  @Input() searchText: string = '';
+  @Input() mainSearchBar: string = '';
+  isShown = false;
   
   public currentSelectedRecord: any = null;
+
+  constructor(
+  ){
+  }
+
+  reInit() {
+    this.isShown = false;
+    setTimeout(() => {
+      this.isShown = true;
+    });
+  }
 
   getSpecificData(obj: ZoteroItem) {
     console.log(obj)

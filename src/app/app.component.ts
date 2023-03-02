@@ -11,6 +11,7 @@ export class AppComponent implements OnInit {
   title = 'fair-biblio';
   loginUser = null;
   keysPressed: any = {};
+  public mainSearchBar: string = '';
 
   constructor(
     private authService: AuthService

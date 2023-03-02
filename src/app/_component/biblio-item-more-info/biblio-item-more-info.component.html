@@ -23,10 +23,12 @@
       <table class="table table-hover mt-2">
         <tbody>
           <tr *ngFor="let item of zoteroObject | keyvalue">
-            <td *ngIf="item.key !== 'creators' && item.key !=='tags' && item.key !=='relations' && item.key !=='url' && itemHasValue(item.value)">
+            <td
+              *ngIf="item.key !== 'creators' && item.key !=='tags' && item.key !=='relations' && item.key !=='url' && itemHasValue(item.value)">
               {{ getColumnName(item.key) }}
             </td>
-            <td *ngIf="item.key !== 'creators' && item.key !=='tags' && item.key !=='relations' && item.key !=='url' && itemHasValue(item.value)">
+            <td
+              *ngIf="item.key !== 'creators' && item.key !=='tags' && item.key !=='relations' && item.key !=='url' && itemHasValue(item.value)">
               <span *ngIf="item.key !== 'shortTitle'">{{item.value}}</span>
               <!-- <span *ngIf="item.key === 'shortTitle'">
                 {{ getFirstAbbr(item.value) }}
@@ -37,24 +39,27 @@
                 <li *ngFor="let obj of getAbbr(item)"
                   [ngStyle]="{'list-style-type': obj.abbr === '' ? 'none' : '\' - \''}">
                   <span *ngIf="obj.abbr !== ''">{{ obj.abbr }} ({{obj.source }})</span>
-                  <form *ngIf="obj.abbr === '' && hasPermission" (submit)="addAbbreviation(item, $event)">
+                  <!-- <form *ngIf="obj.abbr === '' && hasPermission" (submit)="addAbbreviation(item, $event)">
                     <input type="text" required placeholder="Enter Abbreviation" autofocus />
-                  </form>
+                  </form> -->
                 </li>
               </ul>
             </td>
 
             <!-- with creators -->
             <td colspan="2" *ngIf="item.key === 'creators' && getCreators(item.value).length > 0">
-              <div class="row w-100" *ngFor="let c of getCreators(item.value);">
+              <div class="row w-100" *ngFor="let c of getCreators(item.value); let i = index; trackBy: trackByIdFn">
                 <div class="col-md-2 offset-md-2">{{c.creatorType}}</div>
                 <div class="col-md-6 text-start text-dark">
                   {{c.getFullName(c)}}
-                  <span *ngIf="c.VIAF !==undefined && c.VIAF !== ''"> | {{ c.VIAF }}</span>
-                  <i *ngIf="c.VIAF === undefined && hasPermission" class="bi bi-plus-circle" title="Add VIAF" style="cursor: pointer;"
-                    (click)="showTextbox(c)"></i>
-                  <form *ngIf="c.VIAF === ''" (submit)="addVIAF(c, $event)">
-                    <input type="text" required placeholder="Enter VIAF" autofocus />
+                  <a href="https://viaf.org/viaf/{{c.VIAF}}" target="_blank"
+                    *ngIf="c.VIAF !==undefined && c.VIAF !== ''"> | {{ c.VIAF }}</a>
+                  <i *ngIf="c.VIAF === undefined && hasPermission" class="bi bi-plus-circle" title="Add VIAF"
+                    style="cursor: pointer;" (click)="showTextbox(c)"></i>
+                  <form [formGroup]="formVIAF" *ngIf="c.VIAF === ''" (ngSubmit)="addVIAF(c, formVIAF.value, $event)">
+                    <input type="text" placeholder="Enter VIAF" autofocus required formControlName="VIAF"
+                      class="form-control" style="width: 120%;"
+                      [class.is-invalid]="formVIAF.controls['VIAF'].invalid && formVIAF.controls['VIAF'].touched" />
                   </form>
                 </div>
               </div>
@@ -85,11 +90,17 @@
   <div class="tab-pane fade" id="relations" role="tabpanel" aria-labelledby="contact-tab">
     <div class="mt-2" *ngIf="zoteroObject !== null">
       {{getRelationURIs().length}} relations
-      <button class="btn btn-primary" (click)="showTextbox(zoteroObject)">Add</button>
+      <button class="btn btn-primary" *ngIf="hasPermission" (click)="showTextbox(zoteroObject)">Add</button>
 
-      <form (submit)="addRelations(zoteroObject, $event)">
-        <input type="url" class="form-control mt-3" *ngIf="zoteroObject.relations.added === false"
+      <form [formGroup]="formLink" (submit)="addRelations(zoteroObject)">
+        <input type="url" class="form-control mt-3" formControlName="link"
+          *ngIf="zoteroObject.relations.added === false"
+          [class.is-invalid]="formLink.controls['link'].invalid && formLink.controls['link'].touched"
           placeholder="Enter URI" autofocus required />
+        <div *ngIf="formLink.controls['link'].invalid && formLink.controls['link'].touched"
+          [class.invalid-feedback]="formLink.controls['link'].invalid && formLink.controls['link'].touched">
+          Please provide a valid URI.
+        </div>
       </form>
     </div>
 
