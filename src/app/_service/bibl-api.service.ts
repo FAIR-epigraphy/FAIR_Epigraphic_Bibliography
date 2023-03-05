@@ -76,6 +76,10 @@ export class BiblApiService {
   addBiblioItemLink(callNumber: any, link: any): Observable<any> {
     return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, link: link, method: 'addBiblioItemLink' });
   }
+  
+  getAllBiblioParentChildItems(): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { method: 'getAllBiblioParentChildItems' });
+  }
 
   addBiblioParentChildItem(bibParent: any, bibChild: any, added_by: any) {
     let requests = [];

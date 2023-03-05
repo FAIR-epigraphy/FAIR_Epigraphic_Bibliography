@@ -34,7 +34,21 @@ export class ZoteroItem {
     public series: string = '';
     public seriesText: string = '';
     public seriesTitle: string = '';
+    public publisher: string = '';
+    public publisher_place: string = '';
+    public volume: string = '';
+    public numberOfVolumes: string = '';
+    public edition: string = '';
+    public event_place: string = '';
+    public seriesNumber: string = '';
+    public numPages: string = '';
+    public ISBN: string = '';
+
     public static notes: any = [];
+    public children: Array<ZoteroItem> = new Array();
+    public showChild: boolean = false;
+    public category: string = '';
+    public creatorsName: string = '';
 
     constructor(d: any) {
         if (d.itemType === 'note') {
@@ -48,6 +62,7 @@ export class ZoteroItem {
             for (let creator of d.creators) {
                 this.creators.push(new Creator(creator));
             }
+            this.creatorsName = this.creators.map(x => ({ name: x.fullName }).name).join(', ');
             this.abstractNote = d.abstractNote;
             this.websiteTitle = d.websiteTitle;
             this.date = d.date;
@@ -74,11 +89,28 @@ export class ZoteroItem {
             this.series = d.series;
             this.seriesText = d.seriesText;
             this.seriesTitle = d.seriesTitle;
+
+            this.publisher = d.publisher;
+            this.event_place = d.place;
+            this.volume = d.volume;
+            this.numberOfVolumes = d.numberOfVolumes;
+            this.seriesNumber = d.seriesNumber;
+            this.numPages = d.numPages;
+            this.ISBN = d.ISBN;
         }
     }
 
     getCreators() {
-        return this.creators.map(x => ({ name: x.firstName + " " + x.lastName }).name).join(', ');
+        //return this.creators.map(x => ({ name: x.fullName }).name).join(', ');
+        if(this.creators.length > 1)
+        {
+            return this.creators[0].lastName + ' et al.'
+        }
+        else if(this.creators.length === 1)
+        {
+            return this.creators[0].lastName;
+        }
+        return '';
     }
 
 

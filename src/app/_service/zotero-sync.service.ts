@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+const { default: api } = require('zotero-api-client');
 
 @Injectable({
   providedIn: 'root'
 })
 export class ZoteroSyncService {
-  //myapi = api('4Rti1M1IB3Cw2993pop81f5v').library('group', 4858485);
   api_key = '4Rti1M1IB3Cw2993pop81f5v'
+  zoteroAPI = api(this.api_key).library('group', 4858485);
   storeName = 'allBiblioData';
   headers = { 'Zotero-API-Version': '3', Authorization: '' };
   libraries: any = {};
@@ -76,7 +77,7 @@ export class ZoteroSyncService {
       await this.login();
       let prefix = this.libraries[Object.keys(this.libraries)[0]].prefix;
       await this.update(prefix, includeTrashed);
-      return {items: this.items, libraryName: this.name, version: this.version };
+      return { items: this.items, libraryName: this.name, version: this.version };
     }
     catch (err) {
       console.log(err);
@@ -136,4 +137,22 @@ export class ZoteroSyncService {
     await this.save(remote.type === 'group' ? remote.name : undefined, remote.version);
   }
 
+  async export(format: any, key: any, ext: any) {
+    let d = await this.zoteroAPI.items(key).get({ format: format });
+    this.download(`export.${ext}`, await d.getData().text())
+  }
+
+  download(filename: any, text: any) {
+    //var element = document.createElement('a');
+    //element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    const contentType = 'data:text/plain;charset=utf-8,';//'text/csv;charset=utf-8;';
+    const a = document.createElement('a');
+    const file = new Blob([text], { type: contentType });
+
+    a.href = URL.createObjectURL(file);
+    a.download = filename;
+    a.click();
+
+    URL.revokeObjectURL(a.href);
+  }
 }

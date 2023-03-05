@@ -1,11 +1,13 @@
-@keyframes placeHolderShimmer{
-    0%{
+@keyframes placeHolderShimmer {
+    0% {
         background-position: -468px 0
     }
-    100%{
+
+    100% {
         background-position: 468px 0
     }
 }
+
 .loading {
     animation-duration: 1s;
     animation-fill-mode: forwards;
@@ -20,24 +22,35 @@
     border-radius: 1em;
 }
 
-span{
+span {
     height: 10px;
     display: block;
 }
 
-.table-responsive{
+.table-responsive {
     height: 80vh !important;
     width: 101% !important;
 }
 
-.table-responsive td p{
+.table-responsive td p {
     height: 1px;
 }
 
-.highlighted{
+.highlighted {
     background-color: #0d6efd;
     color: white;
-    td{
+
+    td {
         color: white !important;
     }
+}
+
+.dropdown.dropdown-toggle::after {
+    display: none;
+}
+
+.disabled {
+    color: #adb5bd;
+    pointer-events: none;
+    background-color: transparent;
 }
