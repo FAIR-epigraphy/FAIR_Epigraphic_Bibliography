@@ -32,14 +32,14 @@ export class BiblioParentchildRelComponent implements OnInit {
 
   categories: any = [];
   errorMessage = '';
-  lastestCallNumber = '';
+  @Input() lastestCallNumber = '';
   added_by = 0;
+  isSaving = false;
 
   constructor(
     private apiService: BiblApiService,
     private authService: AuthService,
   ) {
-
   }
 
   ngOnInit(): void {
@@ -49,10 +49,10 @@ export class BiblioParentchildRelComponent implements OnInit {
 
       //this.biblioDataParent[0].abstractNote = 'dfgdfgd'
       this.getAllCategories();
-      this.getLatestCallNumber();
-
+      //this.getLatestCallNumber();
+      console.log(this.lastestCallNumber);
       this.added_by = JSON.parse(this.authService.getToken() || '{}').id;
-      
+
     }
   }
 
@@ -83,11 +83,14 @@ export class BiblioParentchildRelComponent implements OnInit {
 
   addToParentList() {
     this.selectedParentBiblio = this.currentSelectedRecord;
+    let index = this.biblioDataChild.findIndex(x => x.key === this.selectedParentBiblio.key)
+    this.biblioDataChild.splice(index, 1);
     this.btnParentAdd = false;
     this.btnParentRemove = true;
   }
 
   removeFromParentList() {
+    this.biblioDataChild.push(this.selectedParentBiblio)
     this.selectedParentBiblio = null;
     this.btnParentRemove = false;
     this.currentSelectedRecord = null;
@@ -147,7 +150,8 @@ export class BiblioParentchildRelComponent implements OnInit {
     }
   }
   ///////////////////////////////////////////////////////////
-  addParentChildRel() {
+  async addParentChildRel() {
+    this.isSaving = true;
     if (this.selectedChildBiblio.filter(x => x.sel_cat === undefined).length > 0) {
       this.showToast('Please select category for all children', 'bg-danger');
       return;
@@ -159,6 +163,11 @@ export class BiblioParentchildRelComponent implements OnInit {
       replaced++;
       this.lastestCallNumber = 'epig' + replaced;
       this.selectedParentBiblio.callNumber = this.lastestCallNumber;
+      let resp = await this.myapi.items(this.selectedParentBiblio.key).patch(
+        {
+          callNumber: this.selectedParentBiblio.callNumber,
+          version: this.selectedParentBiblio.version
+        });
     }
 
     //set child call number if it is not assigned
@@ -168,38 +177,16 @@ export class BiblioParentchildRelComponent implements OnInit {
         replaced++;
         this.lastestCallNumber = 'epig' + replaced;
         sel.callNumber = this.lastestCallNumber;
+        let resp = await this.myapi.items(sel.key).patch({ callNumber: sel.callNumber, version: sel.version });
       }
     }
 
     this.apiService.addBiblioParentChildItem(this.selectedParentBiblio, this.selectedChildBiblio, this.added_by)
-      .subscribe(respList => { 
+      .subscribe(respList => {
         console.log(respList);
+        this.isSaving = false;
+        this.showToast('Record updated', 'bg-success');
       })
-    //console.log(this.selectedChildBiblio);
-  }
-
-  async getLatestCallNumber() {
-    // let filtered = this.biblioData.filter(x => x.callNumber !== '');
-    // let maxCallNumber = filtered.sort(function (a, b) {
-    //   try {
-    //     const nameA = a.callNumber.toUpperCase(); // ignore upper and lowercase
-    //     const nameB = b.callNumber.toUpperCase(); // ignore upper and lowercase
-    //     if (nameA > nameB) {
-    //       return -1;
-    //     }
-    //     if (nameA < nameB) {
-    //       return 1;
-    //     }
-    //   } catch (error) {
-    //     console.log(a, b)
-    //   }
-    //   // names must be equal
-    //   return 0;
-    // });
-
-    // this.lastestCallNumber = maxCallNumber[0].callNumber;
-    let itemsResponse = await this.myapi.items().get({ limit: 50, sort:'callNumber', direction:'desc', itemKey:'callNumber' });
-    console.log(itemsResponse.getData());
   }
 
   showToast(msg: any, color: any) {

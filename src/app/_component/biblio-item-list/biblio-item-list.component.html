@@ -12,16 +12,16 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="staticBackdropLabel">Epigraphic Bibliography Parent-Child Relation</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal()"></button>
         </div>
         <div class="modal-body">
-          <app-biblio-parentchild-rel *ngIf="isShown" [biblioData]="biblioData"></app-biblio-parentchild-rel>
+          <app-biblio-parentchild-rel *ngIf="isShown" [biblioData]="biblioData" [lastestCallNumber]="lastCallNumber"></app-biblio-parentchild-rel>
         </div>
       </div>
     </div>
   </div>
 </div>
-<div class="table-responsive" (scroll)="onScroll($event)">
+<div class="table-responsive">
   <table class="table" *ngIf="loading">
     <thead class="bg-light text-dark">
       <tr>
@@ -49,19 +49,22 @@
     <thead class="sticky-top bg-light text-dark">
       <tr>
         <!-- <th scope="col">#</th> -->
-        <th scope="col" style="width: 50%;">Title</th>
-        <th scope="col">Date</th>
-        <th scope="col">Creator</th>
+        <th scope="col" style="width: 50%;" (click)="sortByCol('title', $event)">Title <i class="bi bi-chevron-up  float-end"></i></th>
+        <th scope="col" (click)="sortByCol('date', $event)">Date <i class="float-end"></i></th>
+        <th scope="col" (click)="sortByCol('creator', $event)">Creator <i class="float-end"></i></th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let data of biblioData | customFilter: mainSearchBar" style="cursor: pointer;" (click)="getSpecificData(data)"
+      <tr *ngFor="let data of biblioData | customFilter: mainSearchBar" style="cursor: pointer;"
+        (click)="getSpecificData(data)"
         [class.highlighted]="currentSelectedRecord !== null && data.title === currentSelectedRecord.title && data.date === currentSelectedRecord.date">
         <td title="{{data.title}}">
           <p *ngIf="data.title.length < 50">
+            <i [class]="getItemTypeIcon(data.itemType)"></i>
             {{data.title}}
           </p>
           <p *ngIf="data.title.length >= 50">
+            <i [class]="getItemTypeIcon(data.itemType)"></i>
             {{data.title | slice:0:50}}...
           </p>
         </td>
