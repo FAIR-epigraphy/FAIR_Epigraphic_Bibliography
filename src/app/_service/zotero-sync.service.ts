@@ -81,8 +81,13 @@ export class ZoteroSyncService {
     }
     catch (err) {
       console.log(err);
-      return null;
+      return 'Error: ' + err;
     }
+  }
+
+  getPreviousVersion()
+  {
+    return JSON.parse(localStorage.getItem(this.storeName) || '{}');
   }
 
   async get(prefix: any, uri: any) {
@@ -154,5 +159,11 @@ export class ZoteroSyncService {
     a.click();
 
     URL.revokeObjectURL(a.href);
+  }
+
+  takeBackup(){
+    let data = localStorage.getItem(this.storeName);
+    let fileName = `Backup_${new Date().toJSON().slice(0,19).replaceAll(':','_').replace('T', '-')}.json`;
+    this.download(fileName, data);
   }
 }

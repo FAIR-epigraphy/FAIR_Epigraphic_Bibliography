@@ -3,11 +3,11 @@
     data-bs-toggle="modal" data-bs-target="#staticBackdrop" (click)="reInit()">
   </i>
   <i class="bi bi-upload ms-3 dropdown dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
-    aria-expanded="false" title="Export" style="font-size: 20px;cursor: pointer;" 
+    aria-expanded="false" title="Export" style="font-size: 20px;cursor: pointer;"
     [class]="currentSelectedRecord === null ? 'disabled' : ''">
     <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="z-index: 2000">
       <li (click)="export('biblatex', 'bib')"><a class="dropdown-item">BibLaTeX</a></li>
-      <li (click)="export('rdf_bibliontology', 'rdf')" ><a class="dropdown-item">Bibliographic Ontology RDF</a></li>
+      <li (click)="export('rdf_bibliontology', 'rdf')"><a class="dropdown-item">Bibliographic Ontology RDF</a></li>
       <li (click)="export('bibtex', 'bib')"><a class="dropdown-item">BibTeX</a></li>
       <li (click)="export('coins', 'html')"><a class="dropdown-item">COinS</a></li>
       <li (click)="export('csljson', 'json')"><a class="dropdown-item">CSL-JSON</a></li>
@@ -25,7 +25,7 @@
     </ul>
   </i>
   <i class="bi bi-blockquote-left ms-2" title="Create Citation" style="font-size: 24px;cursor: pointer;"
-  [class]="currentSelectedRecord === null ? 'disabled' : ''"></i>
+    [class]="currentSelectedRecord === null ? 'disabled' : ''"></i>
   <!-- <i class="bi bi-diagram-3" style="font-size: 24px;cursor: pointer;"></i> -->
 
   <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -79,9 +79,10 @@
         <th scope="col" (click)="sortByCol('creators', $event)">Creator <i class="float-end"></i></th>
       </tr>
     </thead>
-    <tbody *ngFor="let data of biblioData | customFilter: mainSearchBar">
-      <tr style="cursor: pointer;" (click)="getSpecificData(data)"
-        [class.highlighted]="currentSelectedRecord !== null && data.title === currentSelectedRecord.title && data.date === currentSelectedRecord.date">
+    <tbody *ngFor="let data of biblioData | customFilter: mainSearchBar; let isEven = even; let isOdd = odd">
+      <tr style="cursor: pointer;" (click)="getSpecificData(data)" [class.highlighted]="currentSelectedRecord !== null && 
+        data.title === currentSelectedRecord.title && 
+        data.date === currentSelectedRecord.date" [class]="isEven ? 'bg-white' : 'bg-light'">
         <td style="color: green;">
           <i class="bi bi-plus-circle-fill" *ngIf="data.children.length > 0 && !data.showChild"
             (click)="expandChild(data, true)"></i>
@@ -141,21 +142,6 @@
             {{ child.getCreators() | slice:0:30 }}...
           </span>
           <!-- </span> -->
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <table class="table" *ngIf="loadingEnd">
-    <tbody>
-      <tr *ngFor="let number of [0,1,2]">
-        <td>
-          <span class="loading"></span>
-        </td>
-        <td>
-          <span class="loading"></span>
-        </td>
-        <td>
-          <span class="loading"></span>
         </td>
       </tr>
     </tbody>

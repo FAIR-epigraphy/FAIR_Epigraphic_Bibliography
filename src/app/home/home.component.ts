@@ -25,6 +25,7 @@ export class HomeComponent implements OnInit {
   canActive: boolean = false;
   lastCallNumber = '';
   @Input() searchText: string = '';
+  errorMessage = '';
 
   title = 'fair-biblio';
   loginUser = null;
@@ -67,6 +68,11 @@ export class HomeComponent implements OnInit {
   async getAllBiblioData() {
     this.data = await this.syncService.sync();
     if (this.data !== null) {
+      if(typeof this.data === 'string')
+      {
+        this.showToast(this.data, 'bg-danger');
+        this.data = this.syncService.getPreviousVersion()
+      }
       this.convertJSONToArray(this.data.items);
       this.libraryName = this.data.libraryName;
       this.getLastCallNumber();
@@ -108,5 +114,19 @@ export class HomeComponent implements OnInit {
   }
   closeModal() {
     this.router.navigate([''])
+  }
+
+  takeBackup(){
+    this.syncService.takeBackup();
+  }
+
+  showToast(msg: any, color: any) {
+    document.getElementById('divError')?.classList.add('show')
+    document.getElementById('divError')?.classList.add(color)
+    this.errorMessage = msg;
+    setTimeout(() => {
+      document.getElementById('divError')?.classList.remove('show')
+      document.getElementById('divError')?.classList.remove(color)
+    }, 5000);
   }
 }

@@ -102,13 +102,15 @@ export class ZoteroItem {
 
     getCreators() {
         //return this.creators.map(x => ({ name: x.fullName }).name).join(', ');
-        if(this.creators.length > 1)
-        {
-            return this.creators[0].lastName + ' et al.'
-        }
-        else if(this.creators.length === 1)
-        {
+
+        if (this.creators.length === 1) {
             return this.creators[0].lastName;
+        }
+        else if (this.creators.length === 2) {
+            return `${this.creators[0].lastName} and ${this.creators[1].lastName}`;
+        }
+        else if (this.creators.length > 1) {
+            return this.creators[0].lastName + ' et al.'
         }
         return '';
     }
