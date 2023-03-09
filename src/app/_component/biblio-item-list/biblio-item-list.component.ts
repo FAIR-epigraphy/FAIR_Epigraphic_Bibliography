@@ -158,4 +158,8 @@ export class BiblioItemListComponent implements OnInit {
   export(format: any, ext: any) {
     this.zoteroAPI.export(format, this.currentSelectedRecord.key, ext);
   }
+
+  ngAfterViewInit() {
+    console.log(this.biblioData.length);
+  }
 }

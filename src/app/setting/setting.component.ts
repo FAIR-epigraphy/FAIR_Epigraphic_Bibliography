@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { BiblApiService } from '../_service/bibl-api.service';
 import {AuthService } from '../_service/auth.service';
 
@@ -10,6 +10,7 @@ import {AuthService } from '../_service/auth.service';
 export class SettingComponent implements OnInit{
   user: any = null;
   isShown = false;
+  loginUser = null;
 
   constructor(
     private apiService: BiblApiService,
@@ -30,6 +31,12 @@ export class SettingComponent implements OnInit{
 
   getUserInfoForAccount()
   {
+    if (this.authService.isAuthenticate()) {
+      this.loginUser = JSON.parse(this.authService.getToken() || '{}')
+    }
+    else
+      this.loginUser = null;
+
     let id =  JSON.parse(this.authService.getToken() || '{}').id;
     this.apiService.getUserInfo(id).subscribe(resp => {
       if (resp !== null) {

@@ -33,11 +33,11 @@
                             {{ data.date }}
                         </td>
                         <td title="{{data.getCreators()}}">
-                            <span *ngIf="data.getCreators().length < 17">
+                            <span *ngIf="data.getCreators().length < 15">
                                 {{ data.getCreators() }}
                             </span>
-                            <span *ngIf="data.getCreators().length >= 17">
-                                {{ data.getCreators() | slice:0:17}}...
+                            <span *ngIf="data.getCreators().length >= 15">
+                                {{ data.getCreators() | slice:0:15}}...
                             </span>
                         </td>
                     </tr>
@@ -131,7 +131,7 @@
                         <!-- <th scope="col">#</th> -->
                         <th scope="col" style="width: 50%;">Title</th>
                         <th scope="col">Date</th>
-                        <th scope="col">Creator</th>
+                        <th scope="col" style="width: 30%;">Creator</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -149,11 +149,11 @@
                             {{ data.date }}
                         </td>
                         <td title="{{data.getCreators()}}">
-                            <span *ngIf="data.getCreators().length < 17">
+                            <span *ngIf="data.getCreators().length < 15">
                                 {{ data.getCreators() }}
                             </span>
-                            <span *ngIf="data.getCreators().length >= 17">
-                                {{ data.getCreators() | slice:0:17}}...
+                            <span *ngIf="data.getCreators().length >= 15">
+                                {{ data.getCreators() | slice:0:15}}...
                             </span>
                         </td>
                     </tr>

@@ -4,8 +4,7 @@ import { ZoteroItem } from '../../_models/zotero-item.model';
 import { BiblApiService } from '../../_service/bibl-api.service'
 import { AuthService } from '../../_service/auth.service'
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-
-//const { default: api } = require('zotero-api-client');
+import { ZoteroSyncService } from 'src/app/_service/zotero-sync.service';
 
 @Component({
   selector: 'app-biblio-item-more-info',
@@ -13,18 +12,23 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
   styleUrls: ['./biblio-item-more-info.component.scss']
 })
 export class BiblioItemMoreInfoComponent {
-  //myapi = api('4Rti1M1IB3Cw2993pop81f5v').library('group', 4858485);
 
   zoteroObject: any = null;
   user: any = null;
   hasPermission = false;
   isOpenTextbox = false;
   formVIAF: FormGroup;
-  formLink: FormGroup
+  formLink: FormGroup;
+  @Input() totalNumberOfRecords = 0;
+  @Input() lastCallNumber = '';
+  resourceTypes: any = [];
+  isDisplayedResourceType = false;
+
 
   constructor(
     private apiService: BiblApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private zoteroAPI: ZoteroSyncService
   ) {
     this.formVIAF = new FormGroup({
       VIAF: new FormControl('', [
@@ -65,6 +69,7 @@ export class BiblioItemMoreInfoComponent {
         }
       }
       this.zoteroObject = obj;
+      this.updateCallNumber();
 
       this.apiService.getVIAFByCreator(this.zoteroObject.creators).subscribe(respList => {
         for (let resp of respList) {
@@ -78,11 +83,32 @@ export class BiblioItemMoreInfoComponent {
         }
       });
 
+      this.apiService.getAllItemResourceTypes().subscribe(resp => {
+        if (resp.length > 0) {
+          this.resourceTypes = resp;
+        }
+      });
+
+      this.apiService.getItemByCallNumber(this.zoteroObject.callNumber).subscribe(resp => {
+        if (resp !== null) {
+          this.zoteroObject.resourceType = resp[0].resourceTypeGeneral;
+          this.zoteroObject.resourceTypeId = resp[0].resourceTypeId;
+        }
+      });
+
       this.getRelations(this.zoteroObject);
       //console.log(resp)
     })
-
-
+  }
+  updateCallNumber() {
+    if (this.zoteroObject.callNumber === '') {
+      let replaced = parseInt(this.lastCallNumber.replace(/\D/g, ''));
+      replaced++;
+      this.lastCallNumber = 'epig' + replaced;
+      this.zoteroObject.callNumber = this.lastCallNumber;
+      console.log(this.lastCallNumber);
+      this.zoteroAPI.updateCallNumber(this.zoteroObject);
+    }
   }
 
   itemHasValue(obj: any) {
@@ -120,8 +146,7 @@ export class BiblioItemMoreInfoComponent {
       let rels = this.zoteroObject.url.split(',')
       if (resp.length > 0) {
         for (let r of resp) {
-          if (rels.findIndex((x: any) => x === r.link) === -1)
-          {
+          if (rels.findIndex((x: any) => x === r.link) === -1) {
             this.zoteroObject.url += ',' + r.link;
           }
         }
@@ -177,6 +202,23 @@ export class BiblioItemMoreInfoComponent {
         }
       })
     }
+  }
+
+  visableResourceTypeDropDown() {
+    this.isDisplayedResourceType = !this.isDisplayedResourceType;
+  }
+
+  updateItemResourceType() {
+    //console.log(this.zoteroObject.resourceType)
+    this.apiService.UpdateItemResourceTypeByCallNumber(this.zoteroObject.callNumber, this.zoteroObject.resourceTypeId)
+      .subscribe(resp => {
+        this.apiService.getItemByCallNumber(this.zoteroObject.callNumber).subscribe(resp => {
+          if (resp !== null) {
+            this.zoteroObject.resourceType = resp[0].resourceTypeGeneral;
+            this.zoteroObject.resourceTypeId = resp[0].resourceTypeId;
+          }
+        });
+      });
   }
 
   getAbbr(item: any) {

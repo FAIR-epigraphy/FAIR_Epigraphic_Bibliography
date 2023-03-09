@@ -1,8 +1,6 @@
-import { Component, OnInit, ViewChild, Input, Host } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-// import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { Router } from '@angular/router';
 import { ZoteroItem } from '../_models/zotero-item.model';
-const { default: api } = require('zotero-api-client');
 import { AuthService } from '../_service/auth.service';
 import { ZoteroSyncService } from '../_service/zotero-sync.service';
 
@@ -26,6 +24,7 @@ export class HomeComponent implements OnInit {
   lastCallNumber = '';
   @Input() searchText: string = '';
   errorMessage = '';
+  totalItems = 0;
 
   title = 'fair-biblio';
   loginUser = null;
@@ -39,8 +38,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.authService.isAuthenticate())
-    {
+    if (this.authService.isAuthenticate()) {
       this.loginUser = JSON.parse(this.authService.getToken() || '{}')
       this.canActive = true;
     }
@@ -55,24 +53,29 @@ export class HomeComponent implements OnInit {
   getBibloItemInfo() {
     const id = window.location.href.split('/')[window.location.href.split('/').length - 1]
     if (id !== null && id !== '') {
-      let obj = this.allBiblioData.filter(x => x.callNumber === id);
+      let data = this.syncService.getPreviousVersion();
+      let obj = data.items.filter((x: any) => x.callNumber === id);
       if (obj.length > 0) {
-        this.zoteroObject = obj[0] as ZoteroItem;
+        this.zoteroObject = new ZoteroItem(obj[0]);
         console.log(this.zoteroObject)
         this.biblioItemMore.getSpecificData(this.zoteroObject)
-        document.getElementById('btnOpenModal')?.click();
+        document.getElementById('btnOpenModalDetail')?.click();
       }
     }
+  }
+
+  changeSearchValue(p: any) {
+    this.mainSearchBar = p;
   }
 
   async getAllBiblioData() {
     this.data = await this.syncService.sync();
     if (this.data !== null) {
-      if(typeof this.data === 'string')
-      {
+      if (typeof this.data === 'string') {
         this.showToast(this.data, 'bg-danger');
         this.data = this.syncService.getPreviousVersion()
       }
+      this.totalItems = this.data.items.length;
       this.convertJSONToArray(this.data.items);
       this.libraryName = this.data.libraryName;
       this.getLastCallNumber();
@@ -87,8 +90,7 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  getLastCallNumber()
-  {
+  getLastCallNumber() {
     let filtered = this.allBiblioData.filter(x => x.callNumber !== '');
     let maxCallNumber = filtered.sort(function (a, b) {
       try {
@@ -114,10 +116,6 @@ export class HomeComponent implements OnInit {
   }
   closeModal() {
     this.router.navigate([''])
-  }
-
-  takeBackup(){
-    this.syncService.takeBackup();
   }
 
   showToast(msg: any, color: any) {

@@ -85,9 +85,12 @@ export class ZoteroSyncService {
     }
   }
 
-  getPreviousVersion()
-  {
+  getPreviousVersion() {
     return JSON.parse(localStorage.getItem(this.storeName) || '{}');
+  }
+
+  getTotalNumberOfItems() {
+    return JSON.parse(localStorage.getItem(this.storeName) || '{}').items.length;
   }
 
   async get(prefix: any, uri: any) {
@@ -147,6 +150,14 @@ export class ZoteroSyncService {
     this.download(`export.${ext}`, await d.getData().text())
   }
 
+  async updateCallNumber(zoteroObject: any) {
+    let resp = await this.zoteroAPI.items(zoteroObject.key).patch(
+      {
+        callNumber: zoteroObject.callNumber,
+        version: zoteroObject.version
+      });
+  }
+
   download(filename: any, text: any) {
     //var element = document.createElement('a');
     //element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -161,9 +172,9 @@ export class ZoteroSyncService {
     URL.revokeObjectURL(a.href);
   }
 
-  takeBackup(){
+  takeBackup() {
     let data = localStorage.getItem(this.storeName);
-    let fileName = `Backup_${new Date().toJSON().slice(0,19).replaceAll(':','_').replace('T', '-')}.json`;
+    let fileName = `Backup_${new Date().toJSON().slice(0, 19).replaceAll(':', '_').replace('T', '-')}.json`;
     this.download(fileName, data);
   }
 }

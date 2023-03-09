@@ -19,6 +19,7 @@ import { SettingComponent } from './setting/setting.component';
 import { ManageUserComponent } from './setting/manage-user/manage-user.component';
 import { ManageRoleComponent } from './setting/manage-role/manage-role.component';
 import { ManageBiblioItemCategoryComponent } from './setting/manage-biblio-item-category/manage-biblio-item-category.component';
+import { NavBarComponent } from './_component/nav-bar/nav-bar.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { ManageBiblioItemCategoryComponent } from './setting/manage-biblio-item-
     ManageUserComponent,
     ManageRoleComponent,
     ManageBiblioItemCategoryComponent,
+    NavBarComponent,
   ],
   imports: [
     BrowserModule,

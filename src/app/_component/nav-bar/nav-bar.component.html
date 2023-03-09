@@ -1,0 +1,47 @@
+<nav class="navbar navbar-expand-sm navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <h1>FAIR Bibliography</h1>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" routerLink="/" routerLinkActive="active">
+              <i class="bi bi-house-door"></i> Home
+            </a>
+          </li>
+  
+          <li class="nav-item">
+            <div *ngIf="!loginUser">
+              <a class="nav-link" [routerLink]="['/login']" routerLinkActive="active">
+                <i class="bi bi-box-arrow-in-right"></i> <span> Login</span>
+              </a>
+            </div>
+          </li>
+          <li class="nav-item dropdown" *ngIf="loginUser">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              <i class="bi bi-person-circle"></i> {{ loginUser['username'] }}
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="z-index: 2000">
+              <li><a class="dropdown-item" [routerLink]="['/setting']" routerLinkActive="active"><i class="bi bi-gear"></i> Setting</a></li>
+              <li (click)="takeBackup()" style="cursor: pointer;"><a class="dropdown-item"><i class="bi bi-database-down"></i> Backup</a></li>
+              <li (click)="sync()" style="cursor: pointer;"><a class="dropdown-item"><i class="bi bi-arrow-repeat"></i> Sync</a></li>
+              <li><a class="dropdown-item" [routerLink]="['/logout']" routerLinkActive="active"><i class="bi bi-box-arrow-in-left"></i> Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+        <div class="d-flex w-50" *ngIf="showSearchBar">
+          <div class="input-group mb-3">
+            <input class="form-control" (input)="changeText()" type="search" placeholder="Search anything..." aria-label="Search"
+              [(ngModel)]="mainSearchBar">
+            <i class="input-group-text bi bi-search" id="basic-addon2"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>

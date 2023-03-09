@@ -22,16 +22,31 @@
     <div class="table-responsive">
       <table class="table table-hover mt-2">
         <tbody>
+          <tr>
+            <td>Resource Type</td>
+            <td>
+              <select [(ngModel)]="zoteroObject.resourceTypeId" (change)="updateItemResourceType()" (mouseleave)="visableResourceTypeDropDown()"  *ngIf="isDisplayedResourceType">
+                <option *ngFor="let resType of resourceTypes" [ngValue]="resType.id">
+                  {{ resType.resourceTypeGeneral }}
+                </option>
+              </select>
+              <p (mouseenter)="visableResourceTypeDropDown()" *ngIf="!isDisplayedResourceType">
+                {{ zoteroObject.resourceType }}
+              </p>
+            </td>
+          </tr>
           <tr *ngFor="let item of zoteroObject | keyvalue">
             <td *ngIf="item.key !== 'creators' && item.key !=='tags' && 
                     item.key !=='relations' && item.key !=='url' && 
                     item.key !== 'children' && item.key !== 'key' && item.key !== 'creatorsName' &&
+                    item.key !== 'resourceTypeId' && item.key !== 'resourceType' &&
                     itemHasValue(item.value)">
               {{ getColumnName(item.key) }}
             </td>
             <td *ngIf="item.key !== 'creators' && item.key !=='tags' && 
               item.key !=='relations' && item.key !=='url' &&
               item.key !== 'children' && item.key !== 'key' && item.key !== 'creatorsName' &&
+              item.key !== 'resourceTypeId' && item.key !== 'resourceType' &&
                itemHasValue(item.value)">
               <span *ngIf="item.key !== 'shortTitle'">{{item.value}}</span>
               <!-- <span *ngIf="item.key === 'shortTitle'">
@@ -117,4 +132,8 @@
       </li>
     </ul>
   </div>
+</div>
+
+<div *ngIf="zoteroObject === null && totalNumberOfRecords > 0" class="totalItems">
+  {{ totalNumberOfRecords }} items
 </div>

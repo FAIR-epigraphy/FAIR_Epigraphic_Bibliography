@@ -5,6 +5,8 @@ export class ZoteroItem {
     public key: string = '';
     public version: number = -1;
     public itemType: string = '';
+    public resourceType: string = 'Book';
+    public resourceTypeId: string = '';
     public title: string = '';
     public creators: Array<Creator> = [];
     public abstractNote: string = '';

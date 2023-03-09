@@ -76,7 +76,7 @@ export class BiblApiService {
   addBiblioItemLink(callNumber: any, link: any): Observable<any> {
     return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, link: link, method: 'addBiblioItemLink' });
   }
-  
+
   getAllBiblioParentChildItems(): Observable<any> {
     return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { method: 'getAllBiblioParentChildItems' });
   }
@@ -98,6 +98,18 @@ export class BiblApiService {
     }
 
     return forkJoin(requests);
+  }
+
+  getAllItemResourceTypes(): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { method: 'getAllItemResourceTypes' });
+  }
+
+  getItemByCallNumber(callNumber: any): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, method: 'getItemByCallNumber' });
+  }
+
+  UpdateItemResourceTypeByCallNumber(callNumber: any, resourceTypeId: any): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, resourceTypeId: resourceTypeId, method: 'UpdateItemResourceTypeByCallNumber' });
   }
 }
 
