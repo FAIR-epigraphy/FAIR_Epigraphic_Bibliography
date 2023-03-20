@@ -35,6 +35,7 @@ export class BiblioParentchildRelComponent implements OnInit {
   @Input() lastestCallNumber = '';
   added_by = 0;
   isSaving = false;
+  // parentFromDB = false;
 
   constructor(
     private apiService: BiblApiService,
@@ -82,11 +83,31 @@ export class BiblioParentchildRelComponent implements OnInit {
   }
 
   addToParentList() {
-    this.selectedParentBiblio = this.currentSelectedRecord;
-    let index = this.biblioDataChild.findIndex(x => x.key === this.selectedParentBiblio.key)
-    this.biblioDataChild.splice(index, 1);
-    this.btnParentAdd = false;
-    this.btnParentRemove = true;
+    this.apiService.getBiblioParentChildItemsByCallNo(this.currentSelectedRecord.callNumber).subscribe(async (resp) => {
+      if (resp !== null)
+        if (resp.length > 0) {
+          for (let child of resp) {
+            let index = this.biblioDataChild.findIndex(x => x.callNumber === child.child_callNumber)
+            let obj: any = this.biblioDataChild[index];
+            if (child.cat_id != null)
+              obj.sel_cat = child.cat_id;
+
+            this.selectedChildBiblio.push(obj);
+
+            this.biblioDataChild.splice(index, 1);
+          }
+        }
+        else {
+          this.currentSelectedRecord.callNumber = await this.updateCallNumber(this.currentSelectedRecord);
+          this.btnParentRemove = true;
+        }
+
+      this.selectedParentBiblio = this.currentSelectedRecord;
+      let index = this.biblioDataChild.findIndex(x => x.key === this.selectedParentBiblio.key)
+      this.biblioDataChild.splice(index, 1);
+      this.btnParentAdd = false;
+
+    });
   }
 
   removeFromParentList() {
@@ -117,13 +138,14 @@ export class BiblioParentchildRelComponent implements OnInit {
     return this.currentSelectedRecordChild.filter(x => x.key === obj.key).length > 0 ? true : false;
   }
 
-  addToChildList() {
+  async addToChildList() {
     for (let i = 0; i < this.currentSelectedRecordChild.length; i++) {
       this.selectedChildBiblio.push(this.currentSelectedRecordChild[i])
       let index = this.biblioDataChild.findIndex(x => x.key === this.currentSelectedRecordChild[i].key)
       if (index >= 0)
         this.biblioDataChild.splice(index, 1)
     }
+    await this.addParentChildRel();
     this.currentSelectedRecordChild = []
     this.btnChildAdd = false;
     //this.btnChildRemove = true;
@@ -142,51 +164,74 @@ export class BiblioParentchildRelComponent implements OnInit {
 
   removeFromChildList() {
     if (this.selectedChildBiblioObj !== null) {
-      this.biblioDataChild.push(this.selectedChildBiblioObj)
-      let index = this.selectedChildBiblio.findIndex(x => x.key === this.selectedChildBiblioObj.key)
-      this.selectedChildBiblio.splice(index, 1);
-      this.selectedChildBiblioObj = null;
-      this.btnChildRemove = false;
+      this.apiService.deleteChildItem(this.selectedParentBiblio.callNumber, this.selectedChildBiblioObj.callNumber)
+        .subscribe(resp => {
+          if (resp !== null) {
+            if (resp.indexOf('Error') > -1) {
+              this.showToast(resp, 'bg-danger');
+            }
+            else {
+              this.biblioDataChild.push(this.selectedChildBiblioObj)
+              let index = this.selectedChildBiblio.findIndex(x => x.key === this.selectedChildBiblioObj.key)
+              this.selectedChildBiblio.splice(index, 1);
+              this.selectedChildBiblioObj = null;
+              this.btnChildRemove = false;
+            }
+          }
+        });
     }
   }
   ///////////////////////////////////////////////////////////
-  async addParentChildRel() {
-    this.isSaving = true;
-    if (this.selectedChildBiblio.filter(x => x.sel_cat === undefined).length > 0) {
-      this.showToast('Please select category for all children', 'bg-danger');
-      return;
-    }
-
-    //set parent call number if it is not assigned
-    if (this.selectedParentBiblio.callNumber === '') {
+  async updateCallNumber(obj: any) {
+    if (obj.callNumber === '') {
       let replaced = parseInt(this.lastestCallNumber.replace(/\D/g, ''));
       replaced++;
       this.lastestCallNumber = 'epig' + replaced;
-      this.selectedParentBiblio.callNumber = this.lastestCallNumber;
-      let resp = await this.myapi.items(this.selectedParentBiblio.key).patch(
+      obj.callNumber = this.lastestCallNumber;
+      let resp = await this.myapi.items(obj.key).patch(
         {
-          callNumber: this.selectedParentBiblio.callNumber,
-          version: this.selectedParentBiblio.version
+          callNumber: obj.callNumber,
+          version: obj.version
         });
+      return obj.callNumber;
     }
+    return obj.callNumber;
+  }
+
+  async addParentChildRel() {
+    // this.isSaving = true;
+    // if (this.selectedChildBiblio.filter(x => x.sel_cat === undefined).length > 0) {
+    //   this.showToast('Please select category for all children', 'bg-danger');
+    //   return;
+    // }
 
     //set child call number if it is not assigned
     for (let sel of this.selectedChildBiblio) {
-      if (sel.callNumber === '') {
-        let replaced = parseInt(this.lastestCallNumber.replace(/\D/g, ''));
-        replaced++;
-        this.lastestCallNumber = 'epig' + replaced;
-        sel.callNumber = this.lastestCallNumber;
-        let resp = await this.myapi.items(sel.key).patch({ callNumber: sel.callNumber, version: sel.version });
-      }
+      sel.callNumber = await this.updateCallNumber(sel);
     }
 
     this.apiService.addBiblioParentChildItem(this.selectedParentBiblio, this.selectedChildBiblio, this.added_by)
       .subscribe(respList => {
         console.log(respList);
-        this.isSaving = false;
-        this.showToast('Record updated', 'bg-success');
+        //this.isSaving = false;
+        //this.showToast('Record updated', 'bg-success');
       })
+  }
+
+  async updateChildCategory() {
+    if (this.selectedChildBiblio.filter((x: any) => x.sel_cat !== undefined).length > 0) {
+      this.isSaving = true
+      this.apiService.UpdateChildCategory(this.selectedParentBiblio, this.selectedChildBiblio)
+        .subscribe(respList => {
+          console.log(respList);
+          this.isSaving = false;
+          this.showToast('Record updated', 'bg-success');
+        })
+    }
+    else
+    {
+      this.showToast('Record updated', 'bg-success');
+    }
   }
 
   showToast(msg: any, color: any) {

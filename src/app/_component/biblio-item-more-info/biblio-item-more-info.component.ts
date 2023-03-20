@@ -17,7 +17,6 @@ export class BiblioItemMoreInfoComponent {
   user: any = null;
   hasPermission = false;
   isOpenTextbox = false;
-  formVIAF: FormGroup;
   formLink: FormGroup;
   @Input() totalNumberOfRecords = 0;
   @Input() lastCallNumber = '';
@@ -30,13 +29,6 @@ export class BiblioItemMoreInfoComponent {
     private authService: AuthService,
     private zoteroAPI: ZoteroSyncService
   ) {
-    this.formVIAF = new FormGroup({
-      VIAF: new FormControl('', [
-        Validators.required,
-        Validators.pattern("^[1-9]{1,22}$")
-      ]),
-    });
-
     this.formLink = new FormGroup({
       link: new FormControl('', [
         Validators.required,
@@ -49,65 +41,87 @@ export class BiblioItemMoreInfoComponent {
     form.reset();
   }
 
-  getSpecificData(obj: ZoteroItem) {
+  async getSpecificData(obj: ZoteroItem) {
     this.user = JSON.parse(this.authService.getToken() || '{}');
     if (this.user.role_name === 'Admin' || this.user.role_name === 'Editor') this.hasPermission = true;
 
-    this.apiService.getSEGAbbrByAIEGL(obj.shortTitle[0]['abbr']).subscribe(resp => {
+    this.zoteroObject = obj;
+    await this.updateCallNumber();
+
+    this.apiService.getItemAbbr(this.zoteroObject.callNumber, this.zoteroObject.shortTitle[0]['abbr']).subscribe(resp => {
       if (resp !== null) {
         if (resp.length > 0) {
-          for (let d of resp) {
+          for (let d of resp.filter((x: any) => x.seg1_abbr !== undefined)) {
             if (d.seg1_abbr !== null) {
-              if (obj.shortTitle.filter(x => x.abbr === d.seg1_abbr && x.source === 'SEG 1').length === 0)
-                obj.shortTitle.push({ abbr: d.seg1_abbr, source: 'SEG 1' })
+              if (this.zoteroObject.shortTitle.filter((x: any) => x.abbr === d.seg1_abbr && x.source === 'SEG 1').length === 0)
+                this.zoteroObject.shortTitle.push({ abbr: d.seg1_abbr, source: 'SEG 1' })
             }
-            else if (d.seg2_abbr !== null) {
-              if (obj.shortTitle.filter(x => x.abbr === d.seg2_abbr && x.source === 'SEG 2').length === 0)
-                obj.shortTitle.push({ abbr: d.seg2_abbr, source: 'SEG 2' })
+            if (d.seg2_abbr !== null) {
+              if (this.zoteroObject.shortTitle.filter((x: any) => x.abbr === d.seg2_abbr && x.source === 'SEG 2').length === 0)
+                this.zoteroObject.shortTitle.push({ abbr: d.seg2_abbr, source: 'SEG 2' })
             }
+          }
+
+          // Custom Abbr
+          for (let d of resp.filter((x: any) => x.abbr !== undefined)) {
+            if (this.zoteroObject.shortTitle.filter((x: any) => x.abbr === d.abbr && x.source === d.source).length === 0)
+              this.zoteroObject.shortTitle.push({ abbr: d.abbr, source: d.source })
           }
         }
       }
       this.zoteroObject = obj;
-      this.updateCallNumber();
+      //this.updateCallNumber();
 
-      this.apiService.getVIAFByCreator(this.zoteroObject.creators).subscribe(respList => {
-        for (let resp of respList) {
-          if (resp.length > 0) {
-            let index = this.zoteroObject.creators.findIndex((x: Creator) => x.firstName === resp[0].first_name &&
-              x.lastName === resp[0].last_name
-            );
-            if (index > -1)
-              this.zoteroObject.creators[index].VIAF = resp[0].VIAF;
-          }
-        }
-      });
-
-      this.apiService.getAllItemResourceTypes().subscribe(resp => {
-        if (resp.length > 0) {
-          this.resourceTypes = resp;
-        }
-      });
-
-      this.apiService.getItemByCallNumber(this.zoteroObject.callNumber).subscribe(resp => {
-        if (resp !== null) {
-          this.zoteroObject.resourceType = resp[0].resourceTypeGeneral;
-          this.zoteroObject.resourceTypeId = resp[0].resourceTypeId;
-        }
-      });
-
+      this.getVIAF();
+      this.geResourceTypes();
+      this.getItemByCallNo();
       this.getRelations(this.zoteroObject);
       //console.log(resp)
     })
   }
-  updateCallNumber() {
+
+  getItemByCallNo() {
+    this.apiService.getItemByCallNumber(this.zoteroObject.callNumber).subscribe(resp => {
+      if (resp !== null) {
+        if (resp.length > 0) {
+          this.zoteroObject.resourceType = resp[0].resourceTypeGeneral;
+          this.zoteroObject.resourceTypeId = resp[0].resourceTypeId;
+        }
+      }
+    });
+  }
+
+  geResourceTypes() {
+    this.apiService.getAllItemResourceTypes().subscribe(resp => {
+      if (resp.length > 0) {
+        this.resourceTypes = resp;
+      }
+    });
+  }
+
+  getVIAF() {
+    this.apiService.getVIAF_ORCIDByCreator(this.zoteroObject.creators).subscribe(respList => {
+      for (let resp of respList) {
+        if (resp.length > 0) {
+          let index = this.zoteroObject.creators.findIndex((x: Creator) => x.firstName === resp[0].first_name &&
+            x.lastName === resp[0].last_name
+          );
+          if (index > -1)
+            this.zoteroObject.creators[index].VIAF.value = resp[0].VIAF;
+          this.zoteroObject.creators[index].ORCID.value = resp[0].ORCID;
+        }
+      }
+    });
+  }
+
+  async updateCallNumber() {
     if (this.zoteroObject.callNumber === '') {
       let replaced = parseInt(this.lastCallNumber.replace(/\D/g, ''));
       replaced++;
       this.lastCallNumber = 'epig' + replaced;
       this.zoteroObject.callNumber = this.lastCallNumber;
       console.log(this.lastCallNumber);
-      this.zoteroAPI.updateCallNumber(this.zoteroObject);
+      await this.zoteroAPI.updateCallNumber(this.zoteroObject);
     }
   }
 
@@ -165,12 +179,12 @@ export class BiblioItemMoreInfoComponent {
     if ('relations' in obj) {
       obj.relations.added = false;
     }
-    else if ('firstName' in obj) {
-      let c = this.zoteroObject.creators.filter((x: any) => x.firstName === obj.firstName && x.lastName === obj.lastName && x.creatorType === obj.creatorType);
-      c[0].VIAF = '';
-    }
+    // else if ('firstName' in obj) {
+    //   let c = this.zoteroObject.creators.filter((x: any) => x.firstName === obj.firstName && x.lastName === obj.lastName && x.creatorType === obj.creatorType);
+    //   c[0].VIAF = '';
+    // }
     else if ('value' in obj) {
-      obj.value.push('')
+      obj.value.push({ abbr: '', source: '' })
     }
   }
 
@@ -185,22 +199,51 @@ export class BiblioItemMoreInfoComponent {
     //return false;
   }
 
-  addVIAF(obj: Creator, formData: any, event: any) {
-    if (this.formVIAF.valid) {
-      let c = this.zoteroObject.creators.filter((x: any) => x.firstName === obj.firstName && x.lastName === obj.lastName && x.creatorType === obj.creatorType);
-      let target = event.currentTarget || event.target;
-      let objCreator: any = null;
-      objCreator = c[0];
-      objCreator.VIAF = formData.VIAF;
-      objCreator['callNumber'] = this.zoteroObject.callNumber;
+  addVIAF(obj: Creator, event: any) {
+    let c = this.zoteroObject.creators.filter((x: any) => x.firstName === obj.firstName && x.lastName === obj.lastName && x.creatorType === obj.creatorType);
+    let objCreator: any = null;
+    objCreator = c[0];
+    if (event.target.value !== '') {
+      if (/^[1-9]{1,22}$/.test(event.target.value)) {
+        objCreator.VIAF.value = event.target.value;
+        //objCreator.ORCID = formData.ORCID;
+        this.apiService.addCreatorVIAF(objCreator, this.zoteroObject.callNumber).subscribe(resp => {
+          if (resp !== null) {
+            c[0].VIAF.value = event.target.value;
+          }
+        })
+        objCreator.VIAF.invalid = false;
+      }
+      else {
+        objCreator.VIAF.invalid = true;
+      }
+    }
+    else {
+      objCreator.VIAF.invalid = true;
+    }
+  }
 
-      this.apiService.addCreatorVIAF(objCreator).subscribe(resp => {
-        if (resp !== null) {
-          c[0].VIAF = target.children[0].value;
-          this.resetForm(this.formVIAF);
-          //alert('added.')
-        }
-      })
+  addORCID(obj: Creator, event: any) {
+    let c = this.zoteroObject.creators.filter((x: any) => x.firstName === obj.firstName && x.lastName === obj.lastName && x.creatorType === obj.creatorType);
+    let objCreator: any = null;
+    objCreator = c[0];
+    if (event.target.value !== '') {
+      if (/^(\d{4}-){3}\d{3}(\d|X)$/.test(event.target.value)) {
+        objCreator.ORCID.value = event.target.value;
+        objCreator.ORCID.invalid = false;
+
+        this.apiService.addCreatorORCID(objCreator, this.zoteroObject.callNumber).subscribe(resp => {
+          if (resp !== null) {
+            c[0].ORCID.value = event.target.value;
+          }
+        })
+      }
+      else {
+        objCreator.ORCID.invalid = true;
+      }
+    }
+    else {
+      objCreator.ORCID.invalid = true;
     }
   }
 
@@ -214,8 +257,10 @@ export class BiblioItemMoreInfoComponent {
       .subscribe(resp => {
         this.apiService.getItemByCallNumber(this.zoteroObject.callNumber).subscribe(resp => {
           if (resp !== null) {
-            this.zoteroObject.resourceType = resp[0].resourceTypeGeneral;
-            this.zoteroObject.resourceTypeId = resp[0].resourceTypeId;
+            if (resp.length > 0) {
+              this.zoteroObject.resourceType = resp[0].resourceTypeGeneral;
+              this.zoteroObject.resourceTypeId = resp[0].resourceTypeId;
+            }
           }
         });
       });
@@ -228,10 +273,24 @@ export class BiblioItemMoreInfoComponent {
 
   addAbbreviation(item: any, event: any) {
     let target = event.currentTarget || event.target;
-    let index = this.zoteroObject.shortTitle.findIndex((x: any) => x === '')
-    this.zoteroObject.shortTitle[index] = target.children[0].value;
-    localStorage.setItem(`ZoteroItem_${this.zoteroObject.key}`, JSON.stringify(this.zoteroObject))
-    return false;
+    let abbr = target.children[0].children[0].value;
+    let source = target.children[0].children[1].value;
+    if (abbr !== '' && source !== '') {
+      let obj: any = {};
+      obj.abbr = abbr;
+      obj.source = source;
+      obj.callNumber = this.zoteroObject.callNumber;
+      item.value[item.value.length - 1].invalid = false;
+
+      this.apiService.addItemAbbr(obj).subscribe(resp => {
+        item.value[item.value.length - 1].abbr = abbr;
+        item.value[item.value.length - 1].source = source;
+      })
+
+    }
+    else {
+      item.value[item.value.length - 1].invalid = true;
+    }
   }
 
   getFirstAbbr(item: any) {

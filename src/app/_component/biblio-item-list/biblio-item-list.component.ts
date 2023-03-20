@@ -1,9 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, createComponent, Input, OnInit, QueryList, ViewChild, ViewChildren, ViewContainerRef, ViewRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { BiblApiService } from 'src/app/_service/bibl-api.service';
 import { ZoteroSyncService } from 'src/app/_service/zotero-sync.service';
 import { Creator } from '../../_models/creator.model';
 import { ZoteroItem } from '../../_models/zotero-item.model';
+import { ChildListComponent } from './child-list/child-list.component';
+import { childViewContainerDirective } from './child.view.container.directive';
 
 @Component({
   selector: 'app-biblio-item-list',
@@ -12,7 +14,9 @@ import { ZoteroItem } from '../../_models/zotero-item.model';
 })
 export class BiblioItemListComponent implements OnInit {
   @Input() biblioData: Array<ZoteroItem> = new Array();
-  //creator: Creator = new Creator(null);
+  allBiblioData: Array<ZoteroItem> = new Array();
+  @ViewChildren('dynamic', { read: ViewContainerRef }) childView!: QueryList<ViewContainerRef>;
+
   start = 0;
   limit = 30;
   @Input() loading = false;
@@ -44,18 +48,33 @@ export class BiblioItemListComponent implements OnInit {
     let interval = setInterval(() => {
       //let data: Array<ZoteroItem> = new Array();
       if (this.biblioData.length > 0) {
+        this.allBiblioData = this.biblioData.map(a => Object.assign(new ZoteroItem(a), a));
+
         for (let item of this.parentChildRelations) {
           let childIndex = this.biblioData.findIndex((x: any) => x.callNumber === item.child_callNumber);
           let parentIndex = this.biblioData.findIndex((x: any) => x.callNumber === item.parent_callNumber);
           if (childIndex > -1) {
             this.biblioData[parentIndex].children.push(this.biblioData[childIndex]);
             this.biblioData[childIndex].category = item.cat_name;
-            this.biblioData.splice(childIndex, 1);
+            //this.biblioData.splice(childIndex, 1);
           }
+        }
+
+        for (let item of this.parentChildRelations) {
+          this.biblioData = this.biblioData.filter((x: any) => x.callNumber !== item.child_callNumber);
         }
 
         clearInterval(interval);
         this.sortByCol('title', null!);
+        this.allBiblioData = this.allBiblioData.sort((a, b) => {
+          if (a.title < b.title) {
+            return -1;
+          }
+          if (a.title > b.title) {
+            return 1;
+          }
+          return 0;
+        });
       }
     }, 500)
 
@@ -68,10 +87,20 @@ export class BiblioItemListComponent implements OnInit {
     });
   }
 
-  getSpecificData(obj: ZoteroItem) {
+  getSpecificData(obj: ZoteroItem, event: Event) {
     console.log(obj)
-    this.currentSelectedRecord = obj;
+    this.removeHiglightedClass(event.currentTarget as HTMLElement);
     this.biblioItemInfoComp.getSpecificData(obj);
+  }
+
+  removeHiglightedClass(element: HTMLElement) {
+    let classes = document.getElementsByClassName('highlighted')
+    if (classes.length > 0) {
+      Array.from(classes).forEach((element: any) => {
+        element.classList.remove('highlighted');
+      });
+    }
+    element.classList.add('highlighted');
   }
 
   getCreators(value: any) {
@@ -94,6 +123,26 @@ export class BiblioItemListComponent implements OnInit {
 
   expandChild(data: any, flag: boolean) {
     data.showChild = flag;
+  }
+
+  expandInnerChild(data: any, flag: boolean, event: any) {
+    // this.childView.map((vcr: ViewContainerRef, index: number) => {
+    //   if(vcr.element.nativeElement.isEqualNode(event.currentTarget.parentNode.parentNode)){
+    //     console.log('equal');
+    //   }
+    //   return;
+    // });
+    let viewContainerRef = this.childView.filter(x => x.element.nativeElement.isEqualNode(event.currentTarget.parentNode.parentNode))[0];
+    data.showChild = flag;
+    if (flag) {
+      const componentRef = viewContainerRef.createComponent(ChildListComponent);
+      componentRef.instance.data = data;
+      componentRef.instance.biblioItemInfoComp = this.biblioItemInfoComp;
+      componentRef.instance.parentComponent = this;
+    }
+    else {
+      viewContainerRef.clear();
+    }
   }
 
   removeAllSortingIcons() {

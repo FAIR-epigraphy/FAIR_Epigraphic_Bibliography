@@ -20,12 +20,18 @@ import { ManageUserComponent } from './setting/manage-user/manage-user.component
 import { ManageRoleComponent } from './setting/manage-role/manage-role.component';
 import { ManageBiblioItemCategoryComponent } from './setting/manage-biblio-item-category/manage-biblio-item-category.component';
 import { NavBarComponent } from './_component/nav-bar/nav-bar.component';
+import { childViewContainerDirective } from './_component/biblio-item-list/child.view.container.directive'
+import { ChildListComponent  } from './_component/biblio-item-list/child-list/child-list.component';
+import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component'
+
 
 @NgModule({
   declarations: [
     AppComponent,
     ItemListComponent,
     BiblioItemListComponent,
+    childViewContainerDirective,
+    ChildListComponent,
     BiblioItemMoreInfoComponent,
     LoginComponent,
     HomeComponent,
@@ -37,6 +43,7 @@ import { NavBarComponent } from './_component/nav-bar/nav-bar.component';
     ManageRoleComponent,
     ManageBiblioItemCategoryComponent,
     NavBarComponent,
+    PagenotfoundComponent,
   ],
   imports: [
     BrowserModule,
@@ -46,7 +53,7 @@ import { NavBarComponent } from './_component/nav-bar/nav-bar.component';
     FormsModule,
     ReactiveFormsModule
   ],
-  providers: [BiblioItemMoreInfoComponent, BiblioParentchildRelComponent],
+  providers: [BiblioItemMoreInfoComponent, BiblioParentchildRelComponent, childViewContainerDirective, ChildListComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

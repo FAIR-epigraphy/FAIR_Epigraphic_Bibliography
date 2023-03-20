@@ -57,11 +57,15 @@ export class BiblApiService {
     return this.http.post<any>(`${this.base_url}/categories/category.php`, { catId: catId, method: 'deleteCategory' });
   }
 
-  addCreatorVIAF(creator: any): Observable<any> {
-    return this.http.post<any>(`${this.base_url}/creators/creator.php`, { creator: creator, method: 'addCreatorVIAF' });
+  addCreatorVIAF(creator: any, callNumber: any): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/creators/creator.php`, { creator: creator, callNumber: callNumber, method: 'addCreatorVIAF' });
   }
 
-  getVIAFByCreator(creators: any): Observable<any> {
+  addCreatorORCID(creator: any, callNumber: any): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/creators/creator.php`, { creator: creator, callNumber: callNumber, method: 'addCreatorORCID' });
+  }
+
+  getVIAF_ORCIDByCreator(creators: any): Observable<any> {
     let requests = [];
     for (let c of creators) {
       requests.push(this.http.post<any>(`${this.base_url}/creators/creator.php`, { creator: c, method: 'getVIAFByCreator' }));
@@ -100,6 +104,34 @@ export class BiblApiService {
     return forkJoin(requests);
   }
 
+  getBiblioParentChildItemsByCallNo(callNumber: any): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, method: 'getBiblioParentChildItemsByCallNo' });
+  }
+
+  addBiblioItemParent(callNumber: any, zotero_item_key: any, added_by: any): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, zotero_item_key: zotero_item_key, added_by: added_by, method: 'addBiblioItemParent' });
+  }
+
+  deleteChildItem(parent_callNumber: any, child_callNumber: any): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`,
+      { parent_callNumber: parent_callNumber, child_callNumber: child_callNumber, method: 'deleteChildItem' });
+  }
+
+  UpdateChildCategory(bibParent: any, bibChild: any): Observable<any> {
+    let requests = [];
+    for (let sel of bibChild.filter((x: any) => x.sel_cat !== undefined)) {
+      requests.push(this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`,
+        {
+          parent_callNumber: bibParent.callNumber,
+          child_callNumber: sel.callNumber,
+          cat_id: sel.sel_cat,
+          method: 'UpdateChildCategory'
+        }
+      ));
+    }
+    return forkJoin(requests);
+  }
+
   getAllItemResourceTypes(): Observable<any> {
     return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { method: 'getAllItemResourceTypes' });
   }
@@ -110,6 +142,14 @@ export class BiblApiService {
 
   UpdateItemResourceTypeByCallNumber(callNumber: any, resourceTypeId: any): Observable<any> {
     return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, resourceTypeId: resourceTypeId, method: 'UpdateItemResourceTypeByCallNumber' });
+  }
+
+  addItemAbbr(obj: any): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { itemAbbr: obj, method: 'addItemAbbr' });
+  }
+
+  getItemAbbr(callNumber: any, abbr: any): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, abbr: abbr, method: 'getItemAbbr' });
   }
 }
 

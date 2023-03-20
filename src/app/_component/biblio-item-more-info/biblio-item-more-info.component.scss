@@ -32,3 +32,20 @@
     font-size: 20px;
     color: #bbb;
 }
+
+.accordion-toggle {
+    text-decoration: none !important;
+}
+
+.accordion-toggle:after {
+    font-family: 'bootstrap-icons';
+    content: "\F235";
+    /* adjust as needed, taken from font-awesome.css */
+    color: grey;
+}
+
+.accordion-toggle.collapsed:after {
+    /* symbol for "collapsed" panels */
+    content: "\F229";
+    /* adjust as needed, taken from font-awesome.css */
+}

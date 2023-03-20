@@ -83,7 +83,7 @@
             <hr />
             <div>
                 <div class="list-group">
-                    <button type="button" class="list-group-item list-group-item-action"
+                    <button type="button" class="list-group-item list-group-item-action" title="{{selBib.title}}"
                         *ngFor="let selBib of selectedChildBiblio" (click)="selectChildFromList(selBib, $event)">
                         {{ selBib.title | slice:0:25 }}, {{ selBib.date }}, {{ selBib.getCreators() }}
                         <select class="form-select" [(ngModel)]="selBib.sel_cat">
@@ -170,7 +170,7 @@
         <hr />
         <button class="btn btn-primary float-end me-5" *ngIf="selectedParentBiblio !== null && 
                       selectedChildBiblio.length > 0"
-                      (click)="addParentChildRel()" [disabled]="isSaving">
+                      (click)="updateChildCategory()" [disabled]="isSaving">
                       <i class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="isSaving"></i>
                        <label *ngIf="isSaving">  Saving...</label>
                       <label *ngIf="!isSaving">Apply</label>
