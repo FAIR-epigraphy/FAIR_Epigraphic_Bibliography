@@ -48,19 +48,26 @@ export class HomeComponent implements OnInit {
     this.allBiblioData = []
     this.loading = true;
     this.getAllBiblioData()
+    //this.getBibloItemInfo()
   }
 
   getBibloItemInfo() {
     const id = window.location.href.split('/')[window.location.href.split('/').length - 1]
     if (id !== null && id !== '') {
-      let data = this.syncService.getPreviousVersion();
-      let obj = data.items.filter((x: any) => x.callNumber === id);
-      if (obj.length > 0) {
-        this.zoteroObject = new ZoteroItem(obj[0]);
-        console.log(this.zoteroObject)
-        this.biblioItemMore.getSpecificData(this.zoteroObject)
-        document.getElementById('btnOpenModalDetail')?.click();
-      }
+      let interval = setInterval(()=>{
+        if(this.allBiblioData.length > 0)
+        {
+          let data = this.allBiblioData;//this.syncService.getPreviousVersion();
+          let obj = data.filter((x: any) => x.callNumber === id);
+          if (obj.length > 0) {
+            this.zoteroObject =  obj[0];//new ZoteroItem(obj[0]);
+            console.log(this.zoteroObject)
+            this.biblioItemMore.getSpecificData(this.zoteroObject)
+            document.getElementById('btnOpenModalDetail')?.click();
+            clearInterval(interval);
+          }
+        }
+      }, 100)
     }
   }
 

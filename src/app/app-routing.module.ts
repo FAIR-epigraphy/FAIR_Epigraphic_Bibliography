@@ -5,16 +5,18 @@ import { LoginComponent } from './login/login.component';
 import { LogoutComponent } from './logout/logout.component';
 import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
 import { SettingComponent } from './setting/setting.component';
+import { BiblioItemMoreInfoComponent } from './_component/biblio-item-more-info/biblio-item-more-info.component';
 
 const routes: Routes = [
-  { path: ':callNum', component: HomeComponent },
   //{ path: 'home', component: HomeComponent },
+  { path: 'bibl/:callNum', component: HomeComponent, pathMatch: 'full' },
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'logout', component: LogoutComponent },
   { path: 'setting', component: SettingComponent },
   //Wild Card Route for 404 request
-  { path: '**', pathMatch: 'full', component: PagenotfoundComponent },
+  // { path: '**', pathMatch: 'full', component: PagenotfoundComponent },
+  
 ];
 
 @NgModule({
