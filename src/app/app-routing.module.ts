@@ -7,11 +7,11 @@ import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
 import { SettingComponent } from './setting/setting.component';
 
 const routes: Routes = [
-  { path: 'bibl/:callNum', component: HomeComponent },
+  { path: ':callNum', component: HomeComponent },
   { path: '', component: HomeComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'logout', component: LogoutComponent },
-  { path: 'setting', component: SettingComponent },
+  { path: 'user/login', component: LoginComponent },
+  { path: 'user/logout', component: LogoutComponent },
+  { path: 'user/setting', component: SettingComponent },
   //Wild Card Route for 404 request
   { path: '**', pathMatch: 'full', component: PagenotfoundComponent },
   
