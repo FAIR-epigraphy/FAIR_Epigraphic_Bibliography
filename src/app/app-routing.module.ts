@@ -7,7 +7,7 @@ import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component';
 import { SettingComponent } from './setting/setting.component';
 
 const routes: Routes = [
-  { path: 'bibl/:callNum', component: HomeComponent, pathMatch: 'full' },
+  { path: 'bibl/:callNum', component: HomeComponent },
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'logout', component: LogoutComponent },
