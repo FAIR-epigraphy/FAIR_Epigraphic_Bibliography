@@ -1,5 +1,7 @@
 <div class="border-bottom">
-  <i class="bi bi-diagram-3" style="font-size: 24px;cursor: pointer;" *ngIf="canActive && allBiblioData.length > 0"
+  <i data-bs-target="#sidebar" data-bs-toggle="collapse" style="font-size: 24px;cursor: pointer;"
+    class="bi bi-list"></i>
+  <i class="bi bi-diagram-3 ms-3" style="font-size: 24px;cursor: pointer;" *ngIf="canActive && allBiblioData.length > 0"
     id="btnOpenModal" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop" (click)="reInit()">
   </i>
   <i class="bi bi-upload ms-3 dropdown dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown"

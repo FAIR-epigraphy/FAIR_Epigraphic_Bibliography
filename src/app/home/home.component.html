@@ -1,52 +1,58 @@
-<app-nav-bar [loginUser]="loginUser" [showSearchBar]="true" (searchValueChange)='changeSearchValue($event)'></app-nav-bar>
+<app-nav-bar [loginUser]="loginUser" [showSearchBar]="true" (searchValueChange)='changeSearchValue($event)'>
+</app-nav-bar>
 <div class="container-fluid py-3">
-    <div class="row my-3 border-top border-bottom">
-      <div class="col-md-2">
+  <div class="row my-3 border-top border-bottom" flex-nowrap>
+    <!-- <div class="col-md-2">
+        <app-item-list [libraryName]="libraryName"></app-item-list>
+      </div> -->
+    <div class="col-auto px-0">
+      <div id="sidebar" class="collapse collapse-horizontal border-end">
         <app-item-list [libraryName]="libraryName"></app-item-list>
       </div>
-      <div class="col-md-7 border-start border-end">
-        <app-biblio-item-list [biblioData]="allBiblioData"
-                              [loading]="loading" 
-                              [biblioItemInfoComp]="biblioItemMore1"
-                              [canActive]="canActive"
-                              [mainSearchBar]="mainSearchBar"
-                              [lastCallNumber]="lastCallNumber">
-        </app-biblio-item-list>
-      </div>
-      <div class="col-md-3">
-        <app-biblio-item-more-info #biblioItemMore1 [totalNumberOfRecords]="totalItems" [lastCallNumber]="lastCallNumber"></app-biblio-item-more-info>
-      </div>
     </div>
-  
-    <!-- Button trigger modal -->
-    <button id="btnOpenModalDetail" type="button" style="display: none;" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdropDetail">
-    </button>
-    <!-- Modal -->
-    <div class="modal fade" id="staticBackdropDetail" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-      aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog modal-fullscreen">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel">Detail</h5>
-            <button type="button" class="btn-close" (click)="closeModal()" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <app-biblio-item-more-info #biblioItemMore2></app-biblio-item-more-info>
-          </div>
+    <div class="col ps-md-2 pt-2 border-start border-end">
+
+      <app-biblio-item-list [biblioData]="allBiblioData" [loading]="loading" [biblioItemInfoComp]="biblioItemMore1"
+        [canActive]="canActive" [mainSearchBar]="mainSearchBar" [lastCallNumber]="lastCallNumber">
+      </app-biblio-item-list>
+    </div>
+    <div class="col-md-4">
+      <app-biblio-item-more-info #biblioItemMore1 [totalNumberOfRecords]="totalItems" [lastCallNumber]="lastCallNumber">
+      </app-biblio-item-more-info>
+    </div>
+  </div>
+
+  <!-- Button trigger modal -->
+  <button id="btnOpenModalDetail" type="button" style="display: none;" class="btn btn-primary" data-bs-toggle="modal"
+    data-bs-target="#staticBackdropDetail">
+  </button>
+  <!-- Modal -->
+  <div class="modal fade" id="staticBackdropDetail" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Detail</h5>
+          <button type="button" class="btn-close" (click)="closeModal()" data-bs-dismiss="modal"
+            aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <app-biblio-item-more-info #biblioItemMore2></app-biblio-item-more-info>
         </div>
       </div>
     </div>
-    <!-- Toast -->
-    <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
-      <div id="divError" style="width: auto;" class="toast align-items-center text-white border-0 mt-3" role="alert"
-          aria-live="assertive" aria-atomic="true">
-          <div class="d-flex">
-              <div class="toast-body">
-                  {{ errorMessage }}
-              </div>
-              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                  aria-label="Close"></button>
-          </div>
+  </div>
+  <!-- Toast -->
+  <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <div id="divError" style="width: auto;" class="toast align-items-center text-white border-0 mt-3" role="alert"
+      aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          {{ errorMessage }}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
       </div>
+    </div>
   </div>
-  </div>
+</div>
