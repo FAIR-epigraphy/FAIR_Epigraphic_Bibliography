@@ -16,6 +16,8 @@ export class ZoteroSyncService {
   version = 0;
   name = '';
   batch = 50;
+  public fetchingPercentage = 0;
+  public otherLibItemsCount = 1;
 
   constructor(
     private http: HttpClient
@@ -89,6 +91,20 @@ export class ZoteroSyncService {
     return JSON.parse(localStorage.getItem(this.storeName) || '{}');
   }
 
+  async getAllBiblioCitationStyles() {
+    if (localStorage.getItem('ZoteroStyleCitations') !== null && localStorage.getItem('ZoteroStyleCitations') !== undefined) {
+      return JSON.parse(localStorage.getItem('ZoteroStyleCitations') || '{}')
+    }
+    else {
+      let data = await (await fetch('https://www.zotero.org/styles-files/styles.json')).json()
+      let citations = [];
+      for (let d of data) {
+        citations.push({ title: d.title, name: d.name });
+      }
+      localStorage.setItem('ZoteroStyleCitations', JSON.stringify(citations));
+    }
+  }
+
   getTotalNumberOfItems() {
     return JSON.parse(localStorage.getItem(this.storeName) || '{}').items.length;
   }
@@ -150,6 +166,12 @@ export class ZoteroSyncService {
     this.download(`export.${ext}`, await d.getData().text())
   }
 
+  async citation(content: any, key: any, style: any, language: any) {
+    let d = await this.zoteroAPI.items(key).get({ style: style, format: 'json', include: content, locale: language });
+    let c = await d.getData().bib;
+    return c;
+  }
+
   async updateCallNumber(zoteroObject: any) {
     let resp = await this.zoteroAPI.items(zoteroObject.key).patch(
       {
@@ -170,6 +192,36 @@ export class ZoteroSyncService {
     a.click();
 
     URL.revokeObjectURL(a.href);
+  }
+
+  async fetchURL(apiNumber:any)
+  {
+    let zoteroItems: any = [];
+    let res: any = null;
+    try{
+      let response = await fetch(`https://api.zotero.org/groups/${apiNumber}/items?since=0&format=versions&includeTrashed=0`);
+      if(response.status === 200)
+        res = Object.keys(await (response).json())
+      else 
+        return zoteroItems;
+    }
+    catch(err)
+    {
+      return zoteroItems;
+    }
+
+    this.otherLibItemsCount = res.length;
+    for (let n = 0; n < res.length; n++) {
+      for (const item of await(await fetch(`https://api.zotero.org/groups/${apiNumber}/items?itemKey=${res.slice(n, n + this.batch).join(',')}&includeTrashed=0`)).json()) {
+        zoteroItems.push(item.data);
+        n += 1;
+        this.fetchingPercentage = n;
+      }
+    }
+
+    localStorage.setItem(apiNumber, JSON.stringify(zoteroItems));
+    return zoteroItems;
+    //console.log(res)
   }
 
   takeBackup() {

@@ -9,9 +9,17 @@ export class Creator {
     constructor(creator: any) {
         if (creator !== null) {
             this.creatorType = creator.creatorType;
-            this.firstName = creator.firstName;
-            this.lastName = creator.lastName;
-            this.fullName = creator.firstName + " " + creator.lastName;
+            if(creator.name !== undefined)
+            {
+                this.fullName = creator.name;
+            }
+            else
+            {
+                this.firstName = creator.firstName;
+                this.lastName = creator.lastName;
+                this.fullName = creator.firstName + " " + creator.lastName;
+            }
+            
             if (creator.VIAF !== undefined) {
                 this.VIAF.value = creator.VIAF.value === null ? undefined : creator.VIAF.value;
                 this.VIAF.invalid = creator.VIAF.invalid;
@@ -25,6 +33,6 @@ export class Creator {
     }
 
     getFullName(creator: Creator) {
-        return creator.firstName + " " + creator.lastName;
+        return creator.fullName;
     }
 }

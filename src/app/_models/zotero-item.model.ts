@@ -106,13 +106,22 @@ export class ZoteroItem {
         //return this.creators.map(x => ({ name: x.fullName }).name).join(', ');
 
         if (this.creators.length === 1) {
-            return this.creators[0].lastName;
+            if (this.creators[0].lastName !== '')
+                return this.creators[0].lastName;
+            else
+                return this.creators[0].fullName;
         }
         else if (this.creators.length === 2) {
-            return `${this.creators[0].lastName} and ${this.creators[1].lastName}`;
+            if (this.creators[0].lastName !== '')
+                return `${this.creators[0].lastName} and ${this.creators[1].lastName}`;
+            else
+                return this.creators[0].fullName;
         }
         else if (this.creators.length > 1) {
-            return this.creators[0].lastName + ' et al.'
+            if (this.creators[0].lastName !== '')
+                return this.creators[0].lastName + ' et al.'
+            else
+                return this.creators[0].fullName;
         }
         return '';
     }
