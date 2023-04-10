@@ -25,6 +25,7 @@ export class HomeComponent implements OnInit {
   @Input() searchText: string = '';
   errorMessage = '';
   totalItems = 0;
+  citations:any = [];
 
   title = 'fair-biblio';
   loginUser = null;
@@ -48,6 +49,7 @@ export class HomeComponent implements OnInit {
     this.allBiblioData = []
     this.loading = true;
     this.getAllBiblioData()
+    this.getAllBiblioCitationsStyle();
     //this.getBibloItemInfo()
   }
 
@@ -89,6 +91,12 @@ export class HomeComponent implements OnInit {
       this.loading = false;
     }
   }
+
+  async getAllBiblioCitationsStyle()
+  {
+    this.citations = await this.syncService.getAllBiblioCitationStyles();
+  }
+
   convertJSONToArray(data: any) {
     for (let d of data) {
       let zoteroItem: ZoteroItem = new ZoteroItem(d);

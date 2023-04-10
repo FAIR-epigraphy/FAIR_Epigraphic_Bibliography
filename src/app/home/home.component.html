@@ -17,7 +17,7 @@
       </app-biblio-item-list>
     </div>
     <div class="col-md-4">
-      <app-biblio-item-more-info #biblioItemMore1 [totalNumberOfRecords]="totalItems" [lastCallNumber]="lastCallNumber">
+      <app-biblio-item-more-info #biblioItemMore1 [totalNumberOfRecords]="totalItems" [lastCallNumber]="lastCallNumber" [citations]="citations">
       </app-biblio-item-more-info>
     </div>
   </div>
@@ -37,7 +37,7 @@
             aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <app-biblio-item-more-info #biblioItemMore2></app-biblio-item-more-info>
+          <app-biblio-item-more-info #biblioItemMore2 [citations]="citations"></app-biblio-item-more-info>
         </div>
       </div>
     </div>

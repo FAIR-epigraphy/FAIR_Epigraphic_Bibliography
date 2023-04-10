@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 import { AppRoutingModule } from './app-routing.module';
@@ -23,7 +24,9 @@ import { NavBarComponent } from './_component/nav-bar/nav-bar.component';
 import { childViewContainerDirective } from './_component/biblio-item-list/child.view.container.directive'
 import { ChildListComponent  } from './_component/biblio-item-list/child-list/child-list.component';
 import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component'
-
+import { NgSelectModule } from '@ng-select/ng-select';
+import { BiblioAdvanceSearchComponent } from './_component/biblio-advance-search/biblio-advance-search.component';
+import { BiblioItemAlignmentComponent } from './_component/biblio-item-alignment/biblio-item-alignment.component';
 
 @NgModule({
   declarations: [
@@ -44,14 +47,18 @@ import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component'
     ManageBiblioItemCategoryComponent,
     NavBarComponent,
     PagenotfoundComponent,
+    BiblioAdvanceSearchComponent,
+    BiblioItemAlignmentComponent,
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     NgbModule,
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgSelectModule
   ],
   providers: [BiblioItemMoreInfoComponent, BiblioParentchildRelComponent, childViewContainerDirective, ChildListComponent],
   bootstrap: [AppComponent]
