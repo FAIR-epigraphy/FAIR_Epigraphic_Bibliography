@@ -91,6 +91,7 @@ export class BiblioItemListComponent implements OnInit {
     console.log(obj)
     this.removeHiglightedClass(event.currentTarget as HTMLElement);
     this.biblioItemInfoComp.getSpecificData(obj);
+    this.currentSelectedRecord = obj;
   }
 
   removeHiglightedClass(element: HTMLElement) {
@@ -126,12 +127,6 @@ export class BiblioItemListComponent implements OnInit {
   }
 
   expandInnerChild(data: any, flag: boolean, event: any) {
-    // this.childView.map((vcr: ViewContainerRef, index: number) => {
-    //   if(vcr.element.nativeElement.isEqualNode(event.currentTarget.parentNode.parentNode)){
-    //     console.log('equal');
-    //   }
-    //   return;
-    // });
     let viewContainerRef = this.childView.filter(x => x.element.nativeElement.isEqualNode(event.currentTarget.parentNode.parentNode))[0];
     data.showChild = flag;
     if (flag) {
@@ -210,5 +205,10 @@ export class BiblioItemListComponent implements OnInit {
 
   ngAfterViewInit() {
     console.log(this.biblioData.length);
+  }
+
+  showCitation()
+  {
+    document.getElementById('citation-tab')?.click();
   }
 }

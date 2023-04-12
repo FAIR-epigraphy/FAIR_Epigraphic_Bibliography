@@ -21,7 +21,12 @@ export class ChildListComponent implements OnInit {
   getSpecificData(obj: ZoteroItem, event: Event) {
     console.log(obj)
     this.removeHiglightedClass(event.currentTarget as HTMLElement);
-    this.biblioItemInfoComp.getSpecificData(obj);
+    if (this.biblioItemInfoComp !== undefined)
+    {
+      this.biblioItemInfoComp.getSpecificData(obj);
+      document.getElementById('btnOpenModalDetail')?.click();
+    }
+      
   }
 
   removeHiglightedClass(element: HTMLElement) {

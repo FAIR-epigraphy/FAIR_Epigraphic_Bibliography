@@ -1,19 +1,23 @@
 <ul class="nav nav-tabs" id="myTab" role="tablist">
   <li class="nav-item" role="presentation">
-    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab"
-      aria-controls="home" aria-selected="true">Info</button>
+    <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab"
+      aria-controls="info" aria-selected="true">Info</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab"
-      aria-controls="profile" aria-selected="false">Notes</button>
+    <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab"
+      aria-controls="notes" aria-selected="false">Notes</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#tags" type="button" role="tab"
-      aria-controls="contact" aria-selected="false">Tags</button>
+    <button class="nav-link" id="tags-tab" data-bs-toggle="tab" data-bs-target="#tags" type="button" role="tab"
+      aria-controls="tags" aria-selected="false">Tags</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#relations" type="button" role="tab"
-      aria-controls="contact" aria-selected="false">Relations</button>
+    <button class="nav-link" id="relations-tab" data-bs-toggle="tab" data-bs-target="#relations" type="button" role="tab"
+      aria-controls="relations" aria-selected="false">Relations</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="citation-tab" data-bs-toggle="tab" data-bs-target="#citation" type="button" role="tab"
+      aria-controls="citation" aria-selected="false">Citation</button>
   </li>
 </ul>
 
@@ -63,8 +67,10 @@
                   <span *ngIf="obj.abbr !== ''">{{ obj.abbr }} ({{obj.source }})</span>
                   <div *ngIf="obj.abbr === '' && hasPermission" (keyup.enter)="addAbbreviation(item, $event)">
                     <div class="input-group input-group-sm p-0">
-                      <input [class.is-invalid]="obj.invalid" type="text" class="form-control" style="width: 28%;" placeholder="Enter Abbreviation" />
-                      <input [class.is-invalid]="obj.invalid" type="text" class="form-control" placeholder="Enter Source" />
+                      <input [class.is-invalid]="obj.invalid" type="text" class="form-control" style="width: 28%;"
+                        placeholder="Enter Abbreviation" />
+                      <input [class.is-invalid]="obj.invalid" type="text" class="form-control"
+                        placeholder="Enter Source" />
                       <div [class.invalid-feedback]="obj.invalid" *ngIf="obj.invalid">
                         abbreviation and source are required.
                       </div>
@@ -84,14 +90,13 @@
                     role="button" aria-expanded="false" aria-controls="collapseExample" *ngIf="hasPermission">
                   </a>
                   <a class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#collapseExample{{i}}"
-                    role="button" aria-expanded="false" aria-controls="collapseExample" 
+                    role="button" aria-expanded="false" aria-controls="collapseExample"
                     *ngIf="!hasPermission && (c.VIAF.value !== undefined || c.ORCID.value)">
                   </a>
                   <div class="collapse" id="collapseExample{{i}}">
                     <div class="row mt-2">
                       <div class="input-group input-group-sm p-0 col-md-12">
-                        <span class="input-group-text"
-                        *ngIf="c.VIAF.value !== undefined"
+                        <span class="input-group-text" *ngIf="c.VIAF.value !== undefined"
                           style="font-size: 11px !important; line-height: 0 !important;">VIAF</span>
                         <input type="text" class="form-control" *ngIf="hasPermission" placeholder="Enter VIAF"
                           value="{{c.VIAF.value}}" (keyup.enter)="addVIAF(c, $event)" style="line-height: 0 !important;"
@@ -110,8 +115,7 @@
                       </div>
 
                       <div class="input-group input-group-sm p-0 col-md-12 mt-1">
-                        <span class="input-group-text"
-                          *ngIf="c.ORCID.value !== undefined"
+                        <span class="input-group-text" *ngIf="c.ORCID.value !== undefined"
                           style="font-size: 11px !important; line-height: 0 !important;">ORCID</span>
                         <input type="text" class="form-control" placeholder="Enter ORCID" autofocus required
                           *ngIf="hasPermission" value="{{c.ORCID.value}}" (keyup.enter)="addORCID(c, $event)"
@@ -180,6 +184,55 @@
         </a>
       </li>
     </ul>
+  </div>
+  <div class="tab-pane fade" id="citation" role="tabpanel" aria-labelledby="contact-tab" data-bs-spy="scroll">
+    <div class="mt-2 table-responsive" *ngIf="zoteroObject !== null" id="ccc" style="position: relative;">
+      <div class="row">
+        <div class="col-md-3 text-secondary" style="font-size: 16px;">
+          <span class="align-middle"> Citation Style</span>
+        </div>
+        <div class="col-md-9">
+          <ng-select [items]="citations" appendTo="#ccc" placeholder="Select citation style..." bindLabel="title"
+            bindValue="name" [(ngModel)]="selectedCitationStyle" (change)="getCitation()"></ng-select>
+        </div>
+      </div>
+      <div class="row mt-1">
+        <div class="col-md-3 text-secondary" style="font-size: 16px;">
+          <span class="align-middle"> Language </span>
+        </div>
+        <div class="col-md-9">
+          <ng-select [items]="citationLanguage" appendTo="#ccc" placeholder="Select language.." bindLabel="language"
+            bindValue="langKey" [(ngModel)]="selectedCitationLanguage" (change)="getCitation()"></ng-select>
+        </div>
+      </div>
+
+      <hr />
+      <div class="row">
+        <div class="col-md-12">
+          <div id="citationContent" class="mt-3">
+          </div>
+    
+          <div class="spinner-border text-primary" role="status" *ngIf="isCitationLoading">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+      
+      <hr />
+      <div class="row">
+        <div class="col-md-5 offset-md-7">
+          <div class="input-group mb-3">
+            <button type="button" class="btn btn-primary" (click)="copy('')">Copy to Clipboard</button>
+            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="visually-hidden"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><button class="dropdown-item" (click)="copy('html')">Copy HTML</button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 

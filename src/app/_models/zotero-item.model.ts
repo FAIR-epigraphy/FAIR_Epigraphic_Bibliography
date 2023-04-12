@@ -113,7 +113,11 @@ export class ZoteroItem {
         }
         else if (this.creators.length === 2) {
             if (this.creators[0].lastName !== '')
-                return `${this.creators[0].lastName} and ${this.creators[1].lastName}`;
+                if (this.creators[1].lastName !== '')
+                    return `${this.creators[0].lastName} and ${this.creators[1].lastName}`;
+                else
+                    return `${this.creators[0].lastName} and ${this.creators[1].fullName}`;
+
             else
                 return this.creators[0].fullName;
         }

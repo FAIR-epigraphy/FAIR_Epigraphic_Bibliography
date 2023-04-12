@@ -27,7 +27,7 @@
     </ul>
   </i>
   <i class="bi bi-blockquote-left ms-2" title="Create Citation" style="font-size: 24px;cursor: pointer;"
-    [class]="currentSelectedRecord === null ? 'disabled' : ''"></i>
+    [class]="currentSelectedRecord === null ? 'disabled' : ''" (click)="showCitation()"></i>
   <!-- <i class="bi bi-diagram-3" style="font-size: 24px;cursor: pointer;"></i> -->
 
   <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"

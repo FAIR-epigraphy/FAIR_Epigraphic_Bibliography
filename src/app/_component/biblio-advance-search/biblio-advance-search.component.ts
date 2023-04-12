@@ -35,6 +35,9 @@ export class BiblioAdvanceSearchComponent implements OnInit {
     { id: 'title', displayText: 'Title' },
     { id: 'callNumber', displayText: 'callNumber' },
     { id: 'shortTitle', displayText: 'Abbreviation' },
+    { id: 'firstName', displayText: 'Creator First Name' },
+    { id: 'lastName', displayText: 'Creator Last Name' },
+    { id: 'date', displayText: 'Date' },
     // { id: 'weight', displayText: 'Weight', type: 'number' },
     // { id: 'spendings', displayText: 'Spendings' },
   ];
@@ -190,8 +193,11 @@ export class BiblioAdvanceSearchComponent implements OnInit {
     if (term.fieldName === 'shortTitle') {
       evalValue = item[term.fieldName!].map((x: any) => x.abbr.toLowerCase());
     }
-    else if (term.fieldName === 'creators') {
-
+    else if (term.fieldName === 'firstName') {
+      evalValue = item['creators'].map((x: any) => x.firstName.toLowerCase());
+    }
+    else if (term.fieldName === 'lastName') {
+      evalValue = item['creators'].map((x: any) => x.lastName.toLowerCase());
     }
     else {
       evalValue = String(item[term.fieldName!]).toLowerCase();
@@ -201,7 +207,7 @@ export class BiblioAdvanceSearchComponent implements OnInit {
     // Test value based on selected criteria
     switch (term.action) {
       case 'contains':
-        if (term.fieldName === 'shortTitle') {
+        if (term.fieldName === 'shortTitle' || term.fieldName === 'firstName' || term.fieldName === 'lastName') {
           rerturnVal = evalValue.filter((x: any) => x.includes(termValue)).length > 0
         }
         else {
@@ -210,7 +216,7 @@ export class BiblioAdvanceSearchComponent implements OnInit {
         break;
 
       case 'equals':
-        if (term.fieldName === 'shortTitle') {
+        if (term.fieldName === 'shortTitle' || term.fieldName === 'firstName' || term.fieldName === 'lastName') {
           rerturnVal = evalValue.filter((x: any) => x === termValue).length > 0
         }
         else {
