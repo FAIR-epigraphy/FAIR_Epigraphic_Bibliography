@@ -77,6 +77,10 @@ export class ZoteroSyncService {
     // update all libraries
     try {
       await this.login();
+      //////////////////////////////////
+      // This method is temp will be deleted soon
+      this.checkForModifiedByAddedBy()
+      ///////////////////////////////////
       let prefix = this.libraries[Object.keys(this.libraries)[0]].prefix;
       await this.update(prefix, includeTrashed);
       return { items: this.items, libraryName: this.name, version: this.version };
@@ -84,6 +88,20 @@ export class ZoteroSyncService {
     catch (err) {
       console.log(err);
       return 'Error: ' + err;
+    }
+  }
+
+  checkForModifiedByAddedBy(){
+    let items = [];
+    let version = 0;
+    let name = '';
+    ({ items, version, name } = JSON.parse(localStorage.getItem(this.storeName) || '{}'));
+    if(items!==undefined)
+    {
+      if(items[0]['addedBy'] === undefined)
+      {
+        localStorage.removeItem(this.storeName);
+      }
     }
   }
 
@@ -146,7 +164,13 @@ export class ZoteroSyncService {
     const items = Object.keys(await this.get(prefix, `/items?since=${this.version}&format=versions&includeTrashed=${Number(includeTrashed)}`));
     for (let n = 0; n < items.length; n++) {
       for (const item of await this.get(prefix, `/items?itemKey=${items.slice(n, n + this.batch).join(',')}&includeTrashed=${Number(includeTrashed)}`)) {
-        await this.add(item.data);
+        let bibData = item.data;
+        if(item.meta['createdByUser'] !== undefined)
+          bibData['addedBy'] = item.meta['createdByUser']['username'];
+        if(item.meta['lastModifiedByUser']!==undefined)
+          bibData['modifiedBy'] = item.meta['lastModifiedByUser']['username'];
+
+        await this.add(bibData);
         n += 1;
       }
     }

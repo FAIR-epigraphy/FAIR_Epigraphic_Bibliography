@@ -12,8 +12,8 @@
       aria-controls="tags" aria-selected="false">Tags</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="relations-tab" data-bs-toggle="tab" data-bs-target="#relations" type="button" role="tab"
-      aria-controls="relations" aria-selected="false">Relations</button>
+    <button class="nav-link" id="relations-tab" data-bs-toggle="tab" data-bs-target="#relations" type="button"
+      role="tab" aria-controls="relations" aria-selected="false">Relations</button>
   </li>
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="citation-tab" data-bs-toggle="tab" data-bs-target="#citation" type="button" role="tab"
@@ -26,6 +26,16 @@
     <div class="table-responsive">
       <table class="table table-hover mt-2">
         <tbody>
+          <tr>
+            <td>FAIR Biblio URI</td>
+            <td>
+              https://biblio.inscriptiones.org/{{ zoteroObject.callNumber }}
+              <a href="https://biblio.inscriptiones.org/{{ zoteroObject.callNumber }}"
+                *ngIf="zoteroObject.callNumber !== ''" target="_blank">
+                <i class='bi bi-box-arrow-up-right'></i>
+              </a>
+            </td>
+          </tr>
           <tr>
             <td>Resource Type</td>
             <td>
@@ -48,6 +58,8 @@
                     item.key !=='relations' && item.key !=='url' && 
                     item.key !== 'children' && item.key !== 'key' && item.key !== 'creatorsName' &&
                     item.key !== 'resourceTypeId' && item.key !== 'resourceType' &&
+                    item.key !== 'addedBy' && item.key !== 'modifiedBy' &&
+                    item.key !== 'dateAdded' && item.key !== 'dateModified' &&
                     itemHasValue(item.value)">
               {{ getColumnName(item.key) }}
             </td>
@@ -55,6 +67,8 @@
               item.key !=='relations' && item.key !=='url' &&
               item.key !== 'children' && item.key !== 'key' && item.key !== 'creatorsName' &&
               item.key !== 'resourceTypeId' && item.key !== 'resourceType' &&
+              item.key !== 'addedBy' && item.key !== 'modifiedBy' &&
+              item.key !== 'dateAdded' && item.key !== 'dateModified' &&
                itemHasValue(item.value)">
               <span *ngIf="item.key !== 'shortTitle'">{{item.value}}</span>
               <span *ngIf="item.key === 'shortTitle'">
@@ -79,7 +93,6 @@
                 </li>
               </ul>
             </td>
-
             <!-- with creators -->
             <td colspan="2" *ngIf="item.key === 'creators' && getCreators(item.value).length > 0">
               <div class="row w-100" *ngFor="let c of getCreators(item.value); let i = index; trackBy: trackByIdFn;">
@@ -135,6 +148,39 @@
                   </div>
                 </div>
               </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td *ngIf="zoteroObject.dateAdded !== undefined && zoteroObject.dateAdded !== ''">
+              Date Added
+            </td>
+            <td *ngIf="zoteroObject.dateAdded !== undefined && zoteroObject.dateAdded !== ''">
+              {{ zoteroObject.dateAdded }}
+            </td>
+          </tr>
+          <tr>
+            <td *ngIf="zoteroObject.dateModified !== undefined && zoteroObject.dateModified!== ''">
+              Date Modified
+            </td>
+            <td *ngIf="zoteroObject.dateModified !== undefined && zoteroObject.dateModified!== ''">
+              {{ zoteroObject.dateModified }}
+            </td>
+          </tr>
+          <tr>
+            <td *ngIf="zoteroObject.addedBy !== undefined && zoteroObject.addedBy !== ''">
+              Added By
+            </td>
+            <td *ngIf="zoteroObject.addedBy !== undefined && zoteroObject.addedBy !== ''">
+              {{ zoteroObject.addedBy }}
+            </td>
+          </tr>
+          <tr>
+            <td *ngIf="zoteroObject.modifiedBy !== undefined && zoteroObject.modifiedBy!== ''">
+              Modified By
+            </td>
+            <td *ngIf="zoteroObject.modifiedBy !== undefined && zoteroObject.modifiedBy!== ''">
+              {{ zoteroObject.modifiedBy }}
             </td>
           </tr>
         </tbody>
@@ -211,19 +257,20 @@
         <div class="col-md-12">
           <div id="citationContent" class="mt-3">
           </div>
-    
+
           <div class="spinner-border text-primary" role="status" *ngIf="isCitationLoading">
             <span class="visually-hidden">Loading...</span>
           </div>
         </div>
       </div>
-      
+
       <hr />
       <div class="row">
         <div class="col-md-5 offset-md-7">
           <div class="input-group mb-3">
             <button type="button" class="btn btn-primary" (click)="copy('')">Copy to Clipboard</button>
-            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+              data-bs-toggle="dropdown" aria-expanded="false">
               <span class="visually-hidden"></span>
             </button>
             <ul class="dropdown-menu">

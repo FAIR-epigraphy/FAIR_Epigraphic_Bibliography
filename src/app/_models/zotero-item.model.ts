@@ -1,3 +1,4 @@
+import { DatePipe } from "@angular/common";
 import { Creator } from "./creator.model";
 
 
@@ -19,8 +20,8 @@ export class ZoteroItem {
     public language: string = ''
     public rights: string = '';
     public extra: string = '';
-    public dateAdded: string = '';
-    public dateModified: string = '';
+    public dateAdded: any = '';
+    public dateModified: any = '';
     public tags: Array<string> = [];
     public collections: Array<string> = [];
     public relations: object = {};
@@ -45,6 +46,8 @@ export class ZoteroItem {
     public seriesNumber: string = '';
     public numPages: string = '';
     public ISBN: string = '';
+    public addedBy: string = '';
+    public modifiedBy: string = '';
 
     public static notes: any = [];
     public children: Array<ZoteroItem> = new Array();
@@ -53,6 +56,7 @@ export class ZoteroItem {
     public creatorsName: string = '';
 
     constructor(d: any) {
+        const pipe = new DatePipe('en-US'); // Use your own locale
         if (d.itemType === 'note') {
             ZoteroItem.notes.push(d)
         }
@@ -74,8 +78,8 @@ export class ZoteroItem {
             this.language = d.language;
             this.rights = d.rights;
             this.extra = d.extra;
-            this.dateAdded = d.dateAdded;
-            this.dateModified = d.dateModified;
+            this.dateAdded = new Date(d.dateAdded).toLocaleString();//pipe.transform(new Date(d.dateAdded).toLocaleString(), 'dd/MM/yyyy, hh:mm:ss a');
+            this.dateModified = new Date(d.dateModified).toLocaleString();//pipe.transform(new Date(d.dateModified).toLocaleString(), 'dd/MM/yyyy, hh:mm:ss a');
             this.tags = d.tags;
             this.collections = d.collections;
             this.relations = d.relations;
@@ -99,6 +103,18 @@ export class ZoteroItem {
             this.seriesNumber = d.seriesNumber;
             this.numPages = d.numPages;
             this.ISBN = d.ISBN;
+
+            ////////////////////
+            // Contributor
+            if(d.addedBy !== undefined)
+            {
+                this.addedBy = d.addedBy;
+            }
+
+            if(d.modifiedBy !== undefined)
+            {
+                this.modifiedBy = d.modifiedBy;
+            }
         }
     }
 
