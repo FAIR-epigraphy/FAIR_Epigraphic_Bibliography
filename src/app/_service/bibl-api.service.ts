@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, from, forkJoin } from 'rxjs';
+import { AuthService } from '../_service/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,8 @@ export class BiblApiService {
   private base_url = 'https://fair.classics.ox.ac.uk/bibl_api';
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private authService: AuthService,
   ) { }
 
   getSEGAbbrByAIEGL(abbr: string): Observable<any> {
@@ -58,11 +60,13 @@ export class BiblApiService {
   }
 
   addCreatorVIAF(creator: any, callNumber: any): Observable<any> {
-    return this.http.post<any>(`${this.base_url}/creators/creator.php`, { creator: creator, callNumber: callNumber, method: 'addCreatorVIAF' });
+    let userId = JSON.parse(this.authService.getToken() || '{}').id
+    return this.http.post<any>(`${this.base_url}/creators/creator.php`, { creator: creator, callNumber: callNumber, userId: userId, method: 'addCreatorVIAF' });
   }
 
   addCreatorORCID(creator: any, callNumber: any): Observable<any> {
-    return this.http.post<any>(`${this.base_url}/creators/creator.php`, { creator: creator, callNumber: callNumber, method: 'addCreatorORCID' });
+    let userId = JSON.parse(this.authService.getToken() || '{}').id
+    return this.http.post<any>(`${this.base_url}/creators/creator.php`, { creator: creator, callNumber: callNumber, userId: userId, method: 'addCreatorORCID' });
   }
 
   getVIAF_ORCIDByCreator(creators: any): Observable<any> {
@@ -78,7 +82,8 @@ export class BiblApiService {
   }
 
   addBiblioItemLink(callNumber: any, link: any): Observable<any> {
-    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, link: link, method: 'addBiblioItemLink' });
+    let userId = JSON.parse(this.authService.getToken() || '{}').id
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, link: link, userId: userId, method: 'addBiblioItemLink' });
   }
 
   getAllBiblioParentChildItems(): Observable<any> {
@@ -119,12 +124,14 @@ export class BiblApiService {
 
   UpdateChildCategory(bibParent: any, bibChild: any): Observable<any> {
     let requests = [];
+    let userId = JSON.parse(this.authService.getToken() || '{}').id
     for (let sel of bibChild.filter((x: any) => x.sel_cat !== undefined)) {
       requests.push(this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`,
         {
           parent_callNumber: bibParent.callNumber,
           child_callNumber: sel.callNumber,
           cat_id: sel.sel_cat,
+          userId: userId,
           method: 'UpdateChildCategory'
         }
       ));
@@ -141,11 +148,13 @@ export class BiblApiService {
   }
 
   UpdateItemResourceTypeByCallNumber(callNumber: any, resourceTypeId: any): Observable<any> {
-    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, resourceTypeId: resourceTypeId, method: 'UpdateItemResourceTypeByCallNumber' });
+    let userId = JSON.parse(this.authService.getToken() || '{}').id
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, resourceTypeId: resourceTypeId, userId: userId, method: 'UpdateItemResourceTypeByCallNumber' });
   }
 
   addItemAbbr(obj: any): Observable<any> {
-    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { itemAbbr: obj, method: 'addItemAbbr' });
+    let userId = JSON.parse(this.authService.getToken() || '{}').id
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { itemAbbr: obj, userId: userId, method: 'addItemAbbr' });
   }
 
   getItemAbbr(callNumber: any, abbr: any): Observable<any> {

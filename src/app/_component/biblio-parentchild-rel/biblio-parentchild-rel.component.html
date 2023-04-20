@@ -86,7 +86,7 @@
                     <button type="button" class="list-group-item list-group-item-action" title="{{selBib.title}}"
                         *ngFor="let selBib of selectedChildBiblio" (click)="selectChildFromList(selBib, $event)">
                         {{ selBib.title | slice:0:25 }}, {{ selBib.date }}, {{ selBib.getCreators() }}
-                        <select class="form-select" [(ngModel)]="selBib.sel_cat">
+                        <select class="form-select" [(ngModel)]="selBib['sel_cat']">
                             <option [ngValue]="undefined" disabled>Select category</option>
                             <option *ngFor="let cat of categories" [ngValue]="cat.id">
                                 {{ cat.cat_name }}

@@ -88,12 +88,13 @@ export class BiblioParentchildRelComponent implements OnInit {
         if (resp.length > 0) {
           for (let child of resp) {
             let index = this.biblioDataChild.findIndex(x => x.callNumber === child.child_callNumber)
+            if (index === -1) continue;
+
             let obj: any = this.biblioDataChild[index];
             if (child.cat_id != null)
-              obj.sel_cat = child.cat_id;
+              obj['sel_cat'] = child.cat_id;
 
             this.selectedChildBiblio.push(obj);
-
             this.biblioDataChild.splice(index, 1);
           }
         }
@@ -228,8 +229,7 @@ export class BiblioParentchildRelComponent implements OnInit {
           this.showToast('Record updated', 'bg-success');
         })
     }
-    else
-    {
+    else {
       this.showToast('Record updated', 'bg-success');
     }
   }
