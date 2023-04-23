@@ -19,6 +19,7 @@ The pilot project employs the Zotero open source bibliographic software to host 
 * the ability to record equivalent resources in other platforms;
 * the ability to record additional semantically rich metadata such as VIAF identifiers for authors;
 * and most importantly the maintenance of a unique and stable item identifier.
+
 The pilot project therefore starts from the Zotero bibliography as the best tool to generate and maintain the bibliography, but then extends this with back-end resources and a web-interface. The web-front end is maintained in this github repository, and is accessible at <https://biblio.inscriptiones.org/>. The data is hosted on a server at the [Centre for the Study of Ancient Documents](https://www.csad.ox.ac.uk/home), University of Oxford. This is very much work-in-progress, and fuller information will be posted here soon, but the current interface already provides for search and export, as well as serving URIs for each item (e.g. <https://biblio.inscriptiones.org/epig10001219>).
 
 We welcome all comments and feedback.
