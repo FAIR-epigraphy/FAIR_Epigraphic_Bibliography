@@ -29,5 +29,6 @@ jobs:
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
+          branch: main
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          target_folder: ./docs
