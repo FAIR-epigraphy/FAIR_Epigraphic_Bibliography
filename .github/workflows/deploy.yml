@@ -31,4 +31,4 @@ jobs:
         with:
           branch: main
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          target_folder: ./docs
+          folder: docs
