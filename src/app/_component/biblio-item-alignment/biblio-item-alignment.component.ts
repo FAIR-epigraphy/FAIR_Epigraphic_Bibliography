@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ZoteroItem } from 'src/app/_models/zotero-item.model';
 import { AuthService } from 'src/app/_service/auth.service';
 import { ZoteroSyncService } from 'src/app/_service/zotero-sync.service';
@@ -20,6 +20,10 @@ export class BiblioItemAlignmentComponent implements OnInit {
   matchedBibliography: Array<ZoteroItem> = new Array();
   notMatchedBibliography: Array<ZoteroItem> = new Array();
 
+  @ViewChild('customBiblioList') customBiblioList: any;
+  @ViewChild('zoteroBiblioList') zoteroBiblioList: any;
+
+
   constructor(
     private authService: AuthService,
     public zoteroAPI: ZoteroSyncService
@@ -32,6 +36,10 @@ export class BiblioItemAlignmentComponent implements OnInit {
     }
     else
       this.loginUser = null;
+
+    if (localStorage.getItem('libURL') !== undefined && localStorage.getItem('libURL') !== null) {
+      this.zoteroURL = localStorage.getItem('libURL') || '{}';
+    }
   }
 
   checkURL() {
@@ -55,7 +63,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
           items = JSON.parse(localStorage.getItem(apiNumber) || '{}');
         }
         else {
-          items = await this.zoteroAPI.fetchURL(apiNumber);
+          items = await this.zoteroAPI.fetchURL(apiNumber, this.zoteroURL);
         }
 
         if (items.length > 0) {
@@ -83,7 +91,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
     for (let target of this.allOtherBiblioData) {
       for (let source of this.allSourceBiblioData) {
         currentSource = source;
-        if (source.title === target.title) {
+        if (source.title.includes(target.title) || target.title.includes(source.title)) {
           for (let c of source.creators) {
             let creatorFound = target.creators.filter(x => (x.firstName === c.firstName && x.lastName === c.lastName) ||
               (x.fullName === c.fullName)
@@ -108,6 +116,54 @@ export class BiblioItemAlignmentComponent implements OnInit {
       else
         this.notMatchedBibliography.push(target);
     }
+  }
+
+  compare(item: any) {
+    let biblioSourceItem = this.getSpecificBiblioItem(item, 'biblioList')
+    this.customBiblioList.getSpecificData(biblioSourceItem, 'biblio');
+
+    let biblioTargetItem = this.getSpecificBiblioItem(item, 'zoteroList')
+    this.zoteroBiblioList.getSpecificData(biblioTargetItem, 'zotero');
+  }
+
+  getSpecificBiblioItem(item: any, origin: any) {
+    let currentSource: any = null;
+    if ('biblioList' === origin) {
+      if (this.allSourceBiblioData.filter(source => source.title.includes(item.title) || item.title.includes(source.title)).length > 0) {
+        let source = this.allSourceBiblioData.filter(source => source.title.includes(item.title) || item.title.includes(source.title))[0];
+        for (let c of source.creators) {
+          let creatorFound = item.creators.filter((x:any) => (x.firstName === c.firstName && x.lastName === c.lastName) ||
+            (x.fullName === c.fullName)
+          );
+          if (creatorFound.length > 0) {
+            let splitSourceDate = source.date.split("-");
+            let splitTargetDate = item.date.split("-");
+            if (splitSourceDate[0].trim() === splitTargetDate[0].trim()) {
+              currentSource = source;
+            }
+          }
+        }
+      }
+    }
+    else
+    {
+      if (this.allOtherBiblioData.filter(source => source.title.includes(item.title) || item.title.includes(source.title)).length > 0) {
+        let source = this.allOtherBiblioData.filter(source => source.title.includes(item.title) || item.title.includes(source.title))[0];
+        for (let c of source.creators) {
+          let creatorFound = item.creators.filter((x:any) => (x.firstName === c.firstName && x.lastName === c.lastName) ||
+            (x.fullName === c.fullName)
+          );
+          if (creatorFound.length > 0) {
+            let splitSourceDate = source.date.split("-");
+            let splitTargetDate = item.date.split("-");
+            if (splitSourceDate[0].trim() === splitTargetDate[0].trim()) {
+              currentSource = source;
+            }
+          }
+        }
+      }
+    }
+    return currentSource;
   }
 
   convertJSONToArray(data: any) {

@@ -1,8 +1,8 @@
-.table-responsive {
-    height: 73vh !important;
-    width: 101% !important;
-}
-
 .table-responsive td p {
     height: 1px;
+}
+.container-fluid{
+    overflow-y:scroll; 
+    position:relative;
+    height: 90vh;
 }

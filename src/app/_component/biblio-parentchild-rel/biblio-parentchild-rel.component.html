@@ -18,7 +18,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let data of biblioDataParent | customFilter:searchTextParent" style="cursor: pointer;"
+                    <tr *ngFor="let data of biblioDataParent | customFilter: searchTextParent : excludes;" style="cursor: pointer;"
                         (click)="getSpecificData(data)"
                         [class.highlighted]="currentSelectedRecord !== null && data.title === currentSelectedRecord.title">
                         <td title="{{data.title}}">
@@ -135,7 +135,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let data of biblioDataChild | customFilter:searchTextChild" style="cursor: pointer;"
+                    <tr *ngFor="let data of biblioDataChild | customFilter:searchTextChild: excludes;" style="cursor: pointer;"
                         (click)="getSpecificDataChild(data)" [class.highlighted]="getHiglightedChild(data)">
                         <td title="{{data.title}}">
                             <p *ngIf="data.title.length < 25">
@@ -169,11 +169,14 @@
     <div class="col-md-12">
         <hr />
         <button class="btn btn-primary float-end me-5" *ngIf="selectedParentBiblio !== null && 
-                      selectedChildBiblio.length > 0"
-                      (click)="updateChildCategory()" [disabled]="isSaving">
-                      <i class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="isSaving"></i>
-                       <label *ngIf="isSaving">  Saving...</label>
-                      <label *ngIf="!isSaving">Apply</label>
+                      selectedChildBiblio.length > 0" (click)="updateChildCategory()" [disabled]="isSaving">
+            <i class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="isSaving"></i>
+            <label *ngIf="isSaving"> Saving...</label>
+            <label *ngIf="!isSaving">Apply</label>
+        </button>
+
+        <button class="btn btn-warning float-end me-5" *ngIf="isReset" (click)="resetForm()">
+            <label *ngIf="!isSaving">Reset</label>
         </button>
     </div>
 </div>

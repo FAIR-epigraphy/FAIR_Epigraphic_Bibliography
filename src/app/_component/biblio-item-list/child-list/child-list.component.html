@@ -15,13 +15,13 @@
                             (click)="expandInnerChild(child, false, $event)"></i>
                     </td>
                     <td title="{{child.title}}" style="width: 50%;">
-                        <p *ngIf="child.title.length < 50">
+                        <p *ngIf="child.title.length < 65">
                             <i></i>
                             {{child.title}}
                         </p>
-                        <p *ngIf="child.title.length >= 50">
+                        <p *ngIf="child.title.length >= 65">
                             <i></i>
-                            {{child.title | slice:0:50}}...
+                            {{child.title | slice:0:65}}...
                         </p>
                     </td>
                     <td style="width: 19%;">

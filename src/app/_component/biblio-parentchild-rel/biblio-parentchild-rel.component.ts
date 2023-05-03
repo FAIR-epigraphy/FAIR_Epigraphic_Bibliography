@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AuthService } from 'src/app/_service/auth.service';
 import { BiblApiService } from 'src/app/_service/bibl-api.service';
 import { ZoteroItem } from '../../_models/zotero-item.model';
@@ -20,6 +20,8 @@ export class BiblioParentchildRelComponent implements OnInit {
   searchTextParent: string = '';
   searchTextChild: string = '';
 
+  excludes = ['collections', 'shortTitle', 'tags', 'relations', 'children'];
+
   btnParentAdd: boolean = false;
   btnParentRemove: boolean = false;
 
@@ -33,8 +35,11 @@ export class BiblioParentchildRelComponent implements OnInit {
   categories: any = [];
   errorMessage = '';
   @Input() lastestCallNumber = '';
+  @Input() parentComponent: any;
   added_by = 0;
   isSaving = false;
+  isReset = false;
+  @Output() searchValueChange = new EventEmitter();
   // parentFromDB = false;
 
   constructor(
@@ -232,6 +237,16 @@ export class BiblioParentchildRelComponent implements OnInit {
     else {
       this.showToast('Record updated', 'bg-success');
     }
+    this.isReset = true;
+  }
+
+  resetForm() {
+    this.parentComponent.reInit();
+  }
+
+  changeText()
+  {
+    //this.searchValueChange.emit(this.searchTextParent);
   }
 
   showToast(msg: any, color: any) {

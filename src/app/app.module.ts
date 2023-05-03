@@ -27,6 +27,7 @@ import { PagenotfoundComponent } from './pagenotfound/pagenotfound.component'
 import { NgSelectModule } from '@ng-select/ng-select';
 import { BiblioAdvanceSearchComponent } from './_component/biblio-advance-search/biblio-advance-search.component';
 import { BiblioItemAlignmentComponent } from './_component/biblio-item-alignment/biblio-item-alignment.component';
+import { BiblioItemCompareComponent } from './_component/biblio-item-alignment/biblio-item-compare/biblio-item-compare.component';
 
 @NgModule({
   declarations: [
@@ -49,6 +50,7 @@ import { BiblioItemAlignmentComponent } from './_component/biblio-item-alignment
     PagenotfoundComponent,
     BiblioAdvanceSearchComponent,
     BiblioItemAlignmentComponent,
+    BiblioItemCompareComponent,
   ],
   imports: [
     BrowserModule,

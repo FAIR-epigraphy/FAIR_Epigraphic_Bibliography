@@ -218,7 +218,7 @@ export class ZoteroSyncService {
     URL.revokeObjectURL(a.href);
   }
 
-  async fetchURL(apiNumber:any)
+  async fetchURL(apiNumber:any, libURL: any)
   {
     let zoteroItems: any = [];
     let res: any = null;
@@ -241,9 +241,11 @@ export class ZoteroSyncService {
         n += 1;
         this.fetchingPercentage = n;
       }
+      //break;
     }
 
     localStorage.setItem(apiNumber, JSON.stringify(zoteroItems));
+    localStorage.setItem('libURL', libURL);
     return zoteroItems;
     //console.log(res)
   }

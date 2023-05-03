@@ -5,7 +5,6 @@ import { BiblApiService } from '../../_service/bibl-api.service'
 import { AuthService } from '../../_service/auth.service'
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ZoteroSyncService } from 'src/app/_service/zotero-sync.service';
-import { NgSelectModule, NgOption } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-biblio-item-more-info',

@@ -40,7 +40,7 @@
             (click)="closeModal()"></button>
         </div>
         <div class="modal-body">
-          <app-biblio-parentchild-rel *ngIf="isShown" [biblioData]="allBiblioData" [lastestCallNumber]="lastCallNumber">
+          <app-biblio-parentchild-rel *ngIf="isShown" [parentComponent]="this" [biblioData]="allBiblioData" [lastestCallNumber]="lastCallNumber">
           </app-biblio-parentchild-rel>
         </div>
       </div>
@@ -90,13 +90,13 @@
             (click)="expandChild(data, false)"></i>
         </td>
         <td title="{{data.title}}">
-          <p *ngIf="data.title.length < 50">
+          <p *ngIf="data.title.length < 65">
             <i [class]="getItemTypeIcon(data.itemType)"></i>
             {{data.title}}
           </p>
-          <p *ngIf="data.title.length >= 50">
+          <p *ngIf="data.title.length >= 65">
             <i [class]="getItemTypeIcon(data.itemType)"></i>
-            {{data.title | slice:0:50}}...
+            {{data.title | slice:0:65}}...
           </p>
         </td>
         <td>
@@ -127,7 +127,7 @@
                   <i class="bi bi-dash-circle-fill text-success" *ngIf="child.children.length > 0 && child.showChild"
                     (click)="expandInnerChild(child, false, $event)"></i>
                 </td>
-                <td title="{{child.title}}" style="width: 50%;">
+                <td title="{{child.title}}" style="width: 49%;">
                   <p *ngIf="child.title.length < 50">
                     <i [class]="getItemTypeIcon(child.itemType)"></i>
                     {{child.title}}
@@ -137,7 +137,7 @@
                     {{child.title | slice:0:50}}...
                   </p>
                 </td>
-                <td>
+                <td style="width: 19%;">
                   {{ child.date }}
                 </td>
                 <td title="{{child.getCreators()}}">
