@@ -1,0 +1,129 @@
+@keyframes placeHolderShimmer {
+    0% {
+        background-position: -468px 0
+    }
+
+    100% {
+        background-position: 468px 0
+    }
+}
+
+.loading {
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-name: placeHolderShimmer;
+    animation-timing-function: linear;
+    background: #f6f7f8;
+    background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
+    background-size: 1000px 104px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 1em;
+}
+
+span {
+    height: 10px;
+    display: block;
+}
+
+.table-responsive {
+    height: 65vh !important;
+    width: 101% !important;
+}
+
+.table-responsive td p {
+    height: 1px;
+}
+
+.highlighted {
+    background-color: #0d6efd !important;
+    color: white;
+
+    td {
+        color: white !important;
+
+        i {
+            color: white !important;
+        }
+    }
+}
+
+.modal-dialog-slideout {
+    min-height: 100%;
+    margin: 0 0 0 auto;
+    background: #fff;
+}
+
+.modal.fade .modal-dialog.modal-dialog-slideout {
+    -webkit-transform: translate(100%, 0)scale(1);
+    transform: translate(100%, 0)scale(1);
+}
+
+.modal.fade.show .modal-dialog.modal-dialog-slideout {
+    -webkit-transform: translate(0, 0);
+    transform: translate(0, 0);
+    display: flex;
+    align-items: stretch;
+    -webkit-box-align: stretch;
+    height: 100%;
+}
+
+.modal.fade.show .modal-dialog.modal-dialog-slideout .modal-body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 101% !important;
+}
+
+.modal-dialog-slideout .modal-content {
+    border: 0;
+}
+
+// ***********************************************************************************************************
+// General layout
+// ***********************************************************************************************************
+
+// Top level container
+.container {
+    max-width: 90%;
+    padding: 10px;
+}
+
+// ***********************************************************************************************************
+// Advanced search, high-level
+// ***********************************************************************************************************
+
+// Toggle for advanced term link (AND / OR )
+.advanced-search-link-display {
+    cursor: pointer;
+    color: #007bff;
+    max-width: 30px;
+    padding: 0;
+    margin-left: 15px;
+    margin-right: 1.35rem;
+    margin-top: 1.35rem;
+    margin-bottom: 1.35rem;
+    border-right: 1px solid #007bff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+// Link for adding new adv term
+.advanced-search-newrow {
+    cursor: pointer;
+}
+
+// ***********************************************************************************************************
+// Advanced search, field sepcifics
+// ***********************************************************************************************************
+
+// Is the rule negated, 1
+.advanced-search-negate {
+    cursor: pointer;
+}
+
+// Delete term
+.advanced-search-delrow {
+    cursor: pointer;
+}

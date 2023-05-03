@@ -1,0 +1,37 @@
+<app-nav-bar></app-nav-bar>
+
+<!-- Page Content -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 text-center" style="padding-top: 20px;">
+            <div class="container box" style="margin-top: 10px; padding-left: 0px; padding-right: 0px;">
+                <div class="row">
+                    <div class="col-12" style="text-align: start;">
+                        <form [formGroup]="formData" (ngSubmit)="onClickSubmit(formData.value)" class="form-signin">
+                            <h2>Login</h2>
+                            <hr />
+                            <label for="inputEmail" class="sr-only">Username or Email</label>
+                            <input type="text" id="username" class="form-control mt-2" formControlName="userName"
+                                placeholder="Username" required autofocus>
+                            <label for="inputPassword" class="sr-only">Password</label>
+                            <input type="password" id="inputPassword" class="form-control mt-2"
+                                formControlName="password" placeholder="Password" required>
+                            <button class="btn btn-primary" type="submit">Login</button>
+
+                            <div id="divError" class="toast align-items-center text-white bg-danger border-0 mt-3" role="alert"
+                                aria-live="assertive" aria-atomic="true">
+                                <div class="d-flex">
+                                    <div class="toast-body">
+                                        username or password is incorrect.
+                                    </div>
+                                    <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                                        data-bs-dismiss="toast" aria-label="Close"></button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

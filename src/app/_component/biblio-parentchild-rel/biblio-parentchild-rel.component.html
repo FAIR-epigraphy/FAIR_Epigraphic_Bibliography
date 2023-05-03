@@ -1,0 +1,195 @@
+<div class="row">
+    <div class="col-md-4">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Filter..." [(ngModel)]="searchTextParent" />
+            <i class="bi bi-x" style="margin-left: -25px; z-index: 100;font-size: 25px;cursor: pointer;"
+                *ngIf="searchTextParent.length > 0" (click)="searchTextParent = ''"></i>
+            <i class="input-group-text bi bi-search" id="basic-addon2"></i>
+        </div>
+
+        <div class="table-responsive mt-1">
+            <table class="table table-striped table-hover" *ngIf="biblioDataParent.length>0">
+                <thead class="sticky-top bg-light text-dark">
+                    <tr>
+                        <!-- <th scope="col">#</th> -->
+                        <th scope="col" style="width: 50%;">Title</th>
+                        <th scope="col">Date</th>
+                        <th scope="col" style="width: 30%;">Creator</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let data of biblioDataParent | customFilter: searchTextParent : excludes;" style="cursor: pointer;"
+                        (click)="getSpecificData(data)"
+                        [class.highlighted]="currentSelectedRecord !== null && data.title === currentSelectedRecord.title">
+                        <td title="{{data.title}}">
+                            <p *ngIf="data.title.length < 25">
+                                {{data.title}}
+                            </p>
+                            <p *ngIf="data.title.length >= 25">
+                                {{data.title | slice:0:25}}...
+                            </p>
+                        </td>
+                        <td>
+                            {{ data.date }}
+                        </td>
+                        <td title="{{data.getCreators()}}">
+                            <span *ngIf="data.getCreators().length < 15">
+                                {{ data.getCreators() }}
+                            </span>
+                            <span *ngIf="data.getCreators().length >= 15">
+                                {{ data.getCreators() | slice:0:15}}...
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Arrow Buttons -->
+    <div class="col-md-1" style="width: 5%;">
+        <p>
+            <button class="btn btn-primary" type="button" [disabled]="!btnParentAdd" (click)="addToParentList()">
+                <i class="bi bi-chevron-right arrows"></i>
+            </button>
+        </p>
+        <p>
+            <button class="btn btn-primary" type="button" [disabled]="!btnParentRemove"
+                (click)="removeFromParentList()">
+                <i class="bi bi-chevron-left arrows"></i>
+            </button>
+        </p>
+    </div>
+    <!-- Middle Section -->
+    <div class="col-md-2">
+        <div class="divParent me-5">
+            <h4>Parent</h4>
+            <hr />
+            <div class="list-group">
+                <button type="button" class="list-group-item list-group-item-action active"
+                    *ngIf="selectedParentBiblio !== null">
+                    {{ selectedParentBiblio.title | slice:0:25 }}, {{ selectedParentBiblio.date }}, {{
+                    selectedParentBiblio.getCreators() }}
+                </button>
+
+                <button type="button" class="list-group-item list-group-item-action"
+                    *ngIf="selectedParentBiblio === null">
+                    Empty...
+                </button>
+            </div>
+        </div>
+
+        <div class="divChild me-5 mt-5">
+            <h4>Child List</h4>
+            <hr />
+            <div>
+                <div class="list-group">
+                    <button type="button" class="list-group-item list-group-item-action" title="{{selBib.title}}"
+                        *ngFor="let selBib of selectedChildBiblio" (click)="selectChildFromList(selBib, $event)">
+                        {{ selBib.title | slice:0:25 }}, {{ selBib.date }}, {{ selBib.getCreators() }}
+                        <select class="form-select" [(ngModel)]="selBib['sel_cat']">
+                            <option [ngValue]="undefined" disabled>Select category</option>
+                            <option *ngFor="let cat of categories" [ngValue]="cat.id">
+                                {{ cat.cat_name }}
+                            </option>
+                        </select>
+                    </button>
+                    <button type="button" class="list-group-item list-group-item-action"
+                        *ngIf="selectedChildBiblio.length === 0">
+                        Empty
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Child Arrow Buttons -->
+    <div class="col-md-1">
+        <p class="ms-5 btn-Child">
+            <button class="btn btn-primary" type="button" [disabled]="!btnChildAdd" (click)="addToChildList()">
+                <i class="bi bi-chevron-left arrows"></i>
+            </button>
+        </p>
+        <p class="ms-5">
+            <button class="btn btn-primary" type="button" [disabled]="!btnChildRemove" (click)="removeFromChildList()">
+                <i class="bi bi-chevron-right arrows"></i>
+            </button>
+        </p>
+    </div>
+    <!-- Child Biblio Section -->
+    <div class="col-md-4">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Filter..." [(ngModel)]="searchTextChild" />
+            <i class="bi bi-x" style="margin-left: -25px; z-index: 100;font-size: 25px;cursor: pointer;"
+                *ngIf="searchTextChild.length > 0" (click)="searchTextChild = ''"></i>
+            <i class="input-group-text bi bi-search" id="basic-addon2"></i>
+        </div>
+
+        <div class="table-responsive mt-1">
+            <table class="table table-striped table-hover" *ngIf="biblioDataChild.length>0">
+                <thead class="sticky-top bg-light text-dark">
+                    <tr>
+                        <!-- <th scope="col">#</th> -->
+                        <th scope="col" style="width: 50%;">Title</th>
+                        <th scope="col">Date</th>
+                        <th scope="col" style="width: 30%;">Creator</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let data of biblioDataChild | customFilter:searchTextChild: excludes;" style="cursor: pointer;"
+                        (click)="getSpecificDataChild(data)" [class.highlighted]="getHiglightedChild(data)">
+                        <td title="{{data.title}}">
+                            <p *ngIf="data.title.length < 25">
+                                {{data.title}}
+                            </p>
+                            <p *ngIf="data.title.length >= 25">
+                                {{data.title | slice:0:25}}...
+                            </p>
+                        </td>
+                        <td>
+                            {{ data.date }}
+                        </td>
+                        <td title="{{data.getCreators()}}">
+                            <span *ngIf="data.getCreators().length < 15">
+                                {{ data.getCreators() }}
+                            </span>
+                            <span *ngIf="data.getCreators().length >= 15">
+                                {{ data.getCreators() | slice:0:15}}...
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+<!-- Apply Button -->
+<div class="row">
+    <div class="col-md-12">
+        <hr />
+        <button class="btn btn-primary float-end me-5" *ngIf="selectedParentBiblio !== null && 
+                      selectedChildBiblio.length > 0" (click)="updateChildCategory()" [disabled]="isSaving">
+            <i class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="isSaving"></i>
+            <label *ngIf="isSaving"> Saving...</label>
+            <label *ngIf="!isSaving">Apply</label>
+        </button>
+
+        <button class="btn btn-warning float-end me-5" *ngIf="isReset" (click)="resetForm()">
+            <label *ngIf="!isSaving">Reset</label>
+        </button>
+    </div>
+</div>
+
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <div id="divError" style="width: auto;" class="toast align-items-center text-white border-0 mt-3" role="alert"
+        aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                {{ errorMessage }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
+        </div>
+    </div>
+</div>

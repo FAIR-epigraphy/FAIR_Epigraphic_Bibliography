@@ -1,0 +1,56 @@
+<h4>Manage Users</h4>
+<hr />
+<form [formGroup]="formUserData" (ngSubmit)="onClickSubmit(formUserData.value)" class="row">
+    <div class="col-md-5">
+        <input class="form-control" formControlName="userName" placeholder="Enter email"
+            [class.is-invalid]="formUserData.controls['userName'].invalid && formUserData.controls['userName'].touched" />
+        <div *ngIf="formUserData.controls['userName'].invalid && formUserData.controls['userName'].touched" 
+            [class.invalid-feedback]="formUserData.controls['userName'].invalid && formUserData.controls['userName'].touched">
+            Please provide a valid email.
+        </div>
+    </div>
+    <div class="col-md-5">
+        <select class="form-select" formControlName="role">
+            <option [ngValue]="null" disabled>Select role</option>
+            <option *ngFor="let role of roles" [ngValue]="role">
+                {{ role.role_name }}
+            </option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" [disabled]="!formUserData.valid" class="btn btn-primary">
+            <i class="bi bi-person-plus"></i> Add
+        </button>
+    </div>
+</form>
+<table class="table mt-3">
+    <thead class="table-light">
+        <tr>
+            <th>Username</th>
+            <th>User Role</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let u of users">
+            <td>{{ u.username }}</td>
+            <td>{{ u.role_name }}</td>
+            <td>
+                <i class="btn btn-danger bi bi-trash" (click)="deleteUser(u)"></i>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="position-fixed top-0 end-0 p-3 mt-5" style="z-index: 11">
+    <div id="divError" style="width: auto;" class="toast align-items-center text-white border-0 mt-3" role="alert"
+        aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                {{ errorMessage }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
+        </div>
+    </div>
+</div>
