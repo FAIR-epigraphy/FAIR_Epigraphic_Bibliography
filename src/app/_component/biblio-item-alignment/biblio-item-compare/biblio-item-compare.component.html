@@ -1,0 +1,127 @@
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="info-tab" data-bs-toggle="tab" [attr.data-bs-target]="'#info-'+tabs" type="button"
+            role="tab" aria-controls="info" aria-selected="true">Info</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="notes-tab" data-bs-toggle="tab" [attr.data-bs-target]="'#notes-'+tabs" type="button" role="tab"
+            aria-controls="notes" aria-selected="false">Notes</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tags-tab" data-bs-toggle="tab" [attr.data-bs-target]="'#tags-'+tabs" type="button" role="tab"
+            aria-controls="tags" aria-selected="false">Tags</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="relations-tab" data-bs-toggle="tab" [attr.data-bs-target]="'#relations-'+tabs" type="button"
+            role="tab" aria-controls="relations" aria-selected="false">Relations</button>
+    </li>
+</ul>
+
+<div class="tab-content" id="myTabContent" *ngIf="zoteroObject !== null">
+    <div class="tab-pane fade show active" id="info-{{tabs}}" role="tabpanel" aria-labelledby="home-tab">
+        <div class="table-responsive">
+            <table class="table table-hover mt-2">
+                <tbody>
+                    <tr *ngFor="let item of zoteroObject | keyvalue">
+                        <td *ngIf="item.key !== 'creators' && item.key !=='tags' && 
+                        item.key !=='relations' && item.key !=='url' && 
+                        item.key !== 'children' && item.key !== 'key' && item.key !== 'creatorsName' &&
+                        item.key !== 'resourceTypeId' && item.key !== 'resourceType' &&
+                        item.key !== 'addedBy' && item.key !== 'modifiedBy' &&
+                        item.key !== 'dateAdded' && item.key !== 'dateModified' && itemHasValue(item.value)">
+                            {{ getColumnName(item.key) }}
+                        </td>
+                        <td *ngIf="item.key !== 'creators' && item.key !=='tags' && 
+                        item.key !=='relations' && item.key !=='url' && 
+                        item.key !== 'children' && item.key !== 'key' && item.key !== 'creatorsName' &&
+                        item.key !== 'resourceTypeId' && item.key !== 'resourceType' &&
+                        item.key !== 'addedBy' && item.key !== 'modifiedBy' &&
+                        item.key !== 'dateAdded' && item.key !== 'dateModified' && itemHasValue(item.value)">
+                            <span *ngIf="item.key !== 'shortTitle'">{{item.value}}</span>
+                            <ul *ngIf="item.key === 'shortTitle'" style="margin-left: -25px;">
+                                <li *ngFor="let obj of getAbbr(item)"
+                                    [ngStyle]="{'list-style-type': obj.abbr === '' ? 'none' : '\' - \''}">
+                                    <span *ngIf="obj.abbr !== ''">{{ obj.abbr }} ({{obj.source }})</span>
+                                </li>
+                            </ul>
+                        </td>
+                        <!-- with creators -->
+                        <td colspan="2" *ngIf="item.key === 'creators' && getCreators(item.value).length > 0">
+                            <div class="row w-100"
+                                *ngFor="let c of getCreators(item.value); let i = index; trackBy: trackByIdFn;">
+                                <div class="col-md-2 offset-md-2">{{c.creatorType}}</div>
+                                <div class="col-md-8 text-start text-dark">
+                                    {{c.getFullName(c)}}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td *ngIf="zoteroObject.dateAdded !== undefined && zoteroObject.dateAdded !== ''">
+                            Date Added
+                        </td>
+                        <td *ngIf="zoteroObject.dateAdded !== undefined && zoteroObject.dateAdded !== ''">
+                            {{ zoteroObject.dateAdded }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td *ngIf="zoteroObject.dateModified !== undefined && zoteroObject.dateModified!== ''">
+                            Date Modified
+                        </td>
+                        <td *ngIf="zoteroObject.dateModified !== undefined && zoteroObject.dateModified!== ''">
+                            {{ zoteroObject.dateModified }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td *ngIf="zoteroObject.addedBy !== undefined && zoteroObject.addedBy !== ''">
+                            Added By
+                        </td>
+                        <td *ngIf="zoteroObject.addedBy !== undefined && zoteroObject.addedBy !== ''">
+                            {{ zoteroObject.addedBy }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td *ngIf="zoteroObject.modifiedBy !== undefined && zoteroObject.modifiedBy!== ''">
+                            Modified By
+                        </td>
+                        <td *ngIf="zoteroObject.modifiedBy !== undefined && zoteroObject.modifiedBy!== ''">
+                            {{ zoteroObject.modifiedBy }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="notes-{{tabs}}" role="tabpanel" aria-labelledby="profile-tab">
+        <div class="mt-2" *ngIf="zoteroObject !== null">
+            {{getNotes(zoteroObject).length}} notes
+        </div>
+        <ul class="list-group list-group-flush mt-2" *ngIf="zoteroObject !== null">
+            <li class="list-group-item" *ngFor="let n of getNotes(zoteroObject)" [innerHTML]="n">
+            </li>
+        </ul>
+    </div>
+    <div class="tab-pane fade" id="tags-{{tabs}}" role="tabpanel" aria-labelledby="contact-tab">
+        <div class="mt-2" *ngIf="zoteroObject !== null">
+            {{zoteroObject.tags.length}} tags
+        </div>
+        <ul class="list-group list-group-flush mt-2" *ngIf="zoteroObject !== null">
+            <li class="list-group-item" *ngFor="let t of zoteroObject.tags" [innerHTML]="t.tag">
+            </li>
+        </ul>
+    </div>
+    <div class="tab-pane fade" id="relations-{{tabs}}" role="tabpanel" aria-labelledby="contact-tab">
+        <div class="mt-2" *ngIf="zoteroObject !== null">
+            {{getRelationURIs().length}} relations
+        </div>
+        <ul class="list-group list-group-flush mt-2" *ngIf="zoteroObject !== null">
+            <li class="list-group-item" *ngFor="let rel of getRelationURIs()">
+                {{ rel }}
+                <a href="{{rel}}" *ngIf="rel !== ''" target="_blank">
+                    <i class='bi bi-box-arrow-up-right'></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

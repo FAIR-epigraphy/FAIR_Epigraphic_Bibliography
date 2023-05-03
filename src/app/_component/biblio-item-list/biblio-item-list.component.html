@@ -1,0 +1,161 @@
+<div class="border-bottom">
+  <i data-bs-target="#sidebar" data-bs-toggle="collapse" style="font-size: 24px;cursor: pointer;"
+    class="bi bi-list"></i>
+  <i class="bi bi-diagram-3 ms-3" style="font-size: 24px;cursor: pointer;" *ngIf="canActive && allBiblioData.length > 0"
+    id="btnOpenModal" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop" (click)="reInit()">
+  </i>
+  <i class="bi bi-upload ms-3 dropdown dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+    aria-expanded="false" title="Export" style="font-size: 20px;cursor: pointer;"
+    [class]="currentSelectedRecord === null ? 'disabled' : ''">
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="z-index: 2000">
+      <li (click)="export('biblatex', 'bib')"><a class="dropdown-item">BibLaTeX</a></li>
+      <li (click)="export('rdf_bibliontology', 'rdf')"><a class="dropdown-item">Bibliographic Ontology RDF</a></li>
+      <li (click)="export('bibtex', 'bib')"><a class="dropdown-item">BibTeX</a></li>
+      <li (click)="export('coins', 'html')"><a class="dropdown-item">COinS</a></li>
+      <li (click)="export('csljson', 'json')"><a class="dropdown-item">CSL-JSON</a></li>
+      <li (click)="export('csv', 'csv')"><a class="dropdown-item">CSV</a></li>
+      <li (click)="export('', '')"><a class="dropdown-item">EndNote XML</a></li>
+      <li (click)="export('mods', 'xml')"><a class="dropdown-item">MODS</a></li>
+      <li (click)="export('bookmarks', 'html')"><a class="dropdown-item">Netscape Bookmark File Format</a></li>
+      <li (click)="export('refer', 'txt')"><a class="dropdown-item">Refer/BibIX</a></li>
+      <li (click)="export('refer', 'txt')"><a class="dropdown-item">RefWorks Tagged</a></li>
+      <li (click)="export('ris', 'ris')"><a class="dropdown-item">RIS</a></li>
+      <li (click)="export('tei', 'xml')"><a class="dropdown-item">Text Encoding Initiative (TEI)</a></li>
+      <li (click)="export('rdf_dc', 'rdf')"><a class="dropdown-item">Unqualified Dublin Core RDF</a></li>
+      <li (click)="export('wikipedia', 'txt')"><a class="dropdown-item">Wikipedia Citation Templates</a></li>
+      <li (click)="export('rdf_zotero', 'rdf')"><a class="dropdown-item">Zotero RDF</a></li>
+    </ul>
+  </i>
+  <i class="bi bi-blockquote-left ms-2" title="Create Citation" style="font-size: 24px;cursor: pointer;"
+    [class]="currentSelectedRecord === null ? 'disabled' : ''" (click)="showCitation()"></i>
+  <!-- <i class="bi bi-diagram-3" style="font-size: 24px;cursor: pointer;"></i> -->
+
+  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Epigraphic Bibliography Parent-Child Relation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+            (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <app-biblio-parentchild-rel *ngIf="isShown" [parentComponent]="this" [biblioData]="allBiblioData" [lastestCallNumber]="lastCallNumber">
+          </app-biblio-parentchild-rel>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="table-responsive">
+  <table class="table" *ngIf="loading">
+    <thead class="bg-light text-dark">
+      <tr>
+        <!-- <th scope="col">#</th> -->
+        <th scope="col" style="width: 40%;">Title</th>
+        <th scope="col">Date</th>
+        <th scope="col">Creator</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let number of [0,1,2]">
+        <td>
+          <span class="loading"></span>
+        </td>
+        <td>
+          <span class="loading"></span>
+        </td>
+        <td>
+          <span class="loading"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="table table-striped table-hover" *ngIf="biblioData.length>0">
+    <thead class="sticky-top bg-light text-dark">
+      <tr>
+        <th scope="col"></th>
+        <th scope="col" style="width: 50%;" (click)="sortByCol('title', $event)">Title <i
+            class="bi bi-chevron-up  float-end"></i></th>
+        <th scope="col" (click)="sortByCol('date', $event)">Date <i class="float-end"></i></th>
+        <th scope="col" (click)="sortByCol('creators', $event)">Creator <i class="float-end"></i></th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let data of biblioData | customFilter: mainSearchBar; let isEven = even; let isOdd = odd">
+      <tr style="cursor: pointer;" (click)="getSpecificData(data, $event)" [class]="isEven ? 'bg-white' : 'bg-light'">
+        <td>
+          <i class="bi bi-plus-circle-fill text-success" *ngIf="data.children.length > 0 && !data.showChild"
+            (click)="expandChild(data, true)"></i>
+          <i class="bi bi-dash-circle-fill text-success" *ngIf="data.children.length > 0 && data.showChild"
+            (click)="expandChild(data, false)"></i>
+        </td>
+        <td title="{{data.title}}">
+          <p *ngIf="data.title.length < 65">
+            <i [class]="getItemTypeIcon(data.itemType)"></i>
+            {{data.title}}
+          </p>
+          <p *ngIf="data.title.length >= 65">
+            <i [class]="getItemTypeIcon(data.itemType)"></i>
+            {{data.title | slice:0:65}}...
+          </p>
+        </td>
+        <td>
+          {{ data.date }}
+        </td>
+        <td title="{{data.getCreators()}}">
+          <!-- <span *ngFor="let creator of data.creators"> -->
+          <span *ngIf="data.getCreators().length < 30">
+            {{ data.getCreators() }}
+          </span>
+          <span *ngIf="data.getCreators().length >= 30">
+            {{ data.getCreators() | slice:0:30 }}...
+          </span>
+          <!-- </span> -->
+        </td>
+      </tr>
+      <tr *ngIf="data.children.length > 0" [style]="data.showChild ? '' : 'display:none;'">
+        <td colspan="4">
+          <table class="table table-striped table-hover" style="margin: auto;">
+            <tbody>
+              <tr *ngFor="let child of data.children; let isLast = last;" [hidden]="!data.showChild"
+                (click)="getSpecificData(child, $event)"
+                style="cursor: pointer; border-left: 2px solid #0d6efd; border-right: 2px solid #0d6efd;"
+                [style]="isLast ? {'border-bottom': '2px solid #0d6efd'}: ''" #dynamic>
+                <td style="width: 4%;">
+                  <i class="bi bi-plus-circle-fill text-success" *ngIf="child.children.length > 0 && !child.showChild"
+                    (click)="expandInnerChild(child, true, $event)"></i>
+                  <i class="bi bi-dash-circle-fill text-success" *ngIf="child.children.length > 0 && child.showChild"
+                    (click)="expandInnerChild(child, false, $event)"></i>
+                </td>
+                <td title="{{child.title}}" style="width: 49%;">
+                  <p *ngIf="child.title.length < 50">
+                    <i [class]="getItemTypeIcon(child.itemType)"></i>
+                    {{child.title}}
+                  </p>
+                  <p *ngIf="child.title.length >= 50">
+                    <i [class]="getItemTypeIcon(child.itemType)"></i>
+                    {{child.title | slice:0:50}}...
+                  </p>
+                </td>
+                <td style="width: 19%;">
+                  {{ child.date }}
+                </td>
+                <td title="{{child.getCreators()}}">
+                  <!-- <span *ngFor="let creator of data.creators"> -->
+                  <span *ngIf="child.getCreators().length < 30">
+                    {{ child.getCreators() }}
+                  </span>
+                  <span *ngIf="child.getCreators().length >= 30">
+                    {{ child.getCreators() | slice:0:30 }}...
+                  </span>
+                  <!-- </span> -->
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
