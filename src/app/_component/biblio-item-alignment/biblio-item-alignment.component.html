@@ -77,12 +77,6 @@
                       <!-- </span> -->
                     </td>
                     <td>
-                      <span class="btn btn-sm btn-success" style="cursor: pointer;">
-                        <i class="bi bi-check-lg"></i>
-                      </span>
-                      <span class="btn btn-sm btn-danger ms-1" style="cursor: pointer;">
-                        <i class="bi bi-x-lg"></i>
-                      </span>
                       <span class="btn btn-sm btn-warning ms-1" style="cursor: pointer;" id="btnOpenModal" type="button"
                         data-bs-toggle="modal" data-bs-target="#staticBackdrop" (click)="compare(data)">
                         <i class="bi bi-sliders"></i>
@@ -157,18 +151,62 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="staticBackdropLabel">Compare</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="w-100">
+              <button type="button" [disabled]="isFetching" class="btn btn-sm btn-success float-end"
+                style="cursor: pointer;" (click)="Accept()">
+                <i class="bi bi-check-lg"></i> Accept
+              </button>
+              <button type="button" [disabled]="isFetching" class="btn btn-sm btn-danger me-2 float-end"
+                style="cursor: pointer;">
+                <i class="bi bi-x-lg"></i> Reject
+              </button>
+              <span *ngIf="isFetching" class="float-end me-2">
+                <i class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></i>
+                Saving ...
+              </span>
+              <span id="btnOpenModalAPIKey" style="display: none;" type="button" data-bs-toggle="modal"
+                data-bs-target="#staticBackdropAPIKey">
+              </span>
+            </div>
+            <button type="button" class="btn-close" id="btnModalCompareClose" data-bs-dismiss="modal"
+              aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <div class="row">
               <div class="col-md-6">
-                <h3>FAIR Bibliography List</h3> <hr/>
+                <h3>FAIR Bibliography List</h3>
+                <hr />
                 <app-biblio-item-compare #customBiblioList></app-biblio-item-compare>
               </div>
               <div class="col-md-6 border-start">
                 <h3>Zotero Bibliography List</h3>
                 <hr />
                 <app-biblio-item-compare #zoteroBiblioList></app-biblio-item-compare>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal -->
+
+    <!-- Start API Key Modal -->
+    <div class="modal fade" id="staticBackdropAPIKey" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+      aria-labelledby="staticBackdropAPIKey" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropAPIKeyLabel text-warning">Warning</h5>
+            <button type="button" id="btnAPIKeyClose" class="btn-close" data-bs-dismiss="modal"
+              aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-12">
+                <i class="bi bi-exclamation-circle text-warning"></i> Please give permission to add the callNumber in
+                your library. You need to enter your KEY here.
+                <input type="text" class="form-control" [(ngModel)]="otherLibAPIKey" />
+                <br /> <button (click)="SaveOtherLibAPIKey()" class="btn btn-primary">Save</button>
               </div>
             </div>
           </div>

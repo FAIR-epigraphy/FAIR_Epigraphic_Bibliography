@@ -19,6 +19,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
   errorMessage = '';
   matchedBibliography: Array<ZoteroItem> = new Array();
   notMatchedBibliography: Array<ZoteroItem> = new Array();
+  otherLibAPIKey: string = '';
 
   @ViewChild('customBiblioList') customBiblioList: any;
   @ViewChild('zoteroBiblioList') zoteroBiblioList: any;
@@ -38,7 +39,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
       this.loginUser = null;
 
     if (localStorage.getItem('libURL') !== undefined && localStorage.getItem('libURL') !== null) {
-      this.zoteroURL = localStorage.getItem('libURL') || '{}';
+      this.zoteroURL = JSON.parse(localStorage.getItem('libURL') || '{}').libURL;
     }
   }
 
@@ -88,23 +89,28 @@ export class BiblioItemAlignmentComponent implements OnInit {
     let currentSource: any = null;
     this.matchedBibliography = []
     this.notMatchedBibliography = []
+    let isCallNumberExist = false;
     for (let target of this.allOtherBiblioData) {
+      isCallNumberExist = this.getCallNumberExist(target.tags);
       for (let source of this.allSourceBiblioData) {
         currentSource = source;
-        if (source.title.includes(target.title) || target.title.includes(source.title)) {
-          for (let c of source.creators) {
-            let creatorFound = target.creators.filter(x => (x.firstName === c.firstName && x.lastName === c.lastName) ||
-              (x.fullName === c.fullName)
-            );
-            if (creatorFound.length > 0) {
-              let splitSourceDate = source.date.split("-");
-              let splitTargetDate = target.date.split("-");
-              if (splitSourceDate[0].trim() === splitTargetDate[0].trim()) {
-                matchedBiblio = true;
+        if (!isCallNumberExist) {
+          if (source.title.includes(target.title) || target.title.includes(source.title)) {
+            for (let c of source.creators) {
+              let creatorFound = target.creators.filter(x => (x.firstName === c.firstName && x.lastName === c.lastName) ||
+                (x.fullName === c.fullName)
+              );
+              if (creatorFound.length > 0) {
+                let splitSourceDate = source.date.split("-");
+                let splitTargetDate = target.date.split("-");
+                if (splitSourceDate[0].trim() === splitTargetDate[0].trim()) {
+                  matchedBiblio = true;
+                }
               }
             }
           }
         }
+
         if (matchedBiblio)
           break;
       }
@@ -113,9 +119,20 @@ export class BiblioItemAlignmentComponent implements OnInit {
         this.matchedBibliography.push(currentSource);
         matchedBiblio = false;
       }
-      else
-        this.notMatchedBibliography.push(target);
+      else {
+        if (!isCallNumberExist)
+          this.notMatchedBibliography.push(target);
+      }
     }
+  }
+
+  getCallNumberExist(tags: any) {
+    if (tags.length === 0)
+      return false;
+    else if (tags.filter((x: any) => x.tag.indexOf('callNumber') > -1))
+      return true;
+
+    return false;
   }
 
   compare(item: any) {
@@ -124,6 +141,8 @@ export class BiblioItemAlignmentComponent implements OnInit {
 
     let biblioTargetItem = this.getSpecificBiblioItem(item, 'zoteroList')
     this.zoteroBiblioList.getSpecificData(biblioTargetItem, 'zotero');
+
+    this.isFetching = false;
   }
 
   getSpecificBiblioItem(item: any, origin: any) {
@@ -132,7 +151,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
       if (this.allSourceBiblioData.filter(source => source.title.includes(item.title) || item.title.includes(source.title)).length > 0) {
         let source = this.allSourceBiblioData.filter(source => source.title.includes(item.title) || item.title.includes(source.title))[0];
         for (let c of source.creators) {
-          let creatorFound = item.creators.filter((x:any) => (x.firstName === c.firstName && x.lastName === c.lastName) ||
+          let creatorFound = item.creators.filter((x: any) => (x.firstName === c.firstName && x.lastName === c.lastName) ||
             (x.fullName === c.fullName)
           );
           if (creatorFound.length > 0) {
@@ -145,12 +164,11 @@ export class BiblioItemAlignmentComponent implements OnInit {
         }
       }
     }
-    else
-    {
+    else {
       if (this.allOtherBiblioData.filter(source => source.title.includes(item.title) || item.title.includes(source.title)).length > 0) {
         let source = this.allOtherBiblioData.filter(source => source.title.includes(item.title) || item.title.includes(source.title))[0];
         for (let c of source.creators) {
-          let creatorFound = item.creators.filter((x:any) => (x.firstName === c.firstName && x.lastName === c.lastName) ||
+          let creatorFound = item.creators.filter((x: any) => (x.firstName === c.firstName && x.lastName === c.lastName) ||
             (x.fullName === c.fullName)
           );
           if (creatorFound.length > 0) {
@@ -242,7 +260,55 @@ export class BiblioItemAlignmentComponent implements OnInit {
       element?.classList.add('bi-chevron-up')
     }
   }
+  /////////////////////////////////////////////////////////////////
+  ///////////// Add tag as callNumber to zotero
+  async Accept() {
+    this.isFetching = true;
+    let callNumber = this.customBiblioList.zoteroObject.callNumber;
+    let zoteroObj = this.zoteroBiblioList.zoteroObject;
+    let tagCallNumber = { tag: `callNumber: ${callNumber}` };
+    let apiKey = JSON.parse(localStorage.getItem('libURL') || '{}').apiKey;
+    let apiNumber = this.zoteroURL.replace(/[^0-9]/g, "");
+    try {
+      if (apiKey !== '') {
+        await this.zoteroAPI.updateOtherLibTagsWithCallNumber(this.zoteroURL, zoteroObj, apiKey, tagCallNumber);
+        this.matchedBibliography = this.matchedBibliography.filter(x => x.key !== this.customBiblioList.zoteroObject.key);
+        let items = JSON.parse(localStorage.getItem(apiNumber) || '{}');
+        let itemIndex = items.findIndex((x: any) => x.key === zoteroObj.key);
+        items[itemIndex].tags.push(tagCallNumber);
+        localStorage.setItem(apiNumber, JSON.stringify(items));
+        document.getElementById('btnModalCompareClose')?.click();
+      }
+      else {
+        document.getElementById('btnOpenModalAPIKey')?.click();
+      }
+      this.isFetching = false;
+    } catch (error) {
+      this.isFetching = false;
+      this.showToast(error, 'bg-error')
+    }
 
+    //console.log(this.zoteroBiblioList.zoteroObject)
+  }
+
+  SaveOtherLibAPIKey() {
+    if (this.otherLibAPIKey !== '') {
+      let url = JSON.parse(localStorage.getItem('libURL') || '{}');
+      if (url.apiKey === '') {
+        let obj = { libURL: '', apiKey: '' };
+        obj.libURL = this.zoteroURL;
+        obj.apiKey = this.otherLibAPIKey;
+        localStorage.setItem('libURL', JSON.stringify(obj));
+      }
+      document.getElementById('btnAPIKeyClose')?.click();
+      document.getElementById('btnOpenModal')?.click();
+      //this.Accept();
+    }
+    else {
+      this.showToast('Please enter API key', 'bg-danger')
+    }
+  }
+  ////////////////////////////////////////////////////////////////
   showToast(msg: any, color: any) {
     document.getElementById('divError')?.classList.add('show')
     document.getElementById('divError')?.classList.add(color)

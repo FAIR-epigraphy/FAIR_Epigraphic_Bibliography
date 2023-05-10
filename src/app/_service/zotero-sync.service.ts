@@ -7,6 +7,7 @@ const { default: api } = require('zotero-api-client');
 })
 export class ZoteroSyncService {
   api_key = '4Rti1M1IB3Cw2993pop81f5v'
+  libraryId = 4858485;
   zoteroAPI = api(this.api_key).library('group', 4858485);
   storeName = 'allBiblioData';
   headers = { 'Zotero-API-Version': '3', Authorization: '' };
@@ -28,12 +29,12 @@ export class ZoteroSyncService {
     let account: any = await this.fetchAPI('https://api.zotero.org/keys/current');
     this.libraries = {};
     let library = await this.fetchAPI(`https://api.zotero.org/users/${account.userID}/groups`);
-    if (account.access.groups[library[0].id]) {
-      const prefix = `/groups/${library[0].id}`;
+    if (account.access.groups[this.libraryId]) {
+      const prefix = `/groups/${this.libraryId}`;
       this.libraries[prefix] = {
         type: 'group',
         prefix,
-        name: library[0].data.name,
+        name: library.find((x: any) => x.id === this.libraryId).data.name,
       };
     }
     this.userID = account.userID;
@@ -91,15 +92,13 @@ export class ZoteroSyncService {
     }
   }
 
-  checkForModifiedByAddedBy(){
+  checkForModifiedByAddedBy() {
     let items = [];
     let version = 0;
     let name = '';
     ({ items, version, name } = JSON.parse(localStorage.getItem(this.storeName) || '{}'));
-    if(items!==undefined)
-    {
-      if(items[0]['addedBy'] === undefined)
-      {
+    if (items !== undefined) {
+      if (items[0]['addedBy'] === undefined) {
         localStorage.removeItem(this.storeName);
       }
     }
@@ -165,9 +164,9 @@ export class ZoteroSyncService {
     for (let n = 0; n < items.length; n++) {
       for (const item of await this.get(prefix, `/items?itemKey=${items.slice(n, n + this.batch).join(',')}&includeTrashed=${Number(includeTrashed)}`)) {
         let bibData = item.data;
-        if(item.meta['createdByUser'] !== undefined)
+        if (item.meta['createdByUser'] !== undefined)
           bibData['addedBy'] = item.meta['createdByUser']['username'];
-        if(item.meta['lastModifiedByUser']!==undefined)
+        if (item.meta['lastModifiedByUser'] !== undefined)
           bibData['modifiedBy'] = item.meta['lastModifiedByUser']['username'];
 
         await this.add(bibData);
@@ -218,25 +217,23 @@ export class ZoteroSyncService {
     URL.revokeObjectURL(a.href);
   }
 
-  async fetchURL(apiNumber:any, libURL: any)
-  {
+  async fetchURL(apiNumber: any, libURL: any) {
     let zoteroItems: any = [];
     let res: any = null;
-    try{
+    try {
       let response = await fetch(`https://api.zotero.org/groups/${apiNumber}/items?since=0&format=versions&includeTrashed=0`);
-      if(response.status === 200)
+      if (response.status === 200)
         res = Object.keys(await (response).json())
-      else 
+      else
         return zoteroItems;
     }
-    catch(err)
-    {
+    catch (err) {
       return zoteroItems;
     }
 
     this.otherLibItemsCount = res.length;
     for (let n = 0; n < res.length; n++) {
-      for (const item of await(await fetch(`https://api.zotero.org/groups/${apiNumber}/items?itemKey=${res.slice(n, n + this.batch).join(',')}&includeTrashed=0`)).json()) {
+      for (const item of await (await fetch(`https://api.zotero.org/groups/${apiNumber}/items?itemKey=${res.slice(n, n + this.batch).join(',')}&includeTrashed=0`)).json()) {
         zoteroItems.push(item.data);
         n += 1;
         this.fetchingPercentage = n;
@@ -245,9 +242,18 @@ export class ZoteroSyncService {
     }
 
     localStorage.setItem(apiNumber, JSON.stringify(zoteroItems));
-    localStorage.setItem('libURL', libURL);
+    localStorage.setItem('libURL', JSON.stringify({ libURL: libURL, apiKey: '' }));
     return zoteroItems;
     //console.log(res)
+  }
+
+  async updateOtherLibTagsWithCallNumber(otherLibURL: any, zoterObj: any, apiKey: any, tag: any) {
+    let other_api_key = apiKey;
+    let zoteroOtherAPI = api(other_api_key).library('group', otherLibURL.replace(/[^0-9]/g, ""));
+    let jsonData = await zoteroOtherAPI.items(zoterObj.key).get();
+    let data = await jsonData.getData();
+    data.tags.push(tag)
+    await zoteroOtherAPI.items(zoterObj.key).patch(data);
   }
 
   takeBackup() {
