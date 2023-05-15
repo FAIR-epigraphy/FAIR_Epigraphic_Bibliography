@@ -1,0 +1,66 @@
+<app-nav-bar [loginUser]="loginUser"></app-nav-bar>
+<div class="container-fluid">
+    <div class="row mt-3">
+        <div class="col-md-3" id="ccc" style="position: relative;">
+            <span>Citation Style</span> <br />
+            <ng-select [items]="citations" appendTo="#ccc" placeholder="Select citation style..." bindLabel="title"
+                bindValue="name" [(ngModel)]="selectedCitationStyle"></ng-select>
+        </div>
+        <div class="col-md-3">
+            <span>Language</span> <br />
+            <ng-select [items]="citationLanguage" appendTo="#ccc" placeholder="Select language.." bindLabel="language"
+                bindValue="langKey" [(ngModel)]="selectedCitationLanguage"></ng-select>
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-primary float-end mt-4" (click)="getCitation()">Apply</button>
+        </div>
+        <div class="col-md-5">
+            <button class="btn btn-primary float-end" (click)="copy('html')">Copy HTML</button> <br /> <br />
+            <button class="btn btn-danger float-end" (click)="clearCache()">Clear Cache</button>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table" *ngIf="isCitationLoading">
+                    <thead class="bg-light text-dark">
+                        <tr>
+                            <th scope="col">Abbreviations</th>
+                            <th scope="col" style="width: 70%;">Citations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let number of [0,1,2]">
+                            <td>
+                                <span class="loading"></span>
+                            </td>
+                            <td>
+                                <span class="loading"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table id="citationContent" class="table table-striped table-hover"
+                    *ngIf="filteredCitationData.length>0">
+                    <thead class="sticky-top bg-light text-dark">
+                        <tr>
+                            <th scope="col">Abbreviations</th>
+                            <th scope="col">Citations</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngFor="let data of filteredCitationData;">
+                        <tr style="cursor: pointer;">
+                            <td>
+                                <p>
+                                    <a target="_blank" href="https://biblio.inscriptiones.org/{{data.callNumber}}">{{data.abbr }}</a>
+                                </p>
+                            </td>
+                            <td [innerHTML]="data.citation">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

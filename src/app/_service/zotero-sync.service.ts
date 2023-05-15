@@ -195,6 +195,12 @@ export class ZoteroSyncService {
     return c;
   }
 
+  async getAllcitations(content: any, style: any, language: any, start: any, limit:any) {
+    let d = await this.zoteroAPI.items().get({ style: style, format: 'json', include: content, locale: language, start:start, limit: limit });
+    let c = await d.getData();
+    return c;
+  }
+
   async updateCallNumber(zoteroObject: any) {
     let resp = await this.zoteroAPI.items(zoteroObject.key).patch(
       {

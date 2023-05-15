@@ -28,6 +28,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { BiblioAdvanceSearchComponent } from './_component/biblio-advance-search/biblio-advance-search.component';
 import { BiblioItemAlignmentComponent } from './_component/biblio-item-alignment/biblio-item-alignment.component';
 import { BiblioItemCompareComponent } from './_component/biblio-item-alignment/biblio-item-compare/biblio-item-compare.component';
+import { AbbreviationListComponent } from './_component/abbreviation-list/abbreviation-list.component';
 
 @NgModule({
   declarations: [
@@ -51,6 +52,7 @@ import { BiblioItemCompareComponent } from './_component/biblio-item-alignment/b
     BiblioAdvanceSearchComponent,
     BiblioItemAlignmentComponent,
     BiblioItemCompareComponent,
+    AbbreviationListComponent,
   ],
   imports: [
     BrowserModule,
