@@ -9,6 +9,7 @@ export class ZoteroItem {
     public resourceType: string = 'Book';
     public resourceTypeId: string = '';
     public title: string = '';
+    public altTitle: any = [];
     public creators: Array<Creator> = [];
     public abstractNote: string = '';
     public websiteTitle: string = '';

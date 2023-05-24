@@ -23,9 +23,10 @@ export class BiblioAdvanceSearchComponent implements OnInit {
   @Input() loading = false;
   @ViewChildren('dynamic', { read: ViewContainerRef }) childView!: QueryList<ViewContainerRef>;
   @ViewChild('biblioItemMore') biblioItemMore!: any;
-  citations:any = [];
-
+  citations: any = [];
+  totalItems: any = 0;
   public parentChildRelations: any = [];
+  allAltTitles: any = [];
   // ***********************************************************************************************************
   // Inputs and outputs
   // ***********************************************************************************************************
@@ -164,6 +165,7 @@ export class BiblioAdvanceSearchComponent implements OnInit {
 
     // Call appropriate fitler function
     this.filteredData = this.advancedFilter();
+    //this.ApplyParentChildRel();
   }
 
   /** Apply the advancedTerms on the items */
@@ -199,6 +201,13 @@ export class BiblioAdvanceSearchComponent implements OnInit {
     else if (term.fieldName === 'lastName') {
       evalValue = item['creators'].map((x: any) => x.lastName.toLowerCase());
     }
+    else if (term.fieldName === 'title') {
+      evalValue = [];
+      if (item['altTitle'].length > 0)
+        evalValue = item['altTitle'].map((x: any) => x.toLowerCase());
+
+      evalValue.push(String(item[term.fieldName!]).toLowerCase());
+    }
     else {
       evalValue = String(item[term.fieldName!]).toLowerCase();
     }
@@ -207,7 +216,7 @@ export class BiblioAdvanceSearchComponent implements OnInit {
     // Test value based on selected criteria
     switch (term.action) {
       case 'contains':
-        if (term.fieldName === 'shortTitle' || term.fieldName === 'firstName' || term.fieldName === 'lastName') {
+        if (term.fieldName === 'shortTitle' || term.fieldName === 'firstName' || term.fieldName === 'lastName' || term.fieldName === 'title') {
           rerturnVal = evalValue.filter((x: any) => x.includes(termValue)).length > 0
         }
         else {
@@ -216,7 +225,7 @@ export class BiblioAdvanceSearchComponent implements OnInit {
         break;
 
       case 'equals':
-        if (term.fieldName === 'shortTitle' || term.fieldName === 'firstName' || term.fieldName === 'lastName') {
+        if (term.fieldName === 'shortTitle' || term.fieldName === 'firstName' || term.fieldName === 'lastName' || term.fieldName === 'title') {
           rerturnVal = evalValue.filter((x: any) => x === termValue).length > 0
         }
         else {
@@ -349,19 +358,26 @@ export class BiblioAdvanceSearchComponent implements OnInit {
         this.showToast(this.data, 'bg-danger');
         this.data = this.syncService.getPreviousVersion()
       }
-      this.convertJSONToArray(this.data.items);
-      this.ApplyAdvanceSearch();
-      this.ApplyParentChildRel();
-      this.sortByCol('title', null!);
-      this.loading = false;
+      this.biblAPI.getAllAlternateTitle().subscribe(resp => {
+        this.allAltTitles = resp;
+        this.convertJSONToArray(this.data.items);
+        this.ApplyAdvanceSearch();
+        this.ApplyParentChildRel();
+        this.sortByCol('title', null!);
+        this.loading = false;
+      });
     }
   }
 
   convertJSONToArray(data: any) {
     for (let d of data) {
       let zoteroItem: ZoteroItem = new ZoteroItem(d);
-      if (d.itemType !== 'note')
+      if (d.itemType !== 'note') {
+        if (this.allAltTitles.filter((x: any) => x.callNumber === zoteroItem.callNumber).length > 0) {
+          zoteroItem.altTitle = this.allAltTitles.filter((x: any) => x.callNumber === zoteroItem.callNumber).map((x: any) => x.title);
+        }
         this.allBiblioData.push(zoteroItem)
+      }
     }
   }
 
@@ -398,8 +414,7 @@ export class BiblioAdvanceSearchComponent implements OnInit {
     document.getElementById('btnOpenModalDetail')?.click();
   }
 
-  async getAllBiblioCitationsStyle()
-  {
+  async getAllBiblioCitationsStyle() {
     this.citations = await this.syncService.getAllBiblioCitationStyles();
   }
 

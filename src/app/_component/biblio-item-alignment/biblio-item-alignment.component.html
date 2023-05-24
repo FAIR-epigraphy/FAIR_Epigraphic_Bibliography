@@ -2,7 +2,10 @@
 
 <div class="container-fluid">
   <div class="container mt-2">
-    <h2>Bibliography Items Alignment</h2>
+    <h2>Bibliography Items Alignment
+      <button type="button" class="btn btn-danger float-end" (click)="clearCache()" *ngIf="zoteroURL!==''">Clear
+        Cache</button>
+    </h2>
     <hr />
 
     <div class="input-group mb-3">
@@ -40,6 +43,10 @@
           data-bs-parent="#accordionExample">
           <div class="accordion-body">
             <div class="table-responsive" style="height: 65vh !important;">
+              <div class="input-group mb-3">
+                <input class="form-control" type="search" placeholder="Search ..." [(ngModel)]="txtSearchMatched">
+                <i class="input-group-text bi bi-search" id="basic-addon2"></i>
+              </div>
               <table class="table table-striped table-hover">
                 <thead class="sticky-top bg-light text-dark">
                   <tr>
@@ -51,7 +58,7 @@
                   </tr>
                 </thead>
 
-                <tbody *ngFor="let data of matchedBibliography; let isEven = even; let isOdd = odd">
+                <tbody *ngFor="let data of matchedBibliography | customFilter: txtSearchMatched; let isEven = even; let isOdd = odd;let i = index">
                   <tr [class]="isEven ? 'bg-white' : 'bg-light'">
                     <td title="{{data.title}}" style="width: 60%;">
                       <p *ngIf="data.title.length < 90">
@@ -77,8 +84,9 @@
                       <!-- </span> -->
                     </td>
                     <td>
-                      <span class="btn btn-sm btn-warning ms-1" style="cursor: pointer;" id="btnOpenModal" type="button"
-                        data-bs-toggle="modal" data-bs-target="#staticBackdrop" (click)="compare(data)">
+                      <span class="btn btn-sm btn-warning ms-1" style="cursor: pointer;" id="btnOpenModal-{{i}}"
+                        type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+                        (click)="compare(data, i)">
                         <i class="bi bi-sliders"></i>
                       </span>
                     </td>
@@ -99,18 +107,26 @@
         <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
           data-bs-parent="#accordionExample">
           <div class="accordion-body">
-            <div class="table-responsive" style="height: 65vh !important;">
+            <div class="input-group mb-3">
+              <input class="form-control" type="search" placeholder="Search ..." [(ngModel)]="txtSearchNotMatched">
+              <i class="input-group-text bi bi-search" id="basic-addon2"></i>
+
+              <button type="button" class="btn btn-primary float-end ms-1" [disabled]="isFetching" (click)="UpdateAll()"> <i class="bi bi-arrow-repeat"></i> Update
+                All</button>
+            </div>
+            <div class="table-responsive mt-2" style="height: 65vh !important;">
               <table class="table table-striped table-hover">
                 <thead class="sticky-top bg-light text-dark">
                   <tr>
-                    <th scope="col" style="width: 50%;" (click)="sortByCol('title', $event)">Title <i
+                    <th scope="col" style="width: 60%;" (click)="sortByCol('title', $event)">Title <i
                         class="bi bi-chevron-up  float-end"></i></th>
-                    <th scope="col" (click)="sortByCol('date', $event)">Date <i class="float-end"></i></th>
-                    <th scope="col" (click)="sortByCol('creators', $event)">Creator <i class="float-end"></i></th>
+                    <th scope="col" style="width: 12%" (click)="sortByCol('date', $event)">Date <i class="float-end"></i></th>
+                    <th scope="col" style="width: 18%" (click)="sortByCol('creators', $event)">Creator <i class="float-end"></i></th>
+                    <th>Action</th>
                   </tr>
                 </thead>
 
-                <tbody *ngFor="let data of notMatchedBibliography; let isEven = even; let isOdd = odd">
+                <tbody *ngFor="let data of notMatchedBibliography | customFilter: txtSearchNotMatched; let isEven = even; let isOdd = odd;let i=index;">
                   <tr style="cursor: pointer;" [class]="isEven ? 'bg-white' : 'bg-light'">
                     <td title="{{data.title}}">
                       <p *ngIf="data.title.length < 40">
@@ -135,6 +151,17 @@
                       </span>
                       <!-- </span> -->
                     </td>
+                    <td>
+                      <span title="Update Auto CallNumber" class="btn btn-sm btn-warning ms-1" style="cursor: pointer;"
+                        type="button" (click)="updateNotMatchedCallNumberSync(data, i)">
+                        <i class="bi bi-arrow-repeat"></i>
+                      </span>
+                      <span title="Add CallNumber" class="btn btn-sm btn-success ms-1" style="cursor: pointer;"
+                        type="button" data-bs-toggle="modal" data-bs-target="#modalCallNumber"
+                        (click)="saveCallNumNotMatched(data)">
+                        <i class="bi bi-chevron-bar-down"></i>
+                      </span>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -157,7 +184,7 @@
                 <i class="bi bi-check-lg"></i> Accept
               </button>
               <button type="button" [disabled]="isFetching" class="btn btn-sm btn-danger me-2 float-end"
-                style="cursor: pointer;">
+                style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modalCallNumber">
                 <i class="bi bi-x-lg"></i> Reject
               </button>
               <span *ngIf="isFetching" class="float-end me-2">
@@ -197,7 +224,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="staticBackdropAPIKeyLabel text-warning">Warning</h5>
-            <button type="button" id="btnAPIKeyClose" class="btn-close" data-bs-dismiss="modal"
+            <button type="button" id="btnAPIKeyClose" (click)="cancel('back')" class="btn-close" data-bs-dismiss="modal"
               aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -215,7 +242,35 @@
     </div>
     <!-- End Modal -->
 
-    <div class="position-fixed top-0 end-0 p-3 mt-5" style="z-index: 11">
+    <!-- Start CallNumber Modal -->
+    <div class="modal fade" id="modalCallNumber" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+      aria-labelledby="modalCallNumber" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalCallNumberLabel text-warning">Warning</h5>
+            <button type="button" id="btnCloseCallNumberModal" class="btn-close" data-bs-dismiss="modal"
+              aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-12">
+                <i class="bi bi-exclamation-circle text-warning"></i> Do you want to enter CallNumber for this item?
+                <input type="text" class="form-control" id="txtOtherCallNumber" [(ngModel)]="otherLibCallNumber" />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button (click)="SaveOtherLibCallNumber()" class="btn btn-primary" [disabled]="isFetching">Save</button>
+            <button (click)="addItemToUnMatchedList()" class="btn btn-danger" [disabled]="isFetching"
+              *ngIf="!isNotMatchedItem">No</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal -->
+
+    <div class="position-fixed top-0 end-0 p-3 mt-5" style="z-index: 2000">
       <div id="divError" style="width: auto;" class="toast align-items-center text-white border-0 mt-3" role="alert"
         aria-live="assertive" aria-atomic="true">
         <div class="d-flex">

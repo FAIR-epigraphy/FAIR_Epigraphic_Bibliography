@@ -23,11 +23,15 @@ export class BiblioItemMoreInfoComponent {
   @Input() citations: any = [];
   resourceTypes: any = [];
   isDisplayedResourceType = false;
+  errorMessage: any = '';
+  alternateTitles: any = [];
 
   citationLanguage: any = JSON.parse('[{"language":"Afrikaans","langKey":"af-ZA"},{"language":"Arabic","langKey":"ar"},{"language":"Basque","langKey":"eu"},{"language":"Bulgarian","langKey":"bg-BG"},{"language":"Catalan","langKey":"ca-AD"},{"language":"Chinese (PRC)","langKey":"zh-CN"},{"language":"Chinese (Taiwan)","langKey":"zh-TW"},{"language":"Croatian","langKey":"hr-HR"},{"language":"Czech","langKey":"cs-CZ"},{"language":"Danish","langKey":"da-DK"},{"language":"Dutch","langKey":"nl-NL"},{"language":"English (UK)","langKey":"en-GB"},{"language":"English (US)","langKey":"en-US"},{"language":"Estonian","langKey":"et-EE"},{"language":"Finnish","langKey":"fi-FI"},{"language":"French (Canada)","langKey":"fr-CA"},{"language":"French (France)","langKey":"fr-FR"},{"language":"German (Austria)","langKey":"de-AT"},{"language":"German (Germany)","langKey":"de-DE"},{"language":"German (Switzerland)","langKey":"de-CH"},{"language":"Greek","langKey":"el-GR"},{"language":"Hebrew","langKey":"he-IL"},{"language":"Hindi","langKey":"hi-IN"},{"language":"Hungarian","langKey":"hu-HU"},{"language":"Icelandic","langKey":"is-IS"},{"language":"Indonesian","langKey":"id-ID"},{"language":"Italian","langKey":"it-IT"},{"language":"Japanese","langKey":"ja-JP"},{"language":"Khmer","langKey":"km-KH"},{"language":"Korean","langKey":"ko-KR"},{"language":"Latin","langKey":"la"},{"language":"Latvian","langKey":"lv-LV"},{"language":"Lithuanian","langKey":"lt-LT"},{"language":"Mongolian","langKey":"mn-MN"},{"language":"Norwegian (Bokmål)","langKey":"nb-NO"},{"language":"Norwegian (Nynorsk)","langKey":"nn-NO"},{"language":"Persian","langKey":"fa-IR"},{"language":"Polish","langKey":"pl-PL"},{"language":"Portuguese (Brazil)","langKey":"pt-BR"},{"language":"Portuguese (Portugal)","langKey":"pt-PT"},{"language":"Romanian","langKey":"ro-RO"},{"language":"Russian","langKey":"ru-RU"},{"language":"Serbian","langKey":"sr-RS"},{"language":"Slovak","langKey":"sk-SK"},{"language":"Slovenian","langKey":"sl-SI"},{"language":"Spanish (Chile)","langKey":"es-CL"},{"language":"Spanish (Mexico)","langKey":"es-MX"},{"language":"Spanish (Spain)","langKey":"es-ES"},{"language":"Swedish","langKey":"sv-SE"},{"language":"Thai","langKey":"th-TH"},{"language":"Turkish","langKey":"tr-TR"},{"language":"Ukrainian","langKey":"uk-UA"},{"language":"Vietnamese","langKey":"vi-VN"},{"language":"Welsh","langKey":"cy-GB"},{"language":"Afrikaans","langKey":"af-ZA"},{"language":"Arabic","langKey":"ar"},{"language":"Basque","langKey":"eu"},{"language":"Bulgarian","langKey":"bg-BG"},{"language":"Catalan","langKey":"ca-AD"},{"language":"Chinese (PRC)","langKey":"zh-CN"},{"language":"Chinese (Taiwan)","langKey":"zh-TW"},{"language":"Croatian","langKey":"hr-HR"},{"language":"Czech","langKey":"cs-CZ"},{"language":"Danish","langKey":"da-DK"},{"language":"Dutch","langKey":"nl-NL"},{"language":"English (UK)","langKey":"en-GB"},{"language":"English (US)","langKey":"en-US"},{"language":"Estonian","langKey":"et-EE"},{"language":"Finnish","langKey":"fi-FI"},{"language":"French (Canada)","langKey":"fr-CA"},{"language":"French (France)","langKey":"fr-FR"},{"language":"German (Austria)","langKey":"de-AT"},{"language":"German (Germany)","langKey":"de-DE"},{"language":"German (Switzerland)","langKey":"de-CH"},{"language":"Greek","langKey":"el-GR"},{"language":"Hebrew","langKey":"he-IL"},{"language":"Hindi","langKey":"hi-IN"},{"language":"Hungarian","langKey":"hu-HU"},{"language":"Icelandic","langKey":"is-IS"},{"language":"Indonesian","langKey":"id-ID"},{"language":"Italian","langKey":"it-IT"},{"language":"Japanese","langKey":"ja-JP"},{"language":"Khmer","langKey":"km-KH"},{"language":"Korean","langKey":"ko-KR"},{"language":"Latin","langKey":"la"},{"language":"Latvian","langKey":"lv-LV"},{"language":"Lithuanian","langKey":"lt-LT"},{"language":"Mongolian","langKey":"mn-MN"},{"language":"Norwegian (Bokmål)","langKey":"nb-NO"},{"language":"Norwegian (Nynorsk)","langKey":"nn-NO"},{"language":"Persian","langKey":"fa-IR"},{"language":"Polish","langKey":"pl-PL"},{"language":"Portuguese (Brazil)","langKey":"pt-BR"},{"language":"Portuguese (Portugal)","langKey":"pt-PT"},{"language":"Romanian","langKey":"ro-RO"},{"language":"Russian","langKey":"ru-RU"},{"language":"Serbian","langKey":"sr-RS"},{"language":"Slovak","langKey":"sk-SK"},{"language":"Slovenian","langKey":"sl-SI"},{"language":"Spanish (Chile)","langKey":"es-CL"},{"language":"Spanish (Mexico)","langKey":"es-MX"},{"language":"Spanish (Spain)","langKey":"es-ES"},{"language":"Swedish","langKey":"sv-SE"},{"language":"Thai","langKey":"th-TH"},{"language":"Turkish","langKey":"tr-TR"},{"language":"Ukrainian","langKey":"uk-UA"},{"language":"Vietnamese","langKey":"vi-VN"},{"language":"Welsh","langKey":"cy-GB"}]');
 
   selectedCitationStyle = 'modern-language-association';
   selectedCitationLanguage = 'en-US'
+  selectedTitleLanguage = 'en-US'
+  alternateTitleText = ''
   isCitationLoading = false;
 
   constructor(
@@ -50,7 +54,7 @@ export class BiblioItemMoreInfoComponent {
   async getSpecificData(obj: ZoteroItem) {
     this.user = JSON.parse(this.authService.getToken() || '{}');
     if (this.user.role_name === 'Admin' || this.user.role_name === 'Editor') this.hasPermission = true;
-    
+
     document.getElementById('info-tab')?.click();
 
     this.zoteroObject = obj;
@@ -87,6 +91,8 @@ export class BiblioItemMoreInfoComponent {
       this.getCitation();
       //console.log(resp)
     })
+
+    this.getAltTitleByCallNo();
   }
 
   getItemByCallNo() {
@@ -346,5 +352,53 @@ export class BiblioItemMoreInfoComponent {
 
   trackByIdFn(item: any): number {
     return item.firstName;
+  }
+
+  saveAlterTitle() {
+    if (this.alternateTitleText !== '') {
+      document.getElementById('txtTitle')?.classList.remove('horizontal-shake');
+      let callNumber = this.zoteroObject.callNumber;
+      let altTitle = this.alternateTitleText;
+      let lang = document.getElementById('selLang')?.innerText.replace(/(\r\n|\n|\r|\t)/gm, "").replace("×", "");
+      let langKey = this.selectedTitleLanguage;
+      let obj: any = { callNumber: callNumber, altTitle: altTitle, lang: lang, langKey: langKey };
+      this.apiService.addAlternateTitle(obj).subscribe(resp => {
+        if (resp === 'success') {
+          this.getAltTitleByCallNo();
+          this.selectedTitleLanguage = 'en-US';
+          this.alternateTitleText = '';
+          this.showToast('Alternate title added.', 'bg-success');
+          document.getElementById('btnAltTitleClose')?.click();
+        }
+        else {
+          this.showToast('Exception occured while saving info.', 'bg-danger')
+        }
+      })
+    }
+    else {
+      document.getElementById('txtTitle')?.classList.remove('horizontal-shake');
+      document.getElementById('txtTitle')?.offsetHeight;
+      document.getElementById('txtTitle')?.classList.add('horizontal-shake');
+    }
+  }
+
+  getAltTitleByCallNo() {
+    this.apiService.getAlternateTitle(this.zoteroObject.callNumber).subscribe(resp => {
+      if (resp.length > 0)
+        this.zoteroObject.altTitle = resp.map((x: any) => x.title);
+
+      this.alternateTitles = resp;
+    });
+  }
+
+  ////////////////////////////////////////////////////////////////
+  showToast(msg: any, color: any) {
+    document.getElementById('divError')?.classList.add('show')
+    document.getElementById('divError')?.classList.add(color)
+    this.errorMessage = msg;
+    setTimeout(() => {
+      document.getElementById('divError')?.classList.remove('show')
+      document.getElementById('divError')?.classList.remove(color)
+    }, 10000);
   }
 }

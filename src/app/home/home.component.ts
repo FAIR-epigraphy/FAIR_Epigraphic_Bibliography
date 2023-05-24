@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { ZoteroItem } from '../_models/zotero-item.model';
 import { AuthService } from '../_service/auth.service';
+import { BiblApiService } from '../_service/bibl-api.service';
 import { ZoteroSyncService } from '../_service/zotero-sync.service';
 
 @Component({
@@ -25,7 +26,8 @@ export class HomeComponent implements OnInit {
   @Input() searchText: string = '';
   errorMessage = '';
   totalItems = 0;
-  citations:any = [];
+  citations: any = [];
+  allAltTitles: any = [];
 
   title = 'fair-biblio';
   loginUser = null;
@@ -35,6 +37,7 @@ export class HomeComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private syncService: ZoteroSyncService,
+    private apiService: BiblApiService
   ) {
   }
 
@@ -56,13 +59,12 @@ export class HomeComponent implements OnInit {
   getBibloItemInfo() {
     const id = window.location.href.split('/')[window.location.href.split('/').length - 1]
     if (id !== null && id !== '') {
-      let interval = setInterval(()=>{
-        if(this.allBiblioData.length > 0)
-        {
+      let interval = setInterval(() => {
+        if (this.allBiblioData.length > 0) {
           let data = this.allBiblioData;//this.syncService.getPreviousVersion();
           let obj = data.filter((x: any) => x.callNumber === id);
           if (obj.length > 0) {
-            this.zoteroObject =  obj[0];//new ZoteroItem(obj[0]);
+            this.zoteroObject = obj[0];//new ZoteroItem(obj[0]);
             console.log(this.zoteroObject)
             this.biblioItemMore.getSpecificData(this.zoteroObject)
             document.getElementById('btnOpenModalDetail')?.click();
@@ -84,24 +86,30 @@ export class HomeComponent implements OnInit {
         this.showToast(this.data, 'bg-danger');
         this.data = this.syncService.getPreviousVersion()
       }
-      this.totalItems = this.data.items.length;
-      this.convertJSONToArray(this.data.items);
-      this.libraryName = this.data.libraryName;
-      this.getLastCallNumber();
-      this.loading = false;
+      this.apiService.getAllAlternateTitle().subscribe(resp => {
+        this.allAltTitles = resp;
+        this.totalItems = this.data.items.length;
+        this.convertJSONToArray(this.data.items);
+        this.libraryName = this.data.libraryName;
+        this.getLastCallNumber();
+        this.loading = false;
+      });
     }
   }
 
-  async getAllBiblioCitationsStyle()
-  {
+  async getAllBiblioCitationsStyle() {
     this.citations = await this.syncService.getAllBiblioCitationStyles();
   }
 
   convertJSONToArray(data: any) {
     for (let d of data) {
       let zoteroItem: ZoteroItem = new ZoteroItem(d);
-      if (d.itemType !== 'note')
-        this.allBiblioData.push(zoteroItem)
+      if (d.itemType !== 'note') {
+        if (this.allAltTitles.filter((x: any) => x.callNumber === zoteroItem.callNumber).length > 0) {
+          zoteroItem.altTitle = this.allAltTitles.filter((x: any) => x.callNumber === zoteroItem.callNumber).map((x: any) => x.title);
+        }
+        this.allBiblioData.push(zoteroItem);
+      }
     }
   }
 

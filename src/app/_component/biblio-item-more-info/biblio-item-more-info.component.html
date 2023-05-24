@@ -62,6 +62,10 @@
                     item.key !== 'dateAdded' && item.key !== 'dateModified' &&
                     itemHasValue(item.value)">
               {{ getColumnName(item.key) }}
+              <span *ngIf="item.key === 'title'">
+                <i class="bi bi-plus-circle" *ngIf="hasPermission" title="Add Alternate" style="cursor: pointer;"
+                  data-bs-toggle="modal" data-bs-target="#modalAddAlternateTitle"></i>
+              </span>
             </td>
             <td *ngIf="item.key !== 'creators' && item.key !=='tags' && 
               item.key !=='relations' && item.key !=='url' &&
@@ -150,7 +154,13 @@
               </div>
             </td>
           </tr>
-
+          <tr *ngFor="let altTitle of alternateTitles">
+            <td>
+              Alternate Title
+              <p style="line-height: 10px; font-size:10px;">{{ altTitle.lang }}</p>
+            </td>
+            <td>{{ altTitle.title }}</td>
+          </tr>
           <tr>
             <td *ngIf="zoteroObject.dateAdded !== undefined && zoteroObject.dateAdded !== ''">
               Date Added
@@ -285,4 +295,46 @@
 
 <div *ngIf="zoteroObject === null && totalNumberOfRecords > 0" class="totalItems">
   {{ totalNumberOfRecords }} items
+</div>
+
+<!-- Start Add Alternate title Modal -->
+<div class="modal fade" id="modalAddAlternateTitle" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="modalAddAlternateTitle" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-plus"></i> Add Alternate Title</h5>
+        <button type="button" id="btnAltTitleClose" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12" id="titleLang" style="position: relative;">
+            <ng-select id="selLang" [items]="citationLanguage" appendTo="#titleLang" placeholder="Select language.."
+              bindLabel="language" bindValue="langKey" [(ngModel)]="selectedTitleLanguage"></ng-select>
+          </div>
+          <div class="col-md-12 mt-2">
+            <textarea type="text" class="form-control" [(ngModel)]="alternateTitleText" rows="5"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="saveAlterTitle()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Modal -->
+
+<div class="position-fixed top-0 end-0 p-3 mt-5" style="z-index: 11">
+  <div id="divError" style="width: auto;" class="toast align-items-center text-white border-0 mt-3" role="alert"
+    aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        {{ errorMessage }}
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+        aria-label="Close"></button>
+    </div>
+  </div>
 </div>

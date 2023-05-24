@@ -160,5 +160,18 @@ export class BiblApiService {
   getItemAbbr(callNumber: any, abbr: any): Observable<any> {
     return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, abbr: abbr, method: 'getItemAbbr' });
   }
+
+  addAlternateTitle(obj: any): Observable<any> {
+    let userId = JSON.parse(this.authService.getToken() || '{}').id
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { itemTitle: obj, userId: userId, method: 'addAlternateTitle' });
+  }
+
+  getAlternateTitle(callNumber: any): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { callNumber: callNumber, method: 'getAlternateTitle' });
+  }
+
+  getAllAlternateTitle(): Observable<any> {
+    return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { method: 'getAllAlternateTitle' });
+  }
 }
 

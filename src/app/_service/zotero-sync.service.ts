@@ -195,8 +195,8 @@ export class ZoteroSyncService {
     return c;
   }
 
-  async getAllcitations(content: any, style: any, language: any, start: any, limit:any) {
-    let d = await this.zoteroAPI.items().get({ style: style, format: 'json', include: content, locale: language, start:start, limit: limit });
+  async getAllcitations(content: any, style: any, language: any, start: any, limit: any) {
+    let d = await this.zoteroAPI.items().get({ style: style, format: 'json', include: content, locale: language, start: start, limit: limit });
     let c = await d.getData();
     return c;
   }
@@ -226,10 +226,20 @@ export class ZoteroSyncService {
   async fetchURL(apiNumber: any, libURL: any) {
     let zoteroItems: any = [];
     let res: any = null;
+    let existingItems: any = [];
+    let existingVersion = 0;
+    if (localStorage.getItem(apiNumber)) {
+      existingItems = JSON.parse(localStorage.getItem(apiNumber) || '{}').items;
+      existingVersion = parseInt(JSON.parse(localStorage.getItem(apiNumber) || '{}').version);
+    }
+
     try {
-      let response = await fetch(`https://api.zotero.org/groups/${apiNumber}/items?since=0&format=versions&includeTrashed=0`);
-      if (response.status === 200)
+      let response: any = await fetch(`https://api.zotero.org/groups/${apiNumber}/items?since=${existingVersion}&format=versions&includeTrashed=0`);
+      if (response.status === 200) {
+        existingVersion = parseInt(response.headers.get('last-modified-version'))
         res = Object.keys(await (response).json())
+      }
+
       else
         return zoteroItems;
     }
@@ -240,17 +250,36 @@ export class ZoteroSyncService {
     this.otherLibItemsCount = res.length;
     for (let n = 0; n < res.length; n++) {
       for (const item of await (await fetch(`https://api.zotero.org/groups/${apiNumber}/items?itemKey=${res.slice(n, n + this.batch).join(',')}&includeTrashed=0`)).json()) {
-        zoteroItems.push(item.data);
+        let existingIndex = existingItems.findIndex((x: any) => x.key === item.data.key)
+        if (existingIndex > -1) {
+          existingItems[existingIndex] = item.data;
+        }
+        else {
+          existingItems.push(item.data);
+        }
         n += 1;
         this.fetchingPercentage = n;
       }
-      //break;
     }
 
-    localStorage.setItem(apiNumber, JSON.stringify(zoteroItems));
-    localStorage.setItem('libURL', JSON.stringify({ libURL: libURL, apiKey: '' }));
-    return zoteroItems;
-    //console.log(res)
+    let obj = { items: existingItems, version: existingVersion }
+    localStorage.setItem(apiNumber, JSON.stringify(obj));
+    if (localStorage.getItem('libURL')) {
+      if (JSON.parse(localStorage.getItem('libURL') || '{}').libURL !== libURL)
+        localStorage.setItem('libURL', JSON.stringify({ libURL: libURL, apiKey: '' }));
+    }
+    else{
+      localStorage.setItem('libURL', JSON.stringify({ libURL: libURL, apiKey: '' }));
+    }
+
+    return existingItems;
+  }
+
+  async insert(item: any) {
+    delete item['key'];
+    delete item['version'];
+    let insertData = await this.zoteroAPI.items().post([item]);
+    return insertData;
   }
 
   async updateOtherLibTagsWithCallNumber(otherLibURL: any, zoterObj: any, apiKey: any, tag: any) {
