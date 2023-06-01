@@ -282,11 +282,14 @@ export class ZoteroSyncService {
     return insertData;
   }
 
-  async updateOtherLibTagsWithCallNumber(otherLibURL: any, zoterObj: any, apiKey: any, tag: any) {
+  async updateOtherLibTagsWithCallNumber(otherLibURL: any, zoterObj: any, apiKey: any, tag: any, callNumber: any = '') {
     let other_api_key = apiKey;
     let zoteroOtherAPI = api(other_api_key).library('group', otherLibURL.replace(/[^0-9]/g, ""));
     let jsonData = await zoteroOtherAPI.items(zoterObj.key).get();
     let data = await jsonData.getData();
+    if(data.callNumber === '')
+      data.callNumber = callNumber;
+      
     data.tags.push(tag)
     await zoteroOtherAPI.items(zoterObj.key).patch(data);
   }

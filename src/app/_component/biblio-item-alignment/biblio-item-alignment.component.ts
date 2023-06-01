@@ -106,7 +106,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
     for (let target of this.allOtherBiblioData) {
       if (target.title === '')
         continue;
-      isCallNumberExist = this.getCallNumberExist(target.tags);
+      isCallNumberExist = this.getCallNumberExist(target.tags, target.callNumber);
       if (isCallNumberExist === null) {
         for (let source of this.allSourceBiblioData) {
           currentSource = source;
@@ -142,11 +142,15 @@ export class BiblioItemAlignmentComponent implements OnInit {
     }
   }
 
-  getCallNumberExist(tags: any) {
-    if (tags.length === 0)
+  getCallNumberExist(tags: any, callNumber: any) {
+    if (tags.length === 0 && callNumber === '')
       return null;
     else if (tags.filter((x: any) => x.tag.indexOf('callNumber') > -1).length > 0) {
       return { callNumber: tags.filter((x: any) => x.tag.indexOf('callNumber') > -1)[0].tag.split(':')[1].trim() };
+    }
+    else if(callNumber !== '' && callNumber.startsWith('epig'))
+    {
+      return { callNumber: callNumber };
     }
 
     return null;
@@ -284,7 +288,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
     let apiNumber = this.zoteroURL.replace(/[^0-9]/g, "");
     try {
       if (apiKey !== '') {
-        await this.zoteroAPI.updateOtherLibTagsWithCallNumber(this.zoteroURL, zoteroObj, apiKey, tagCallNumber);
+        await this.zoteroAPI.updateOtherLibTagsWithCallNumber(this.zoteroURL, zoteroObj, apiKey, tagCallNumber, callNumber);
         this.matchedBibliography = this.matchedBibliography.filter(x => x.key !== this.customBiblioList.zoteroObject.key);
         let obj = JSON.parse(localStorage.getItem(apiNumber) || '{}');
         let itemIndex = obj.items.findIndex((x: any) => x.key === zoteroObj.key);
@@ -430,7 +434,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
       let apiNumber = this.zoteroURL.replace(/[^0-9]/g, "");
       try {
         if (apiKey !== '') {
-          await this.zoteroAPI.updateOtherLibTagsWithCallNumber(this.zoteroURL, zoteroObj, apiKey, tagCallNumber);
+          await this.zoteroAPI.updateOtherLibTagsWithCallNumber(this.zoteroURL, zoteroObj, apiKey, tagCallNumber, callNumber);
           if (this.customBiblioList.zoteroObject !== null && !this.isNotMatchedItem) {
             this.matchedBibliography = this.matchedBibliography.filter(x => x.key !== this.customBiblioList.zoteroObject.key);
           }
