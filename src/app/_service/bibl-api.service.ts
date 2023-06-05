@@ -173,5 +173,20 @@ export class BiblApiService {
   getAllAlternateTitle(): Observable<any> {
     return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { method: 'getAllAlternateTitle' });
   }
+
+  ////////////////////////////////////////////////////
+  /// Following is the python API
+  getRDFData(biblioItem: any): Observable<any> {
+    const url = 'https://fair.classics.ox.ac.uk/wsgi/';
+    const requestBody = { method: 'getRDFData', bibItem: biblioItem };
+    const headers = new HttpHeaders().set('Accept', 'text/plain');
+    //headers.append(('Content-type', 'application/json'));
+
+    return this.http.request('post', url, {
+      body: JSON.stringify(requestBody),
+      headers: headers,
+      responseType: 'text',
+    })
+  }
 }
 

@@ -69,16 +69,8 @@ export class BiblioItemAlignmentComponent implements OnInit {
         this.invalidURL = false;
         this.isFetching = true;
         this.fetchingPercentage = this.zoteroAPI.fetchingPercentage;
-        // if (localStorage.getItem(apiNumber) !== undefined && localStorage.getItem(apiNumber) !== null) {
-        //   items = JSON.parse(localStorage.getItem(apiNumber) || '{}').items;
-
-        //   if (JSON.parse(localStorage.getItem('libURL') || '{}').libURL !== this.zoteroURL) {
-        //     localStorage.setItem('libURL', JSON.stringify({ libURL: this.zoteroURL, apiKey: '' }));
-        //   }
-        // }
-        // else {
+        
         items = await this.zoteroAPI.fetchURL(apiNumber, this.zoteroURL);
-        // }
 
         if (items.length > 0) {
           this.allOtherBiblioData = this.convertJSONToArray(items);

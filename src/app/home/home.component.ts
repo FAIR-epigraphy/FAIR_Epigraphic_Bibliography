@@ -54,6 +54,7 @@ export class HomeComponent implements OnInit {
     this.getAllBiblioData()
     this.getAllBiblioCitationsStyle();
     //this.getBibloItemInfo()
+    
   }
 
   getBibloItemInfo() {

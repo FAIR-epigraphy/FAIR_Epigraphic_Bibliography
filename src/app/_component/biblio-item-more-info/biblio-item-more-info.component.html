@@ -59,12 +59,16 @@
                     item.key !== 'children' && item.key !== 'key' && item.key !== 'creatorsName' &&
                     item.key !== 'resourceTypeId' && item.key !== 'resourceType' &&
                     item.key !== 'addedBy' && item.key !== 'modifiedBy' &&
-                    item.key !== 'dateAdded' && item.key !== 'dateModified' &&
+                    item.key !== 'dateAdded' && item.key !== 'dateModified' && item.key !== 'altTitle' &&
                     itemHasValue(item.value)">
               {{ getColumnName(item.key) }}
               <span *ngIf="item.key === 'title'">
                 <i class="bi bi-plus-circle" *ngIf="hasPermission" title="Add Alternate" style="cursor: pointer;"
                   data-bs-toggle="modal" data-bs-target="#modalAddAlternateTitle"></i>
+              </span>
+              <span *ngIf="item.key === 'shortTitle'">
+                <i class="bi bi-plus-circle" *ngIf="hasPermission" title="Add Abbreviation" style="cursor: pointer;"
+                  (click)="showTextbox(item)"></i>
               </span>
             </td>
             <td *ngIf="item.key !== 'creators' && item.key !=='tags' && 
@@ -72,13 +76,10 @@
               item.key !== 'children' && item.key !== 'key' && item.key !== 'creatorsName' &&
               item.key !== 'resourceTypeId' && item.key !== 'resourceType' &&
               item.key !== 'addedBy' && item.key !== 'modifiedBy' &&
-              item.key !== 'dateAdded' && item.key !== 'dateModified' &&
+              item.key !== 'dateAdded' && item.key !== 'dateModified' && item.key !== 'altTitle' &&
                itemHasValue(item.value)">
               <span *ngIf="item.key !== 'shortTitle'">{{item.value}}</span>
-              <span *ngIf="item.key === 'shortTitle'">
-                <i class="bi bi-plus-circle" *ngIf="hasPermission" title="Add Abbreviation" style="cursor: pointer;"
-                  (click)="showTextbox(item)"></i>
-              </span>
+             
               <ul *ngIf="item.key === 'shortTitle'" style="margin-left: -25px;">
                 <li *ngFor="let obj of getAbbr(item)"
                   [ngStyle]="{'list-style-type': obj.abbr === '' ? 'none' : '\' - \''}">

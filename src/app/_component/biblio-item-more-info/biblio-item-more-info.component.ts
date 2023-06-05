@@ -385,7 +385,7 @@ export class BiblioItemMoreInfoComponent {
   getAltTitleByCallNo() {
     this.apiService.getAlternateTitle(this.zoteroObject.callNumber).subscribe(resp => {
       if (resp.length > 0)
-        this.zoteroObject.altTitle = resp.map((x: any) => x.title);
+        this.zoteroObject.altTitle = resp;//resp.map((x: any) => x.title);
 
       this.alternateTitles = resp;
     });

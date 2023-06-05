@@ -200,7 +200,21 @@ export class BiblioItemListComponent implements OnInit {
   }
 
   export(format: any, ext: any) {
-    this.zoteroAPI.export(format, this.currentSelectedRecord.key, ext);
+    if(format.includes('fair'))
+    {
+      this.getRDFData();
+    }
+    else
+    {
+      this.zoteroAPI.export(format, this.currentSelectedRecord.key, ext);
+    }
+  }
+
+  async getRDFData() {
+    this.biblAPI.getRDFData(this.currentSelectedRecord).subscribe(resp => {
+      //console.log(resp);  
+      this.zoteroAPI.download(`fair-bib_${this.currentSelectedRecord.callNumber}.rdf`, resp);
+    })
   }
 
   ngAfterViewInit() {

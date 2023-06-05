@@ -8,6 +8,7 @@
     aria-expanded="false" title="Export" style="font-size: 20px;cursor: pointer;"
     [class]="currentSelectedRecord === null ? 'disabled' : ''">
     <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="z-index: 2000">
+      <li (click)="export('fair_rdf', 'rdf')"><a class="dropdown-item">FAIR Biblio RDF</a></li>
       <li (click)="export('biblatex', 'bib')"><a class="dropdown-item">BibLaTeX</a></li>
       <li (click)="export('rdf_bibliontology', 'rdf')"><a class="dropdown-item">Bibliographic Ontology RDF</a></li>
       <li (click)="export('bibtex', 'bib')"><a class="dropdown-item">BibTeX</a></li>
