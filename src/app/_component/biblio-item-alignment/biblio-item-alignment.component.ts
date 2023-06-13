@@ -24,6 +24,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
   otherLibCallNumber: string = '';
   @ViewChild('customBiblioList') customBiblioList: any;
   @ViewChild('zoteroBiblioList') zoteroBiblioList: any;
+  @ViewChild('zoteroBiblioListMore') zoteroBiblioListMore: any;
   isNotMatchedItem = false;
   isUpdateAllBtn = false;
 
@@ -69,7 +70,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
         this.invalidURL = false;
         this.isFetching = true;
         this.fetchingPercentage = this.zoteroAPI.fetchingPercentage;
-        
+
         items = await this.zoteroAPI.fetchURL(apiNumber, this.zoteroURL);
 
         if (items.length > 0) {
@@ -77,6 +78,8 @@ export class BiblioItemAlignmentComponent implements OnInit {
           this.allSourceBiblioData = this.convertJSONToArray(this.zoteroAPI.getPreviousVersion().items)
           this.compareBibliographyItems();
           //this.sortByCol('title', null!);
+          this.sortByColMatched('title', null!);
+          this.sortByColNotMatched('title', null!);
         }
         else {
           this.showToast('No zotero items found', 'bg-danger')
@@ -92,6 +95,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
   compareBibliographyItems() {
     let matchedBiblio = false;
     let currentSource: any = null;
+    let currentTarget: any = null;
     this.matchedBibliography = []
     this.notMatchedBibliography = []
     let isCallNumberExist: any = null;
@@ -102,7 +106,8 @@ export class BiblioItemAlignmentComponent implements OnInit {
       if (isCallNumberExist === null) {
         for (let source of this.allSourceBiblioData) {
           currentSource = source;
-          if (source.title.includes(target.title) || target.title.includes(source.title)) {
+          currentTarget = target;
+          if (source.title.includes(target.title)) {
             for (let c of source.creators) {
               let creatorFound = target.creators.filter(x => (x.firstName === c.firstName && x.lastName === c.lastName) ||
                 (x.fullName === c.fullName)
@@ -140,8 +145,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
     else if (tags.filter((x: any) => x.tag.indexOf('callNumber') > -1).length > 0) {
       return { callNumber: tags.filter((x: any) => x.tag.indexOf('callNumber') > -1)[0].tag.split(':')[1].trim() };
     }
-    else if(callNumber !== '' && callNumber.startsWith('epig'))
-    {
+    else if (callNumber !== '' && callNumber.startsWith('epig')) {
       return { callNumber: callNumber };
     }
 
@@ -169,24 +173,28 @@ export class BiblioItemAlignmentComponent implements OnInit {
     }
     else {
       let found = false;
+      let isCallNumberExist: any = null;
       for (let source of this.allOtherBiblioData) {
-        if (source.title.includes(item.title) || item.title.includes(source.title)) {
-          for (let c of source.creators) {
-            let creatorFound = item.creators.filter((x: any) => (x.firstName === c.firstName && x.lastName === c.lastName) ||
-              (x.fullName === c.fullName)
-            );
-            if (creatorFound.length > 0) {
-              let splitSourceDate = source.date.split("-");
-              let splitTargetDate = item.date.split("-");
-              if (splitSourceDate[0].trim() === splitTargetDate[0].trim()) {
-                currentSource = source;
-                found = true;
-                break;
+        isCallNumberExist = this.getCallNumberExist(source.tags, source.callNumber);
+        if (isCallNumberExist === null) {
+          if (source.title.includes(item.title) || item.title.includes(source.title)) {
+            for (let c of source.creators) {
+              let creatorFound = item.creators.filter((x: any) => (x.firstName === c.firstName && x.lastName === c.lastName) ||
+                (x.fullName === c.fullName)
+              );
+              if (creatorFound.length > 0) {
+                let splitSourceDate = source.date.split("-");
+                let splitTargetDate = item.date.split("-");
+                if (splitSourceDate[0].trim() === splitTargetDate[0].trim()) {
+                  currentSource = source;
+                  found = true;
+                  break;
+                }
               }
             }
+            if (found)
+              break;
           }
-          if (found)
-            break;
         }
       }
     }
@@ -226,7 +234,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
     })
   }
 
-  sortByCol(colName: any, event: Event) {
+  sortByColNotMatched(colName: any, event: Event) {
     let sortDirection = '';
     let element;
     if (event !== null) {
@@ -238,7 +246,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
     if (sortDirection.indexOf('bi-chevron-up') > -1)  // Descending order
     {
       if (event !== null) this.removeAllSortingIcons();
-      this.allOtherBiblioData = this.allOtherBiblioData.sort(function (a: any, b: any) {
+      this.notMatchedBibliography = this.notMatchedBibliography.sort(function (a: any, b: any) {
         const nameA = colName !== 'creators' ? a[colName].toUpperCase() : a.getCreators(); // ignore upper and lowercase
         const nameB = colName !== 'creators' ? b[colName].toUpperCase() : b.getCreators(); // ignore upper and lowercase
         if (nameA > nameB) {
@@ -254,7 +262,51 @@ export class BiblioItemAlignmentComponent implements OnInit {
     }
     else {
       if (event !== null) this.removeAllSortingIcons();
-      this.allOtherBiblioData = this.allOtherBiblioData.sort(function (a: any, b: any) {
+      this.notMatchedBibliography = this.notMatchedBibliography.sort(function (a: any, b: any) {
+        const nameA = colName !== 'creators' ? a[colName].toUpperCase() : a.getCreators(); // ignore upper and lowercase
+        const nameB = colName !== 'creators' ? b[colName].toUpperCase() : b.getCreators(); // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        // call number must be equal
+        return 0;
+      });
+      element?.classList.add('bi-chevron-up')
+    }
+  }
+
+  sortByColMatched(colName: any, event: Event) {
+    let sortDirection = '';
+    let element;
+    if (event !== null) {
+      console.log((event.target as HTMLElement).children);
+      element = ((event.target) as HTMLElement).children[0]
+      sortDirection = element.className;
+    }
+
+    if (sortDirection.indexOf('bi-chevron-up') > -1)  // Descending order
+    {
+      if (event !== null) this.removeAllSortingIcons();
+      this.matchedBibliography = this.matchedBibliography.sort(function (a: any, b: any) {
+        const nameA = colName !== 'creators' ? a[colName].toUpperCase() : a.getCreators(); // ignore upper and lowercase
+        const nameB = colName !== 'creators' ? b[colName].toUpperCase() : b.getCreators(); // ignore upper and lowercase
+        if (nameA > nameB) {
+          return -1;
+        }
+        if (nameA < nameB) {
+          return 1;
+        }
+        // call number must be equal
+        return 0;
+      });
+      element?.classList.add('bi-chevron-down')
+    }
+    else {
+      if (event !== null) this.removeAllSortingIcons();
+      this.matchedBibliography = this.matchedBibliography.sort(function (a: any, b: any) {
         const nameA = colName !== 'creators' ? a[colName].toUpperCase() : a.getCreators(); // ignore upper and lowercase
         const nameB = colName !== 'creators' ? b[colName].toUpperCase() : b.getCreators(); // ignore upper and lowercase
         if (nameA < nameB) {
@@ -476,6 +528,11 @@ export class BiblioItemAlignmentComponent implements OnInit {
     this.notMatchedBibliography.push(zoteroObj)
     document.getElementById('btnCloseCallNumberModal')?.click();
   }
+
+  moreInfo(item: any) {
+    this.zoteroBiblioListMore.getSpecificData(item, 'zotero');
+  }
+
 
   cancel(opt: any) {
     if (opt === 'back') {

@@ -234,7 +234,7 @@ export class ZoteroSyncService {
     }
 
     try {
-      let response: any = await fetch(`https://api.zotero.org/groups/${apiNumber}/items?since=${existingVersion}&format=versions&includeTrashed=0`);
+      let response: any = await fetch(`https://api.zotero.org/groups/${apiNumber}/items?since=${existingVersion}&format=versions`);
       if (response.status === 200) {
         existingVersion = parseInt(response.headers.get('last-modified-version'))
         res = Object.keys(await (response).json())
@@ -249,7 +249,7 @@ export class ZoteroSyncService {
 
     this.otherLibItemsCount = res.length;
     for (let n = 0; n < res.length; n++) {
-      for (const item of await (await fetch(`https://api.zotero.org/groups/${apiNumber}/items?itemKey=${res.slice(n, n + this.batch).join(',')}&includeTrashed=0`)).json()) {
+      for (const item of await (await fetch(`https://api.zotero.org/groups/${apiNumber}/items?itemKey=${res.slice(n, n + this.batch).join(',')}`)).json()) {
         let existingIndex = existingItems.findIndex((x: any) => x.key === item.data.key)
         if (existingIndex > -1) {
           existingItems[existingIndex] = item.data;
