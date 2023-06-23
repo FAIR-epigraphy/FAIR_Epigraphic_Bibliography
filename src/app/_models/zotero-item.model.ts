@@ -107,13 +107,11 @@ export class ZoteroItem {
 
             ////////////////////
             // Contributor
-            if(d.addedBy !== undefined)
-            {
+            if (d.addedBy !== undefined) {
                 this.addedBy = d.addedBy;
             }
 
-            if(d.modifiedBy !== undefined)
-            {
+            if (d.modifiedBy !== undefined) {
                 this.modifiedBy = d.modifiedBy;
             }
         }
@@ -121,31 +119,46 @@ export class ZoteroItem {
 
     getCreators() {
         //return this.creators.map(x => ({ name: x.fullName }).name).join(', ');
+        let authors = this.creators.filter((x: Creator) => x.creatorType.toLowerCase() === 'author');
+        let editors = this.creators.filter((x: Creator) => x.creatorType.toLowerCase() === 'editor');
+        let others = this.creators.filter((x: Creator) => x.creatorType.toLowerCase() !== 'author' && x.creatorType.toLowerCase() !== 'editor');
 
-        if (this.creators.length === 1) {
-            if (this.creators[0].lastName !== '')
-                return this.creators[0].lastName;
-            else
-                return this.creators[0].fullName;
-        }
-        else if (this.creators.length === 2) {
-            if (this.creators[0].lastName !== '')
-                if (this.creators[1].lastName !== '')
-                    return `${this.creators[0].lastName} and ${this.creators[1].lastName}`;
-                else
-                    return `${this.creators[0].lastName} and ${this.creators[1].fullName}`;
-
-            else
-                return this.creators[0].fullName;
-        }
-        else if (this.creators.length > 1) {
-            if (this.creators[0].lastName !== '')
-                return this.creators[0].lastName + ' et al.'
-            else
-                return this.creators[0].fullName;
-        }
-        return '';
+        if (authors.length > 0)
+            return this.getCreatorsFromArray(authors);
+        else if (editors.length > 0)
+            return this.getCreatorsFromArray(editors);
+        else
+            return this.getCreatorsFromArray(others);
     }
 
-
+    getCreatorsFromArray(creators: Creator[]) {
+        if(creators.length > 0)
+        {
+            if (creators.length === 1) {
+                if (creators[0].lastName !== '')
+                    return creators[0].lastName;
+                else
+                    return creators[0].fullName;
+    
+            }
+            else if (creators.length === 2) {
+                if (creators[0].lastName !== '')
+                    if (creators[1].lastName !== '')
+                        return `${creators[0].lastName} and ${creators[1].lastName}`;
+                    else
+                        return `${creators[0].lastName} and ${creators[1].fullName}`;
+    
+                else
+                    return creators[0].fullName;
+            }
+            else {
+                if (this.creators[0].lastName !== '')
+                    return this.creators[0].lastName + ' et al.'
+                else
+                    return this.creators[0].fullName;
+            }
+        }
+        
+        return '';
+    }
 }

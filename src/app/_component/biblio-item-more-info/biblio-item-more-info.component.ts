@@ -121,9 +121,10 @@ export class BiblioItemMoreInfoComponent {
           let index = this.zoteroObject.creators.findIndex((x: Creator) => x.firstName === resp[0].first_name &&
             x.lastName === resp[0].last_name
           );
-          if (index > -1)
+          if (index > -1) {
             this.zoteroObject.creators[index].VIAF.value = resp[0].VIAF;
-          this.zoteroObject.creators[index].ORCID.value = resp[0].ORCID;
+            this.zoteroObject.creators[index].ORCID.value = resp[0].ORCID;
+          }
         }
       }
     });
@@ -347,6 +348,22 @@ export class BiblioItemMoreInfoComponent {
     for (let c of value) {
       creators.push(new Creator(c));
     }
+    creators = this.sortByCol(creators, 'creatorType')
+    return creators;
+  }
+
+  sortByCol(creators: Creator[], colName: any) {
+    creators.sort(function (a: any, b: any) {
+      const nameA = a[colName].toUpperCase() // ignore upper and lowercase
+      const nameB = b[colName].toUpperCase() // ignore upper and lowercase
+      if (nameA < nameB) {
+        return -1;
+      }
+      if (nameA > nameB) {
+        return 1;
+      }
+      return 0;
+    });
     return creators;
   }
 

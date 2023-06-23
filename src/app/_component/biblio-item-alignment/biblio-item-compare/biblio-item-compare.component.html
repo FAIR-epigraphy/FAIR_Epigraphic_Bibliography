@@ -1,19 +1,19 @@
 <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="info-tab" data-bs-toggle="tab" [attr.data-bs-target]="'#info-'+tabs" type="button"
-            role="tab" aria-controls="info" aria-selected="true">Info</button>
+        <button class="nav-link active" id="info-tab" data-bs-toggle="tab" [attr.data-bs-target]="'#info-'+tabs"
+            type="button" role="tab" aria-controls="info" aria-selected="true">Info</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="notes-tab" data-bs-toggle="tab" [attr.data-bs-target]="'#notes-'+tabs" type="button" role="tab"
-            aria-controls="notes" aria-selected="false">Notes</button>
+        <button class="nav-link" id="notes-tab" data-bs-toggle="tab" [attr.data-bs-target]="'#notes-'+tabs"
+            type="button" role="tab" aria-controls="notes" aria-selected="false">Notes</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="tags-tab" data-bs-toggle="tab" [attr.data-bs-target]="'#tags-'+tabs" type="button" role="tab"
-            aria-controls="tags" aria-selected="false">Tags</button>
+        <button class="nav-link" id="tags-tab" data-bs-toggle="tab" [attr.data-bs-target]="'#tags-'+tabs" type="button"
+            role="tab" aria-controls="tags" aria-selected="false">Tags</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="relations-tab" data-bs-toggle="tab" [attr.data-bs-target]="'#relations-'+tabs" type="button"
-            role="tab" aria-controls="relations" aria-selected="false">Relations</button>
+        <button class="nav-link" id="relations-tab" data-bs-toggle="tab" [attr.data-bs-target]="'#relations-'+tabs"
+            type="button" role="tab" aria-controls="relations" aria-selected="false">Relations</button>
     </li>
 </ul>
 
@@ -78,7 +78,11 @@
                             Added By
                         </td>
                         <td *ngIf="zoteroObject.addedBy !== undefined && zoteroObject.addedBy !== ''">
-                            {{ zoteroObject.addedBy }}
+                            {{ zoteroObject.addedBy === 'imranasif' ? 'FAIR Biblio' : zoteroObject.addedBy }}
+                            <a href="https://github.com/FAIR-epigraphy/FAIR_Epigraphic_Bibliography"
+                                *ngIf="zoteroObject.addedBy === 'imranasif'" target="_blank">
+                                <i class='bi bi-box-arrow-up-right'></i>
+                            </a>
                         </td>
                     </tr>
                     <tr>
@@ -86,7 +90,11 @@
                             Modified By
                         </td>
                         <td *ngIf="zoteroObject.modifiedBy !== undefined && zoteroObject.modifiedBy!== ''">
-                            {{ zoteroObject.modifiedBy }}
+                            {{ zoteroObject.modifiedBy === 'imranasif' ? 'FAIR Biblio' : zoteroObject.modifiedBy }}
+                            <a href="https://github.com/FAIR-epigraphy/FAIR_Epigraphic_Bibliography"
+                                *ngIf="zoteroObject.modifiedBy === 'imranasif'" target="_blank">
+                                <i class='bi bi-box-arrow-up-right'></i>
+                            </a>
                         </td>
                     </tr>
                 </tbody>

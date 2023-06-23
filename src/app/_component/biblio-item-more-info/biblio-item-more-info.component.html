@@ -183,7 +183,11 @@
               Added By
             </td>
             <td *ngIf="zoteroObject.addedBy !== undefined && zoteroObject.addedBy !== ''">
-              {{ zoteroObject.addedBy }}
+              {{ zoteroObject.addedBy === 'imranasif' ? 'FAIR Biblio' : zoteroObject.addedBy }}
+              <a href="https://github.com/FAIR-epigraphy/FAIR_Epigraphic_Bibliography"
+                *ngIf="zoteroObject.addedBy === 'imranasif'" target="_blank">
+                <i class='bi bi-box-arrow-up-right'></i>
+              </a>
             </td>
           </tr>
           <tr>
@@ -191,7 +195,11 @@
               Modified By
             </td>
             <td *ngIf="zoteroObject.modifiedBy !== undefined && zoteroObject.modifiedBy!== ''">
-              {{ zoteroObject.modifiedBy }}
+              {{ zoteroObject.modifiedBy === 'imranasif' ? 'FAIR Biblio' : zoteroObject.modifiedBy }}
+              <a href="https://github.com/FAIR-epigraphy/FAIR_Epigraphic_Bibliography"
+                *ngIf="zoteroObject.modifiedBy === 'imranasif'" target="_blank">
+                <i class='bi bi-box-arrow-up-right'></i>
+              </a>
             </td>
           </tr>
         </tbody>
