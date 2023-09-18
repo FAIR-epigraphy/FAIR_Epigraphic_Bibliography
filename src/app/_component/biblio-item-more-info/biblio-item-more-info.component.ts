@@ -25,6 +25,7 @@ export class BiblioItemMoreInfoComponent {
   isDisplayedResourceType = false;
   errorMessage: any = '';
   alternateTitles: any = [];
+  parentComponent: any = null;
 
   citationLanguage: any = JSON.parse('[{"language":"Afrikaans","langKey":"af-ZA"},{"language":"Arabic","langKey":"ar"},{"language":"Basque","langKey":"eu"},{"language":"Bulgarian","langKey":"bg-BG"},{"language":"Catalan","langKey":"ca-AD"},{"language":"Chinese (PRC)","langKey":"zh-CN"},{"language":"Chinese (Taiwan)","langKey":"zh-TW"},{"language":"Croatian","langKey":"hr-HR"},{"language":"Czech","langKey":"cs-CZ"},{"language":"Danish","langKey":"da-DK"},{"language":"Dutch","langKey":"nl-NL"},{"language":"English (UK)","langKey":"en-GB"},{"language":"English (US)","langKey":"en-US"},{"language":"Estonian","langKey":"et-EE"},{"language":"Finnish","langKey":"fi-FI"},{"language":"French (Canada)","langKey":"fr-CA"},{"language":"French (France)","langKey":"fr-FR"},{"language":"German (Austria)","langKey":"de-AT"},{"language":"German (Germany)","langKey":"de-DE"},{"language":"German (Switzerland)","langKey":"de-CH"},{"language":"Greek","langKey":"el-GR"},{"language":"Hebrew","langKey":"he-IL"},{"language":"Hindi","langKey":"hi-IN"},{"language":"Hungarian","langKey":"hu-HU"},{"language":"Icelandic","langKey":"is-IS"},{"language":"Indonesian","langKey":"id-ID"},{"language":"Italian","langKey":"it-IT"},{"language":"Japanese","langKey":"ja-JP"},{"language":"Khmer","langKey":"km-KH"},{"language":"Korean","langKey":"ko-KR"},{"language":"Latin","langKey":"la"},{"language":"Latvian","langKey":"lv-LV"},{"language":"Lithuanian","langKey":"lt-LT"},{"language":"Mongolian","langKey":"mn-MN"},{"language":"Norwegian (Bokmål)","langKey":"nb-NO"},{"language":"Norwegian (Nynorsk)","langKey":"nn-NO"},{"language":"Persian","langKey":"fa-IR"},{"language":"Polish","langKey":"pl-PL"},{"language":"Portuguese (Brazil)","langKey":"pt-BR"},{"language":"Portuguese (Portugal)","langKey":"pt-PT"},{"language":"Romanian","langKey":"ro-RO"},{"language":"Russian","langKey":"ru-RU"},{"language":"Serbian","langKey":"sr-RS"},{"language":"Slovak","langKey":"sk-SK"},{"language":"Slovenian","langKey":"sl-SI"},{"language":"Spanish (Chile)","langKey":"es-CL"},{"language":"Spanish (Mexico)","langKey":"es-MX"},{"language":"Spanish (Spain)","langKey":"es-ES"},{"language":"Swedish","langKey":"sv-SE"},{"language":"Thai","langKey":"th-TH"},{"language":"Turkish","langKey":"tr-TR"},{"language":"Ukrainian","langKey":"uk-UA"},{"language":"Vietnamese","langKey":"vi-VN"},{"language":"Welsh","langKey":"cy-GB"},{"language":"Afrikaans","langKey":"af-ZA"},{"language":"Arabic","langKey":"ar"},{"language":"Basque","langKey":"eu"},{"language":"Bulgarian","langKey":"bg-BG"},{"language":"Catalan","langKey":"ca-AD"},{"language":"Chinese (PRC)","langKey":"zh-CN"},{"language":"Chinese (Taiwan)","langKey":"zh-TW"},{"language":"Croatian","langKey":"hr-HR"},{"language":"Czech","langKey":"cs-CZ"},{"language":"Danish","langKey":"da-DK"},{"language":"Dutch","langKey":"nl-NL"},{"language":"English (UK)","langKey":"en-GB"},{"language":"English (US)","langKey":"en-US"},{"language":"Estonian","langKey":"et-EE"},{"language":"Finnish","langKey":"fi-FI"},{"language":"French (Canada)","langKey":"fr-CA"},{"language":"French (France)","langKey":"fr-FR"},{"language":"German (Austria)","langKey":"de-AT"},{"language":"German (Germany)","langKey":"de-DE"},{"language":"German (Switzerland)","langKey":"de-CH"},{"language":"Greek","langKey":"el-GR"},{"language":"Hebrew","langKey":"he-IL"},{"language":"Hindi","langKey":"hi-IN"},{"language":"Hungarian","langKey":"hu-HU"},{"language":"Icelandic","langKey":"is-IS"},{"language":"Indonesian","langKey":"id-ID"},{"language":"Italian","langKey":"it-IT"},{"language":"Japanese","langKey":"ja-JP"},{"language":"Khmer","langKey":"km-KH"},{"language":"Korean","langKey":"ko-KR"},{"language":"Latin","langKey":"la"},{"language":"Latvian","langKey":"lv-LV"},{"language":"Lithuanian","langKey":"lt-LT"},{"language":"Mongolian","langKey":"mn-MN"},{"language":"Norwegian (Bokmål)","langKey":"nb-NO"},{"language":"Norwegian (Nynorsk)","langKey":"nn-NO"},{"language":"Persian","langKey":"fa-IR"},{"language":"Polish","langKey":"pl-PL"},{"language":"Portuguese (Brazil)","langKey":"pt-BR"},{"language":"Portuguese (Portugal)","langKey":"pt-PT"},{"language":"Romanian","langKey":"ro-RO"},{"language":"Russian","langKey":"ru-RU"},{"language":"Serbian","langKey":"sr-RS"},{"language":"Slovak","langKey":"sk-SK"},{"language":"Slovenian","langKey":"sl-SI"},{"language":"Spanish (Chile)","langKey":"es-CL"},{"language":"Spanish (Mexico)","langKey":"es-MX"},{"language":"Spanish (Spain)","langKey":"es-ES"},{"language":"Swedish","langKey":"sv-SE"},{"language":"Thai","langKey":"th-TH"},{"language":"Turkish","langKey":"tr-TR"},{"language":"Ukrainian","langKey":"uk-UA"},{"language":"Vietnamese","langKey":"vi-VN"},{"language":"Welsh","langKey":"cy-GB"}]');
 
@@ -51,13 +52,14 @@ export class BiblioItemMoreInfoComponent {
     form.reset();
   }
 
-  async getSpecificData(obj: ZoteroItem) {
+  async getSpecificData(obj: ZoteroItem, parent: any) {
     this.user = JSON.parse(this.authService.getToken() || '{}');
     if (this.user.role_name === 'Admin' || this.user.role_name === 'Editor') this.hasPermission = true;
 
     document.getElementById('info-tab')?.click();
 
     this.zoteroObject = obj;
+    
     await this.updateCallNumber();
 
     this.apiService.getItemAbbr(this.zoteroObject.callNumber, this.zoteroObject.shortTitle[0]['abbr']).subscribe(resp => {
@@ -72,6 +74,9 @@ export class BiblioItemMoreInfoComponent {
               if (this.zoteroObject.shortTitle.filter((x: any) => x.abbr === d.seg2_abbr && x.source === 'SEG 2').length === 0)
                 this.zoteroObject.shortTitle.push({ abbr: d.seg2_abbr, source: 'SEG 2' })
             }
+
+            /// Update the AIEGL Source
+            this.zoteroObject.shortTitle[0].source = 'AIEGL'
           }
 
           // Custom Abbr
@@ -89,10 +94,12 @@ export class BiblioItemMoreInfoComponent {
       this.getItemByCallNo();
       this.getRelations(this.zoteroObject);
       this.getCitation();
+      this.parentComponent = parent;
       //console.log(resp)
     })
 
     this.getAltTitleByCallNo();
+    
   }
 
   getItemByCallNo() {
@@ -331,12 +338,20 @@ export class BiblioItemMoreInfoComponent {
       this.apiService.addItemAbbr(obj).subscribe(resp => {
         item.value[item.value.length - 1].abbr = abbr;
         item.value[item.value.length - 1].source = source;
-      })
 
+        //this.updateRDFData()
+      })
     }
     else {
       item.value[item.value.length - 1].invalid = true;
     }
+  }
+
+  async updateRDFData() {
+    //console.log(this.parentComponent.currentSelectedRecord)
+    this.apiService.updateRDFData(this.parentComponent.currentSelectedRecord).subscribe(resp => {
+      console.log(resp);  
+    })
   }
 
   getFirstAbbr(item: any) {

@@ -1,4 +1,44 @@
+<!-- Toast -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+  <div id="divErrorHome" class="toast align-items-center border-0" role="alert" aria-live="assertive"
+    aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body" id="divMsg">
+
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+        aria-label="Close"></button>
+    </div>
+  </div>
+</div>
 
 <router-outlet>
   <!-- <app-home [searchText]="mainSearchBar"></app-home> -->
 </router-outlet>
+
+<!-- loading-modal.component.html -->
+<div class="modal" tabindex="-1" role="dialog" id="loadingModal" data-bs-backdrop="static">
+  <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <button type="button" id="btnHideModal" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="display: none;"></button>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-2">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+          <div class="col-md-10">
+            <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="75"
+              aria-valuemin="0" aria-valuemax="100">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" [style.width.%]="getPercentage()">
+                {{getPercentage()}}%
+              </div>
+            </div>
+            <span style="font-size: 10px;" class="ms-1">{{ progressBar.processedCount }} / {{ progressBar.count }} processed ...  </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

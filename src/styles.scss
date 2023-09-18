@@ -9,3 +9,12 @@ body{
 app-child-list{
     display: contents;
 }
+
+.yasr{
+    height: 50vh !important;
+    overflow: auto !important;
+}
+
+.controlbar{
+    display: none !important;
+}

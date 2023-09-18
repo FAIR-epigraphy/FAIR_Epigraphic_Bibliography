@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { ZoteroItem } from '../_models/zotero-item.model';
 import { AuthService } from '../_service/auth.service';
 import { BiblApiService } from '../_service/bibl-api.service';
@@ -54,7 +55,7 @@ export class HomeComponent implements OnInit {
     this.getAllBiblioData()
     this.getAllBiblioCitationsStyle();
     //this.getBibloItemInfo()
-    
+
   }
 
   getBibloItemInfo() {
@@ -93,6 +94,7 @@ export class HomeComponent implements OnInit {
         this.convertJSONToArray(this.data.items);
         this.libraryName = this.data.libraryName;
         this.getLastCallNumber();
+        //this.getAllAbbr()
         this.loading = false;
       });
     }
@@ -101,6 +103,40 @@ export class HomeComponent implements OnInit {
   async getAllBiblioCitationsStyle() {
     this.citations = await this.syncService.getAllBiblioCitationStyles();
   }
+
+  // async getAllAbbr() {
+  //   for (let zObject of this.allBiblioData) {
+  //     if (zObject.shortTitle[0]['abbr'] !== '') {
+  //       let resp = await firstValueFrom(this.apiService.getItemAbbr(zObject.callNumber, zObject.shortTitle[0]['abbr']));
+  //       if (resp !== null) {
+  //         if (resp.length > 0) {
+  //           for (let d of resp.filter((x: any) => x.seg1_abbr !== undefined)) {
+  //             if (d.seg1_abbr !== null) {
+  //               if (zObject.shortTitle.filter((x: any) => x.abbr === d.seg1_abbr && x.source === 'SEG 1').length === 0)
+  //                 zObject.shortTitle.push({ abbr: d.seg1_abbr, source: 'SEG 1' })
+  //             }
+  //             if (d.seg2_abbr !== null) {
+  //               if (zObject.shortTitle.filter((x: any) => x.abbr === d.seg2_abbr && x.source === 'SEG 2').length === 0)
+  //                 zObject.shortTitle.push({ abbr: d.seg2_abbr, source: 'SEG 2' })
+  //             }
+  //           }
+  //           if (resp[0].aiegl_id !== null) {
+  //             /// Update the AIEGL Source
+  //             zObject.shortTitle[0].source = 'AIEGL'
+  //           }
+  //           //console.log(`${zObject.key} - ${resp[0].aiegl_id}`)
+  //         }
+  //         else {
+  //           if (zObject.shortTitle[0]['abbr'] !== '')
+  //             console.log(`${zObject.key} - ${resp} - ${zObject.shortTitle[0]['abbr']} Not Found`)
+  //         }
+  //       }
+  //     }
+  //   }
+  //   let downloadData = this.allBiblioData.map(({ key, callNumber, shortTitle }) => ({ key: key, callNumber: callNumber, shortTitle: shortTitle }));
+  //   let str = '';
+  //   //this.syncService.download('allDataWithAbbr.json', JSON.stringify(downloadData));
+  // }
 
   convertJSONToArray(data: any) {
     for (let d of data) {
@@ -143,12 +179,12 @@ export class HomeComponent implements OnInit {
   }
 
   showToast(msg: any, color: any) {
-    document.getElementById('divError')?.classList.add('show')
-    document.getElementById('divError')?.classList.add(color)
+    document.getElementById('divErrorHome')?.classList.add('show')
+    document.getElementById('divErrorHome')?.classList.add(color)
     this.errorMessage = msg;
     setTimeout(() => {
-      document.getElementById('divError')?.classList.remove('show')
-      document.getElementById('divError')?.classList.remove(color)
+      document.getElementById('divErrorHome')?.classList.remove('show')
+      document.getElementById('divErrorHome')?.classList.remove(color)
     }, 5000);
   }
 }

@@ -7,10 +7,16 @@ import { Component, OnInit} from '@angular/core';
 })
 export class AppComponent implements OnInit {
 
+  public progressBar = { count: 0, processedCount: 0 };
+
   constructor(
   ) { }
 
   ngOnInit() {
     
+  }
+
+  getPercentage(){
+    return parseInt(((this.progressBar.processedCount / this.progressBar.count) * 100).toString())
   }
 }

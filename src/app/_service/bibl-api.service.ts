@@ -188,5 +188,18 @@ export class BiblApiService {
       responseType: 'text',
     })
   }
+
+  updateRDFData(biblioItem: any): Observable<any> {
+    const url = 'https://fair.classics.ox.ac.uk/wsgi/';
+    const requestBody = { method: 'updateRDFData', bibItem: biblioItem };
+    const headers = new HttpHeaders().set('Accept', 'text/plain');
+    //headers.append(('Content-type', 'application/json'));
+
+    return this.http.request('post', url, {
+      body: JSON.stringify(requestBody),
+      headers: headers,
+      responseType: 'text',
+    })
+  }
 }
 

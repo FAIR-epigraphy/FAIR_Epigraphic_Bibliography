@@ -73,7 +73,7 @@ export class ZoteroItem {
             this.abstractNote = d.abstractNote;
             this.websiteTitle = d.websiteTitle;
             this.date = d.date;
-            this.shortTitle.push({ abbr: d.shortTitle, source: 'AIEGL' });
+            this.shortTitle.push({ abbr: d.shortTitle, source: '' });
             this.url = d.url;
             this.accessDate = d.accessDate;
             this.language = d.language;

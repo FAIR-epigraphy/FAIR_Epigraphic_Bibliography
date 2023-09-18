@@ -31,6 +31,16 @@
     [class]="currentSelectedRecord === null ? 'disabled' : ''" (click)="showCitation()"></i>
   <!-- <i class="bi bi-diagram-3" style="font-size: 24px;cursor: pointer;"></i> -->
 
+  <div class="btn-group float-end">
+    <i class="bi bi-download ms-2 dropdown dropdown-toggle" id="navbarDropdownDownload" role="button"
+      data-bs-toggle="dropdown" aria-expanded="false" title="Download all data"
+      style="font-size:32px;cursor: pointer;margin-top:-9px;">
+      <ul class="dropdown-menu" aria-labelledby="navbarDropdownDownload" style="z-index: 2000">
+        <li (click)="downloadAll('rdf')"><a class="dropdown-item">All data in RDF</a></li>
+        <li (click)="downloadAll('json')"><a class="dropdown-item">All data in JSON</a></li>
+      </ul>
+    </i>
+  </div>
   <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
@@ -41,7 +51,8 @@
             (click)="closeModal()"></button>
         </div>
         <div class="modal-body">
-          <app-biblio-parentchild-rel *ngIf="isShown" [parentComponent]="this" [biblioData]="allBiblioData" [lastestCallNumber]="lastCallNumber">
+          <app-biblio-parentchild-rel *ngIf="isShown" [parentComponent]="this" [biblioData]="allBiblioData"
+            [lastestCallNumber]="lastCallNumber">
           </app-biblio-parentchild-rel>
         </div>
       </div>

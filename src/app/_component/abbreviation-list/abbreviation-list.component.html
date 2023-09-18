@@ -1,6 +1,11 @@
 <app-nav-bar [loginUser]="loginUser"></app-nav-bar>
 <div class="container-fluid">
     <div class="row mt-3">
+        <div class="col-md-2" id="ccc" style="position: relative;">
+            <span>Source</span> <br />
+            <ng-select [items]="sources" appendTo="#ccc" placeholder="Select source..." bindLabel="source"
+                bindValue="name" [(ngModel)]="selectedSource"></ng-select>
+        </div>
         <div class="col-md-3" id="ccc" style="position: relative;">
             <span>Citation Style</span> <br />
             <ng-select [items]="citations" appendTo="#ccc" placeholder="Select citation style..." bindLabel="title"
@@ -14,7 +19,7 @@
         <div class="col-md-1">
             <button class="btn btn-primary float-end mt-4" (click)="getCitation()">Apply</button>
         </div>
-        <div class="col-md-5">
+        <div class="col-md-3">
             <button class="btn btn-primary float-end" (click)="copy('html')">Copy HTML</button> <br /> <br />
             <button class="btn btn-danger float-end" (click)="clearCache()">Clear Cache</button>
         </div>

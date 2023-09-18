@@ -1,0 +1,116 @@
+<app-nav-bar [loginUser]="loginUser"></app-nav-bar>
+
+<div class="container-fluid" style="overflow: auto;">
+    <!-- <div class="container mt-2"> -->
+    <div class="row">
+        <div class="col-lg-9 col-md-11 col-sm-11 col-11 p-0">
+            <div id="yasgui" class="border-start border-end border-bottom"></div>
+        </div>
+        <div class="col-sm-1 col-1
+                d-block d-sm-block d-md-block d-lg-none">
+            <nav class="navbar bg-body-tertiary">
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar"
+                    aria-labelledby="offcanvasNavbarLabel" style="margin-top: 9%; height: 90vh">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="offcanvasNavbarLabel"> SPARQL Queries</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <div class="card p-0" style="width: 100%;height: 80vh;">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item list-group-item-action">Query 1</li>
+                                <li class="list-group-item list-group-item-action">Query 2</li>
+                                <li class="list-group-item list-group-item-action">Query 3</li>
+                                <li class="list-group-item"></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="col-lg-3 col-md-3 p-0 m-0">
+            <div class="card p-0" style="width: 100%;height: 90vh;">
+                <div class="card-header">
+                    SPARQL Queries
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item list-group-item-action">Query 1</li>
+                    <li class="list-group-item list-group-item-action">Query 2</li>
+                    <li class="list-group-item list-group-item-action">Query 3</li>
+                    <li class="list-group-item"></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Button trigger modal -->
+    <div id="modalButton" style="display:none;">
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">SPARQL Examples</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <tbody id="divQueries">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Prefixes -->
+    <div class="modal fade" id="modalPrefixes" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-node-plus-fill fs-3"></i> Add
+                        Prefixes</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="list-group" id="divPrefixes">
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset History Modal HTML -->
+    <div id="modalHistory" class="modal fade">
+        <div class="modal-dialog modal-confirm">
+            <div class="modal-content">
+                <div class="modal-header flex-column">
+                    <div class="icon-box">
+                        <i class="bi bi-x-lg"></i>
+                    </div>
+                    <h4 class="modal-title w-100">Are you sure?</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Do you really want to delete history? This process will remove all your queries and reset the
+                        editor.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="DeleteHistory()">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- </div> -->
+</div>

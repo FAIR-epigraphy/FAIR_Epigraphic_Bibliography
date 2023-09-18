@@ -90,7 +90,7 @@ export class BiblioItemListComponent implements OnInit {
   getSpecificData(obj: ZoteroItem, event: Event) {
     console.log(obj)
     this.removeHiglightedClass(event.currentTarget as HTMLElement);
-    this.biblioItemInfoComp.getSpecificData(obj);
+    this.biblioItemInfoComp.getSpecificData(obj, this);
     this.currentSelectedRecord = obj;
   }
 
@@ -200,12 +200,12 @@ export class BiblioItemListComponent implements OnInit {
   }
 
   export(format: any, ext: any) {
-    if(format.includes('fair'))
-    {
+    if (format.includes('fair')) {
       this.getRDFData();
+      //this.updateRDFData();
+      //console.log(this.currentSelectedRecord)
     }
-    else
-    {
+    else {
       this.zoteroAPI.export(format, this.currentSelectedRecord.key, ext);
     }
   }
@@ -217,12 +217,61 @@ export class BiblioItemListComponent implements OnInit {
     })
   }
 
+  async updateRDFData() {
+    this.biblAPI.updateRDFData(this.currentSelectedRecord).subscribe(resp => {
+      console.log(resp);
+      //this.zoteroAPI.download(`fair-bib_${this.currentSelectedRecord.callNumber}.rdf`, resp);
+    })
+  }
+
+ serializeObject(obj:any, seen = new WeakSet()) {
+    if (typeof obj === 'object' && obj !== null) {
+      if (seen.has(obj)) {
+        return '[Circular Reference]';
+      }
+      seen.add(obj);
+      
+      let result: any = {};
+      for (const key in obj) {
+        result[key] = this.serializeObject(obj[key], seen);
+      }
+      return result;
+    } else {
+      return obj;
+    }
+  }
+
+  downloadAll(opt: any) {
+    if (opt === 'rdf') { }
+    else {
+      let allData = '';
+      for (let d of this.allBiblioData) {
+        try {
+          allData += JSON.stringify(this.serializeObject(d), null, 2) + ',';
+        } catch (error) {
+          console.log(d);
+          break;
+        }
+      }
+      allData = this.trimEnd(allData, ',');
+      allData = `[${allData}]`;
+      this.zoteroAPI.download(`dataAll_${new Date().toJSON().slice(0, 19).replaceAll(':', '_').replace('T', '-')}.json`, allData)
+      // this.zoteroAPI.download(`dataAll_${new Date().toJSON().slice(0, 19).replaceAll(':', '_').replace('T', '-')}.json`, JSON.stringify(this.allBiblioData))
+    }
+  }
+
+  trimEnd(str: string, charToRemove: string): string {
+    while (str.charAt(str.length - 1) === charToRemove) {
+      str = str.slice(0, -1);
+    }
+    return str;
+  }
+
   ngAfterViewInit() {
     console.log(this.biblioData.length);
   }
 
-  showCitation()
-  {
+  showCitation() {
     document.getElementById('citation-tab')?.click();
   }
 }

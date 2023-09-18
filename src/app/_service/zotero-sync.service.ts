@@ -80,7 +80,7 @@ export class ZoteroSyncService {
       await this.login();
       //////////////////////////////////
       // This method is temp will be deleted soon
-      this.checkForModifiedByAddedBy()
+      //this.checkForModifiedByAddedBy()
       ///////////////////////////////////
       let prefix = this.libraries[Object.keys(this.libraries)[0]].prefix;
       await this.update(prefix, includeTrashed);
@@ -201,6 +201,12 @@ export class ZoteroSyncService {
     return c;
   }
 
+  async getCitationsBySource(source: any, content: any, style: any, language: any, start: any, limit: any) {
+    let d = await this.zoteroAPI.items().get({ tag: `source: ${source}`, style: style, format: 'json', include: content, locale: language, start: start, limit: limit });
+    let c = await d.getData();
+    return c;
+  }
+
   async updateCallNumber(zoteroObject: any) {
     let resp = await this.zoteroAPI.items(zoteroObject.key).patch(
       {
@@ -268,7 +274,7 @@ export class ZoteroSyncService {
       if (JSON.parse(localStorage.getItem('libURL') || '{}').libURL !== libURL)
         localStorage.setItem('libURL', JSON.stringify({ libURL: libURL, apiKey: '' }));
     }
-    else{
+    else {
       localStorage.setItem('libURL', JSON.stringify({ libURL: libURL, apiKey: '' }));
     }
 
@@ -287,9 +293,9 @@ export class ZoteroSyncService {
     let zoteroOtherAPI = api(other_api_key).library('group', otherLibURL.replace(/[^0-9]/g, ""));
     let jsonData = await zoteroOtherAPI.items(zoterObj.key).get();
     let data = await jsonData.getData();
-    if(data.callNumber === '')
+    if (data.callNumber === '')
       data.callNumber = callNumber;
-      
+
     data.tags.push(tag)
     await zoteroOtherAPI.items(zoterObj.key).patch(data);
   }
