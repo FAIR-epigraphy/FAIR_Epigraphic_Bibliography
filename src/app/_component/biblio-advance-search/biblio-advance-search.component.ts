@@ -352,7 +352,7 @@ export class BiblioAdvanceSearchComponent implements OnInit {
   }
 
   async getAllBiblioData() {
-    this.data = await this.syncService.sync();
+    this.data = await this.syncService.sync(false, null);
     if (this.data !== null) {
       if (typeof this.data === 'string') {
         this.showToast(this.data, 'bg-danger');

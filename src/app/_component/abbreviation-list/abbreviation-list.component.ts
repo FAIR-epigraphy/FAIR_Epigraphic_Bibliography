@@ -102,6 +102,7 @@ export class AbbreviationListComponent implements OnInit {
       let filteredBiblData = this.biblioData.filter((x: any) => x.tags.filter((x: any) => x.tag.includes(this.selectedSource)).length > 0)
       this.appComponent.progressBar.count = filteredBiblData.length;
       this.appComponent.progressBar.processedCount = 0;
+      this.appComponent.progressBar.message = 'Loading ...'
 
       this.showProgress();
       for (let start = 0; start < filteredBiblData.length; start += limit) {

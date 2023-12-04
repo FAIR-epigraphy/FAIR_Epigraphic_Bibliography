@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 const { default: api } = require('zotero-api-client');
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -21,7 +22,7 @@ export class ZoteroSyncService {
   public otherLibItemsCount = 1;
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
   ) {
   }
   async login() {
@@ -73,7 +74,7 @@ export class ZoteroSyncService {
     await localStorage.setItem(this.storeName, JSON.stringify({ items: this.items, name: name, version: version }));
   }
 
-  async sync(includeTrashed = false) {
+  async sync(includeTrashed = false, appComponent: any) {
     // remove libraries we no longer have access to
     // update all libraries
     try {
@@ -83,7 +84,7 @@ export class ZoteroSyncService {
       //this.checkForModifiedByAddedBy()
       ///////////////////////////////////
       let prefix = this.libraries[Object.keys(this.libraries)[0]].prefix;
-      await this.update(prefix, includeTrashed);
+      await this.update(prefix, includeTrashed, appComponent);
       return { items: this.items, libraryName: this.name, version: this.version };
     }
     catch (err) {
@@ -146,10 +147,13 @@ export class ZoteroSyncService {
     return await res.json(); // eslint-disable-line @typescript-eslint/no-unsafe-return
   }
 
-  async update(prefix: any, includeTrashed: any) {
+  async update(prefix: any, includeTrashed: any, appComponent: any) {
     await this.load();
     const remote = this.libraries[prefix];
     // first fetch also gets the remote version
+
+
+
     const deleted = await this.get(prefix, `/deleted?since=${this.version}`);
     if (this.version === remote.version)
       return;
@@ -161,6 +165,11 @@ export class ZoteroSyncService {
       //await stored.remove_collections(deleted.collections);
     }
     const items = Object.keys(await this.get(prefix, `/items?since=${this.version}&format=versions&includeTrashed=${Number(includeTrashed)}`));
+
+    appComponent.progressBar.count = items.length;
+    appComponent.progressBar.processedCount = 0;
+    appComponent.progressBar.message = 'Syncing ...'
+
     for (let n = 0; n < items.length; n++) {
       for (const item of await this.get(prefix, `/items?itemKey=${items.slice(n, n + this.batch).join(',')}&includeTrashed=${Number(includeTrashed)}`)) {
         let bibData = item.data;
@@ -172,6 +181,10 @@ export class ZoteroSyncService {
         await this.add(bibData);
         n += 1;
       }
+      appComponent.progressBar.processedCount = n;
+
+      if (appComponent.progressBar.processedCount >= appComponent.progressBar.count)
+        appComponent.progressBar.processedCount = appComponent.progressBar.count
     }
     // const collections = Object.keys(await this.get(prefix, `/collections?since=${this.version}&format=versions`));
     // for (let n = 0; n < collections.length; n++) {
@@ -298,6 +311,12 @@ export class ZoteroSyncService {
 
     data.tags.push(tag)
     await zoteroOtherAPI.items(zoterObj.key).patch(data);
+  }
+
+  async getZoteroItemByCallNumber(callNumber: any) {
+    let obj = await this.zoteroAPI.items().get({ itemQ: callNumber, itemQMode: 'contains' });
+    let s = '';
+    return obj;
   }
 
   takeBackup() {

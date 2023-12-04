@@ -5,6 +5,9 @@ import { ZoteroItem } from '../_models/zotero-item.model';
 import { AuthService } from '../_service/auth.service';
 import { BiblApiService } from '../_service/bibl-api.service';
 import { ZoteroSyncService } from '../_service/zotero-sync.service';
+import { AppComponent } from 'src/app/app.component';
+
+declare var bootstrap: any; // Declare Bootstrap as a global variable
 
 @Component({
   selector: 'app-home',
@@ -38,7 +41,8 @@ export class HomeComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private syncService: ZoteroSyncService,
-    private apiService: BiblApiService
+    private apiService: BiblApiService,
+    private appComponent: AppComponent
   ) {
   }
 
@@ -54,27 +58,7 @@ export class HomeComponent implements OnInit {
     this.loading = true;
     this.getAllBiblioData()
     this.getAllBiblioCitationsStyle();
-    //this.getBibloItemInfo()
 
-  }
-
-  getBibloItemInfo() {
-    const id = window.location.href.split('/')[window.location.href.split('/').length - 1]
-    if (id !== null && id !== '') {
-      let interval = setInterval(() => {
-        if (this.allBiblioData.length > 0) {
-          let data = this.allBiblioData;//this.syncService.getPreviousVersion();
-          let obj = data.filter((x: any) => x.callNumber === id);
-          if (obj.length > 0) {
-            this.zoteroObject = obj[0];//new ZoteroItem(obj[0]);
-            console.log(this.zoteroObject)
-            this.biblioItemMore.getSpecificData(this.zoteroObject)
-            document.getElementById('btnOpenModalDetail')?.click();
-            clearInterval(interval);
-          }
-        }
-      }, 100)
-    }
   }
 
   changeSearchValue(p: any) {
@@ -82,7 +66,9 @@ export class HomeComponent implements OnInit {
   }
 
   async getAllBiblioData() {
-    this.data = await this.syncService.sync();
+    this.showProgress();
+    this.data = await this.syncService.sync(false, this.appComponent);
+    this.hideProgress();
     if (this.data !== null) {
       if (typeof this.data === 'string') {
         this.showToast(this.data, 'bg-danger');
@@ -171,11 +157,18 @@ export class HomeComponent implements OnInit {
     this.lastCallNumber = maxCallNumber[0].callNumber;
   }
 
-  ngAfterViewInit() {
-    this.getBibloItemInfo();
-  }
   closeModal() {
     this.router.navigate([''])
+  }
+
+  showProgress() {
+    let modalEle = document.getElementById('loadingModal')
+    const modal = new bootstrap.Modal(modalEle);
+    modal.show(); // Show the modal when it's fully initialized.
+  }
+
+  hideProgress() {
+    document.getElementById('btnHideModal')?.click();
   }
 
   showToast(msg: any, color: any) {

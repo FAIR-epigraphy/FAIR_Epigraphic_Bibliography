@@ -22,26 +22,6 @@
     </div>
   </div>
 
-  <!-- Button trigger modal -->
-  <button id="btnOpenModalDetail" type="button" style="display: none;" class="btn btn-primary" data-bs-toggle="modal"
-    data-bs-target="#staticBackdropDetail">
-  </button>
-  <!-- Modal -->
-  <div class="modal fade" id="staticBackdropDetail" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel">Detail</h5>
-          <button type="button" class="btn-close" (click)="closeModal()" data-bs-dismiss="modal"
-            aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <app-biblio-item-more-info #biblioItemMore2 [citations]="citations"></app-biblio-item-more-info>
-        </div>
-      </div>
-    </div>
-  </div>
   <!-- Toast -->
   <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
     <div id="divErrorHome" style="width: auto;" class="toast align-items-center text-white border-0 mt-3" role="alert"

@@ -430,7 +430,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
   }
 
   async syncSourceData() {
-    let data: any = await this.zoteroAPI.sync();
+    let data: any = await this.zoteroAPI.sync(false, null);
     if (data !== null) {
       if (typeof data === 'string') {
         this.showToast(data, 'bg-danger');

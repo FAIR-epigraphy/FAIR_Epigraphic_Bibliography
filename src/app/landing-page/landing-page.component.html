@@ -1,0 +1,136 @@
+<app-nav-bar [loginUser]="loginUser" [showSearchBar]="false">
+</app-nav-bar>
+
+<div class="container-fluid py-3 table-responsive" style="height: 90vh !important">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>
+                    About the FAIR Epigraphy Bibliographic project
+                </h1>
+                <p>
+                    The FAIR Epigraphy Bibliography project aims to enable bibliographic linked open data for digital
+                    projects in ancient epigraphy. In order to achieve this we are piloting a platform to generate and
+                    maintain unique stable identifiers (URIs) for bibliographic items referenced in epigraphic studies.
+                    As part of this pilot, we also aim to make community-established epigraphic abbreviations more
+                    accessible; consequently, the pilot project starts with the <a
+                        href="https://aiegl.org/grepiabbr.html" target="_blank">List of Abbreviations of Editions and
+                        Works of Reference for Alphabetic Greek Epigraphy</a> promoted by the *International Society for
+                    Greek and Latin Epigraphy* (AIEGL).
+                </p>
+                <h3>
+                    Background
+                </h3>
+                <p>
+                    All published inscriptions have at least one bibliographic reference. Traditionally epigraphers have
+                    used these references as the primary identifier for an inscription. Although digital projects are
+                    now generating identifiers for inscriptions, and the <a href="https://www.trismegistos.org/"
+                        target="_blank">Trismegistos project</a> aims to generate unique identifiers for every
+                    inscription in the abstract, bibliographic references remain the primary form of reference. These
+                    references usually refer to specific curated editions, each of which is potentially distinct from
+                    another edition of the same inscription (in contrast to the TM number which points to the
+                    inscription in the abstract, independent of any single edition).
+                </p>
+                <p>
+                    For a long time, epigraphers, like many other scholars, have employed bibliographic abbreviations to
+                    simplify and speed up their reference to individual publications. Such abbreviations offer an early
+                    example of an attempt to use unique identifiers, such as "*CIL* I<sup>2</sup> 1221". However, these
+                    abbreviations and references suffer from two major problems: firstly, they are frequently not very
+                    machine-readable, since they tend to combine multiple types of symbol and character, including very
+                    inconsistent use of punctuation marks; and secondly they are rarely used consistently, and so are
+                    insufficiently standardised for machine – or even human – use. A version of the same problem extends
+                    to a normal ‘full’ bibliographic reference, which can be presented in a myriad of different
+                    editorial styles, and so while more human readable is even less machine readable.
+                </p>
+                <p>
+                    There have been many attempts over the years to standardise the abbreviations used for such
+                    references. Lists of such abbreviations can be found in many places, in particular in the main
+                    epigraphic gazetteers, *L’Année Épigraphique* (the list of abbreviations used in the most recent
+                    volume freely available on JSTOR (2014 [2017]) can be <a
+                        href="https://www.jstor.org/stable/48628058" target="_blank">downloaded in pdf</a> and
+                    *Supplementum Epigraphicum Graecum* (the <a
+                        href="https://scholarlyeditions.brill.com/sego/abbreviations/" target="_blank"> list of
+                        abbreviations is online in HTML</a>); but also in the *Guide de l’Épigraphiste*. The book itself
+                    is not available electronically, but various resources including the original 4th edition (2010)
+                    list of abbreviations and a series of supplements are <a
+                        href="https://antiquite.ens.psl.eu/the-book/" target="_blank">available in pdf</a> (caution:
+                    some of the links are broken and some currently lack a valid security certificate). However, many of
+                    these abbreviations are not identical and, for example, many of those used by *SEG* have changed at
+                    least once over the years. Recently, the *International Association for Greek and Latin Epigraphy*
+                    (AIEGL) sponsored the creation of a newly revised list of abbreviations for Greek epigraphic
+                    publications, in order to try to bring greater consistency and cohesion to such abbreviations. The
+                    list is <a href="https://aiegl.org/grepiabbr.html" target="_blank">available in pdf or docx
+                        format</a> on the AIEGL website. This list was prepared by a group consisting of A. Chaniotis,
+                    T. Corsten, D. Feissel, P.-L. Gatier, K. Hallof, M. Hatzopoulos, S. Orlandi, R. Parker, D. Rousset
+                    and C. Schuler and was first published in 2020, with revisions in 2022. The aim is for the list to
+                    be maintained and updated, with the support of the AIEGL. In order to make that list more
+                    accessible, and in order to maximise its utility for digital as well as paper publications, it was
+                    agreed at the 16th Epigraphic Congress at Bordeaux in 2022 that the list would form the basis for
+                    this pilot project to create stable and unique bibliographic identifiers.
+                </p>
+                <h3>
+                    Approach
+                </h3>
+                <div>
+                    <p>
+                        The pilot project employs the Zotero open source bibliographic software to host the core
+                        bibliography in a <a href="https://www.zotero.org/groups/4858485/fair-epigraphy/library"
+                            target="_blank">public online library</a>. The Zotero platform provides a wide range of
+                        tools to support bibliographic data interoperability and is supported by a large international
+                        community. However, there are several elements which Zotero currently does not support (or does
+                        not support outside of bespoke customisation of data fields), and which we consider necessary to
+                        facilitate bibliographic linked open data for the community. These include (but are not limited
+                        to):
+                    </p>
+                    <ul>
+                        <li>hierarchical relationships between bibliographic items;</li>
+                        <li>a sufficiently rich classification of bibliographic item types;</li>
+                        <li>the ability to record multiple abbreviations;</li>
+                        <li>the ability to record equivalent resources in other platforms;</li>
+                        <li>the ability to record additional semantically rich metadata such as VIAF identifiers for
+                            authors;</li>
+                        <li>and most importantly the maintenance of a unique and stable item identifier.</li>
+                    </ul>
+                </div>
+                <p>
+                    The pilot project therefore starts from the Zotero bibliography as the best tool to generate and
+                    maintain the bibliography, but then extends this with back-end resources and a web-interface. The
+                    web-front end is maintained in this github repository, and is accessible at <a
+                        href="https://biblio.inscriptiones.org/" target="_blank">https://biblio.inscriptiones.org/</a>.
+                    The data is hosted on a server at the <a href="https://www.csad.ox.ac.uk/home"
+                        target="_blank">Centre for the Study of Ancient Documents</a>, University of Oxford. This is
+                    very much work-in-progress, and fuller information will be posted here soon, but the current
+                    interface already provides for search and export, as well as serving URIs for each item (e.g. <a
+                        href="https://biblio.inscriptiones.org/epig10001219"
+                        target="">https://biblio.inscriptiones.org/epig10001219</a>).
+                </p>
+                <p>
+                    We welcome all comments and feedback. For more details please visit <a
+                        href="https://github.com/FAIR-epigraphy/FAIR_Epigraphic_Bibliography/wiki"
+                        target="_blank">wiki</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Button trigger modal -->
+<button id="btnOpenModalDetail" type="button" style="display: none;" class="btn btn-primary" data-bs-toggle="modal"
+    data-bs-target="#staticBackdropDetail">
+</button>
+<!-- Modal -->
+<div class="modal fade" id="staticBackdropDetail" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Detail</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <app-biblio-item-more-info #biblioItemMore2 [citations]="citations"></app-biblio-item-more-info>
+            </div>
+        </div>
+    </div>
+</div>

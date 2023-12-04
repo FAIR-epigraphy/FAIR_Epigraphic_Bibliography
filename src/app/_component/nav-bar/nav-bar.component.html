@@ -16,6 +16,12 @@
         </li>
 
         <li class="nav-item">
+          <a class="nav-link active" aria-current="page" [routerLink]="['/biblio/bibliography']" routerLinkActive="active">
+            <i class="bi bi-blockquote-left"></i> Bibliography
+          </a>
+        </li>
+
+        <li class="nav-item">
           <div *ngIf="!loginUser">
             <a class="nav-link" [routerLink]="['/user/login']" routerLinkActive="active">
               <i class="bi bi-box-arrow-in-right"></i> <span> Login</span>
@@ -35,7 +41,7 @@
             <li (click)="takeBackup()" style="cursor: pointer;"><a class="dropdown-item"><i
                   class="bi bi-database-down"></i> Backup</a></li>
             <li (click)="sync()" style="cursor: pointer;"><a class="dropdown-item"><i class="bi bi-arrow-repeat"></i>
-                Sync</a></li>
+                Clear Cache</a></li>
             <li><a class="dropdown-item" [routerLink]="['/user/logout']" routerLinkActive="active"><i
                   class="bi bi-box-arrow-in-left"></i> Logout</a></li>
           </ul>

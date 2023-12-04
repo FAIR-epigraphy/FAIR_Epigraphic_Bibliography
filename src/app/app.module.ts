@@ -30,6 +30,7 @@ import { BiblioItemAlignmentComponent } from './_component/biblio-item-alignment
 import { BiblioItemCompareComponent } from './_component/biblio-item-alignment/biblio-item-compare/biblio-item-compare.component';
 import { AbbreviationListComponent } from './_component/abbreviation-list/abbreviation-list.component';
 import { SparqlComponent } from './sparql/sparql.component';
+import { LandingPageComponent } from './landing-page/landing-page.component';
 
 @NgModule({
   declarations: [
@@ -55,6 +56,7 @@ import { SparqlComponent } from './sparql/sparql.component';
     BiblioItemCompareComponent,
     AbbreviationListComponent,
     SparqlComponent,
+    LandingPageComponent,
   ],
   imports: [
     BrowserModule,

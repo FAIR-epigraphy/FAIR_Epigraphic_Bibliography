@@ -1,4 +1,4 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -7,16 +7,24 @@ import { Component, OnInit} from '@angular/core';
 })
 export class AppComponent implements OnInit {
 
-  public progressBar = { count: 0, processedCount: 0 };
+  public progressBar = { count: 0, processedCount: 0, message: '' };
 
   constructor(
   ) { }
 
   ngOnInit() {
-    
+
   }
 
-  getPercentage(){
+  deleteCache(){
+    localStorage.removeItem('allBiblioData');
+    window.location.reload();
+  }
+
+  getPercentage() {
+    if(this.progressBar.count === 0)
+      return this.progressBar.message;
+
     return parseInt(((this.progressBar.processedCount / this.progressBar.count) * 100).toString())
   }
 }
