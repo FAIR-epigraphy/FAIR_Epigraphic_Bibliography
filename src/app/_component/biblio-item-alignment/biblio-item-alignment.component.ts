@@ -2,6 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ZoteroItem } from 'src/app/_models/zotero-item.model';
 import { AuthService } from 'src/app/_service/auth.service';
 import { ZoteroSyncService } from 'src/app/_service/zotero-sync.service';
+import { AppComponent } from 'src/app/app.component';
+
+declare var bootstrap: any; // Declare Bootstrap as a global variable
 
 @Component({
   selector: 'app-biblio-item-alignment',
@@ -33,7 +36,8 @@ export class BiblioItemAlignmentComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    public zoteroAPI: ZoteroSyncService
+    public zoteroAPI: ZoteroSyncService,
+    private appComponent: AppComponent
   ) {
   }
 
@@ -430,7 +434,9 @@ export class BiblioItemAlignmentComponent implements OnInit {
   }
 
   async syncSourceData() {
-    let data: any = await this.zoteroAPI.sync(false, null);
+    this.showProgress();
+    let data: any = await this.zoteroAPI.sync(false, this.appComponent);
+    this.hideProgress();
     if (data !== null) {
       if (typeof data === 'string') {
         this.showToast(data, 'bg-danger');
@@ -533,6 +539,15 @@ export class BiblioItemAlignmentComponent implements OnInit {
     this.zoteroBiblioListMore.getSpecificData(item, 'zotero');
   }
 
+  showProgress() {
+    let modalEle = document.getElementById('loadingModal')
+    const modal = new bootstrap.Modal(modalEle);
+    modal.show(); // Show the modal when it's fully initialized.
+  }
+
+  hideProgress() {
+    document.getElementById('btnHideModal')?.click();
+  }
 
   cancel(opt: any) {
     if (opt === 'back') {

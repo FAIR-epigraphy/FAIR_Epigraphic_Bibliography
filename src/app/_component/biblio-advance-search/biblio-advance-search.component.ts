@@ -352,21 +352,21 @@ export class BiblioAdvanceSearchComponent implements OnInit {
   }
 
   async getAllBiblioData() {
-    this.data = await this.syncService.sync(false, null);
-    if (this.data !== null) {
-      if (typeof this.data === 'string') {
-        this.showToast(this.data, 'bg-danger');
-        this.data = this.syncService.getPreviousVersion()
-      }
-      this.biblAPI.getAllAlternateTitle().subscribe(resp => {
-        this.allAltTitles = resp;
-        this.convertJSONToArray(this.data.items);
-        this.ApplyAdvanceSearch();
-        this.ApplyParentChildRel();
-        this.sortByCol('title', null!);
-        this.loading = false;
-      });
-    }
+    // this.data = await this.syncService.sync(false, null);
+    // if (this.data !== null) {
+    //   if (typeof this.data === 'string') {
+    //     this.showToast(this.data, 'bg-danger');
+    this.data = this.syncService.getPreviousVersion()
+    // }
+    this.biblAPI.getAllAlternateTitle().subscribe(resp => {
+      this.allAltTitles = resp;
+      this.convertJSONToArray(this.data.items);
+      this.ApplyAdvanceSearch();
+      this.ApplyParentChildRel();
+      this.sortByCol('title', null!);
+      this.loading = false;
+    });
+    // }
   }
 
   convertJSONToArray(data: any) {

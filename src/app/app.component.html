@@ -56,7 +56,9 @@
                 {{getPercentage()}}%
               </div>
             </div>
-            <span style="font-size: 10px;" class="ms-1">{{ progressBar.processedCount }} / {{ progressBar.count }} processed ...  </span>
+
+            <span style="font-size: 10px;" class="ms-1" *ngIf="progressBar.count === 0"> Loading ... </span>
+            <span style="font-size: 10px;" class="ms-1" *ngIf="progressBar.count > 0">{{ progressBar.processedCount }} / {{ progressBar.count }} processed ...  </span>
           </div>
         </div>
       </div>
