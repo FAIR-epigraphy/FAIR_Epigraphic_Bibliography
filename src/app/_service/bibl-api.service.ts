@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, from, forkJoin } from 'rxjs';
+import { Observable, firstValueFrom, forkJoin } from 'rxjs';
 import { AuthService } from '../_service/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BiblApiService {
+  
 
   private base_url = 'https://fair.classics.ox.ac.uk/bibl_api';
 
@@ -14,6 +15,16 @@ export class BiblApiService {
     private http: HttpClient,
     private authService: AuthService,
   ) { }
+
+  getClientIP(): any {
+    //let url = 'https://www.cloudflare.com/cdn-cgi/trace';
+    let url = 'https://api.db-ip.com/v2/free/self';
+    return firstValueFrom(this.http.get<any>(url));
+  }
+
+  callVisitorCounter(visitor: any): any {
+    return firstValueFrom(this.http.post<any>(`https://fair.classics.ox.ac.uk/visitorInfo.php`, { visitor: visitor }));
+  }
 
   getSEGAbbrByAIEGL(abbr: string): Observable<any> {
     return this.http.get<any>(`${this.base_url}/fetch_aiegl_seg_abbr.php?abbr=${abbr}`);
