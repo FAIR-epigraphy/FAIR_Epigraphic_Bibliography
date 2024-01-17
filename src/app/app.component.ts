@@ -29,6 +29,7 @@ export class AppComponent implements OnInit {
       let v = JSON.parse(localStorage.getItem('visitor') || '{}');
       this.visitor.visitor_id = v.visitor_id;
       this.visitor.ip_address = v.ip_address;
+      this.visitor.access_url = window.location.hostname;
       await this.apiService.callVisitorCounter(this.visitor);
     }
     else{
