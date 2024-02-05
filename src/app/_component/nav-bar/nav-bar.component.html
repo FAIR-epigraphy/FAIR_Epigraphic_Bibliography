@@ -47,11 +47,25 @@
           </ul>
         </li>
 
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" [routerLink]="['/biblio/abbreviations']" routerLinkActive="active">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
             <i class="bi bi-list-columns-reverse"></i> Abbreviations
           </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="z-index: 2000">
+            <li>
+              <a class="nav-link active" aria-current="page" [routerLink]="['/biblio/abbreviations']" routerLinkActive="active">
+                <i class="bi bi-table"></i> All Abbreviations
+              </a>
+            </li>
+            <li>
+              <a class="nav-link active" aria-current="page" [routerLink]="['/biblio/abbreviation/aiegl']" routerLinkActive="active">
+                <i class="bi bi-filetype-html"></i> AIEGL
+              </a>
+            </li>
+          </ul>
         </li>
+        
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" [routerLink]="['/biblio/sparql']" routerLinkActive="active">
             <i class="bi bi-share"></i> SPARQL
