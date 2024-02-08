@@ -1,12 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit} from '@angular/core';
 import { BiblApiService } from './_service/bibl-api.service';
+import { NgcCookieConsentService, NgcInitializationErrorEvent, NgcInitializingEvent, NgcNoCookieLawEvent, NgcStatusChangeEvent } from 'ngx-cookieconsent';
+import { Subscription }   from 'rxjs';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
+
+  //keep refs to subscriptions to be able to unsubscribe later
+  private popupOpenSubscription!: Subscription;
+  private popupCloseSubscription!: Subscription;
+  private initializingSubscription!: Subscription;
+  private initializedSubscription!: Subscription;
+  private initializationErrorSubscription!: Subscription;
+  private statusChangeSubscription!: Subscription;
+  private revokeChoiceSubscription!: Subscription;
+  private noCookieLawSubscription!: Subscription;
 
   public progressBar = { count: 0, processedCount: 0, message: '' };
   public visitor = {
@@ -22,6 +34,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     private apiService: BiblApiService,
+    private ccService: NgcCookieConsentService
   ) { }
 
   async ngOnInit() {
@@ -50,6 +63,82 @@ export class AppComponent implements OnInit {
         localStorage.setItem('visitor', JSON.stringify({visitor_id: visitor, ip_address: this.visitor.ip_address}))
       }
     }
+    ///////////////////////////////////////////////////////////
+    ////////////////// Cookie Consent
+    this.ccService.init({
+      cookie: {
+        domain: window.location.hostname // or 'your.domain.com' // it is mandatory to set a domain, for cookies to work properly (see https://goo.gl/S2Hy2A)
+      },
+      palette: {
+        popup: {
+          background: '#000'
+        },
+        button: {
+          background: '#f1d600'
+        }
+      },
+      theme: 'edgeless',
+      type: 'opt-out'
+    })
+    // subscribe to cookieconsent observables to react to main events
+    this.popupOpenSubscription = this.ccService.popupOpen$.subscribe(
+      () => {
+        // you can use this.ccService.getConfig() to do stuff...
+        console.log(this.ccService.getConfig())
+      });
+
+    this.popupCloseSubscription = this.ccService.popupClose$.subscribe(
+      () => {
+        // you can use this.ccService.getConfig() to do stuff...
+        console.log(this.ccService.getConfig())
+      });
+
+    this.initializingSubscription = this.ccService.initializing$.subscribe(
+      (event: NgcInitializingEvent) => {
+        // the cookieconsent is initilializing... Not yet safe to call methods like `NgcCookieConsentService.hasAnswered()`
+        console.log(`initializing: ${JSON.stringify(event)}`);
+      });
+    
+    this.initializedSubscription = this.ccService.initialized$.subscribe(
+      () => {
+        // the cookieconsent has been successfully initialized.
+        // It's now safe to use methods on NgcCookieConsentService that require it, like `hasAnswered()` for eg...
+        console.log(`initialized: ${JSON.stringify(event)}`);
+      });
+
+    this.initializationErrorSubscription = this.ccService.initializationError$.subscribe(
+      (event: NgcInitializationErrorEvent) => {
+        // the cookieconsent has failed to initialize... 
+        console.log(`initializationError: ${JSON.stringify(event.error?.message)}`);
+      });
+
+    this.statusChangeSubscription = this.ccService.statusChange$.subscribe(
+      (event: NgcStatusChangeEvent) => {
+        console.log(this.ccService.getConfig())   // you can use this.ccService.getConfig() to do stuff...
+      });
+
+    this.revokeChoiceSubscription = this.ccService.revokeChoice$.subscribe(
+      () => {
+        // you can use this.ccService.getConfig() to do stuff...
+        console.log(this.ccService.getConfig())});
+
+      this.noCookieLawSubscription = this.ccService.noCookieLaw$.subscribe(
+      (event: NgcNoCookieLawEvent) => {
+        // you can use this.ccService.getConfig() to do stuff...
+        console.log(this.ccService.getConfig())
+      });
+  }
+
+  ngOnDestroy() {
+    // unsubscribe to cookieconsent observables to prevent memory leaks
+    this.popupOpenSubscription.unsubscribe();
+    this.popupCloseSubscription.unsubscribe();
+    this.initializingSubscription.unsubscribe();
+    this.initializedSubscription.unsubscribe();
+    this.initializationErrorSubscription.unsubscribe();
+    this.statusChangeSubscription.unsubscribe();
+    this.revokeChoiceSubscription.unsubscribe();
+    this.noCookieLawSubscription.unsubscribe();
   }
 
   async getIPAddress(){

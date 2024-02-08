@@ -32,6 +32,23 @@ import { AbbreviationListComponent } from './_component/abbreviation-list/abbrev
 import { SparqlComponent } from './sparql/sparql.component';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { AieglAbbreviationComponent } from './_component/aiegl-abbreviation/aiegl-abbreviation.component';
+import {NgcCookieConsentConfig, NgcCookieConsentModule, provideNgcCookieConsent} from 'ngx-cookieconsent';
+
+const cookieConfig:NgcCookieConsentConfig = {
+  cookie: {
+    domain: window.location.hostname // or 'your.domain.com' // it is mandatory to set a domain, for cookies to work properly (see https://goo.gl/S2Hy2A)
+  },
+  palette: {
+    popup: {
+      background: '#000'
+    },
+    button: {
+      background: '#f1d600'
+    }
+  },
+  theme: 'edgeless',
+  type: 'opt-out'
+};
 
 @NgModule({
   declarations: [
@@ -68,9 +85,10 @@ import { AieglAbbreviationComponent } from './_component/aiegl-abbreviation/aieg
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    NgSelectModule
+    NgSelectModule,
+    NgcCookieConsentModule.forRoot(cookieConfig)
   ],
-  providers: [BiblioItemMoreInfoComponent, BiblioParentchildRelComponent, childViewContainerDirective, ChildListComponent],
+  providers: [BiblioItemMoreInfoComponent, BiblioParentchildRelComponent, childViewContainerDirective, ChildListComponent, provideNgcCookieConsent(cookieConfig)],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

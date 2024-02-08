@@ -34,12 +34,14 @@
               "node_modules/bootstrap/scss/bootstrap.scss",
               "node_modules/bootstrap-icons/font/bootstrap-icons.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
-              "node_modules/@triply/yasgui/build/yasgui.min.css"
+              "node_modules/@triply/yasgui/build/yasgui.min.css",
+              "node_modules/cookieconsent/build/cookieconsent.min.css"
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
               "node_modules/@triply/yasgui/build/yasgui.min.js",
-              "node_modules/@triply/yasgui/static/yasgui.polyfill.min.js"
+              "node_modules/@triply/yasgui/static/yasgui.polyfill.min.js",
+              "node_modules/cookieconsent/build/cookieconsent.min.js"
             ]
           },
           "configurations": {
@@ -105,12 +107,14 @@
               "node_modules/bootstrap/scss/bootstrap.scss",
               "node_modules/bootstrap-icons/font/bootstrap-icons.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
-              "node_modules/@triply/yasgui/build/yasgui.min.css"
+              "node_modules/@triply/yasgui/build/yasgui.min.css",
+              "node_modules/cookieconsent/build/cookieconsent.min.css"
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
               "node_modules/@triply/yasgui/build/yasgui.min.js",
-              "node_modules/@triply/yasgui/static/yasgui.polyfill.min.js"
+              "node_modules/@triply/yasgui/static/yasgui.polyfill.min.js",
+              "node_modules/cookieconsent/build/cookieconsent.min.js"
             ]
           }
         }
