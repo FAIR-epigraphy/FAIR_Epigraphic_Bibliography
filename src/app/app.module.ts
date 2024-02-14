@@ -39,15 +39,17 @@ const cookieConfig:NgcCookieConsentConfig = {
     domain: window.location.hostname // or 'your.domain.com' // it is mandatory to set a domain, for cookies to work properly (see https://goo.gl/S2Hy2A)
   },
   palette: {
-    popup: {
-      background: '#000'
-    },
-    button: {
-      background: '#f1d600'
-    }
+    popup: { background: "#000" },
+    button: { background: "#f1d600" },
   },
-  theme: 'edgeless',
-  type: 'opt-out'
+  position: "bottom-right",
+  revokable: true,
+  theme: 'classic',
+  type: 'opt-out',
+  law: {
+    regionalLaw: false,
+  },
+  location: true,
 };
 
 @NgModule({
@@ -88,7 +90,7 @@ const cookieConfig:NgcCookieConsentConfig = {
     NgSelectModule,
     NgcCookieConsentModule.forRoot(cookieConfig)
   ],
-  providers: [BiblioItemMoreInfoComponent, BiblioParentchildRelComponent, childViewContainerDirective, ChildListComponent, provideNgcCookieConsent(cookieConfig)],
+  providers: [BiblioItemMoreInfoComponent, BiblioParentchildRelComponent, childViewContainerDirective, ChildListComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

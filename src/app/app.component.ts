@@ -65,32 +65,19 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     ///////////////////////////////////////////////////////////
     ////////////////// Cookie Consent
-    this.ccService.init({
-      cookie: {
-        domain: window.location.hostname // or 'your.domain.com' // it is mandatory to set a domain, for cookies to work properly (see https://goo.gl/S2Hy2A)
-      },
-      palette: {
-        popup: {
-          background: '#000'
-        },
-        button: {
-          background: '#f1d600'
-        }
-      },
-      theme: 'edgeless',
-      type: 'opt-out'
-    })
     // subscribe to cookieconsent observables to react to main events
     this.popupOpenSubscription = this.ccService.popupOpen$.subscribe(
       () => {
         // you can use this.ccService.getConfig() to do stuff...
-        console.log(this.ccService.getConfig())
+        //console.log(this.ccService.getConfig())
+        (document.getElementById('overlay') as HTMLElement).style.display = 'block';
       });
 
     this.popupCloseSubscription = this.ccService.popupClose$.subscribe(
       () => {
         // you can use this.ccService.getConfig() to do stuff...
-        console.log(this.ccService.getConfig())
+        (document.getElementById('overlay') as HTMLElement).style.display = 'none';
+        //window.location.reload();
       });
 
     this.initializingSubscription = this.ccService.initializing$.subscribe(
@@ -114,7 +101,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.statusChangeSubscription = this.ccService.statusChange$.subscribe(
       (event: NgcStatusChangeEvent) => {
-        console.log(this.ccService.getConfig())   // you can use this.ccService.getConfig() to do stuff...
+        console.log(event);
+        if(event.status === 'allow'){
+          window.location.reload();
+        }
       });
 
     this.revokeChoiceSubscription = this.ccService.revokeChoice$.subscribe(
