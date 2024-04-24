@@ -53,8 +53,43 @@ span {
     display: none;
 }
 
+.tbl-more-list h6{
+  overflow: hidden;
+  -webkit-line-clamp: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+}
+
 .disabled {
     color: #adb5bd;
     pointer-events: none;
     background-color: transparent;
 }
+
+/* Customize offcanvas width based on screen size */
+@media (min-width: 376px) {
+    #divMoreItemModal {
+      width: 100%; /* Adjust width for small devices */
+    }
+  }
+@media (min-width: 576px) {
+    #divMoreItemModal {
+      width: 90%; /* Adjust width for small devices */
+    }
+  }
+  @media (min-width: 768px) {
+    #divMoreItemModal {
+      width: 60%; /* Adjust width for medium devices */
+    }
+  }
+  @media (min-width: 992px) {
+    #divMoreItemModal {
+      width: 60%; /* Adjust width for large devices */
+    }
+  }
+  @media (min-width: 1200px) {
+    #divMoreItemModal {
+      width: 60%; /* Adjust width for extra large devices */
+    }
+  }

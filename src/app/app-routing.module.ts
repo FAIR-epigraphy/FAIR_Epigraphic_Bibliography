@@ -11,6 +11,7 @@ import { AbbreviationListComponent } from './_component/abbreviation-list/abbrev
 import { AieglAbbreviationComponent } from './_component/aiegl-abbreviation/aiegl-abbreviation.component';
 import { BiblioAdvanceSearchComponent } from './_component/biblio-advance-search/biblio-advance-search.component';
 import { BiblioItemAlignmentComponent } from './_component/biblio-item-alignment/biblio-item-alignment.component';
+import { DuplicateCallnoComponent } from './_component/duplicate-callno/duplicate-callno.component';
 
 const routes: Routes = [
   { path: ':callNum', component: LandingPageComponent },
@@ -21,6 +22,7 @@ const routes: Routes = [
   { path: 'user/setting', component: SettingComponent },
   { path: 'biblio/advance-search', component: BiblioAdvanceSearchComponent },
   { path: 'biblio/alignment', component: BiblioItemAlignmentComponent },
+  { path: 'biblio/duplicate-callno', component: DuplicateCallnoComponent },
   { path: 'biblio/abbreviations', component: AbbreviationListComponent },
   { path: 'biblio/abbreviation/aiegl', component: AieglAbbreviationComponent },
   { path: 'biblio/sparql', component: SparqlComponent },

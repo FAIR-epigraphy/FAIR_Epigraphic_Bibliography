@@ -170,7 +170,7 @@ export class ZoteroSyncService {
     appComponent.progressBar.processedCount = 0;
     appComponent.progressBar.message = 'Syncing ...'
 
-    for (let n = 0; n < items.length; n++) {
+    for (let n = 0; n < items.length;) {
       for (const item of await this.get(prefix, `/items?itemKey=${items.slice(n, n + this.batch).join(',')}&includeTrashed=${Number(includeTrashed)}`)) {
         let bibData = item.data;
         if (item.meta['createdByUser'] !== undefined)

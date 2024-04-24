@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -33,6 +32,8 @@ import { SparqlComponent } from './sparql/sparql.component';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { AieglAbbreviationComponent } from './_component/aiegl-abbreviation/aiegl-abbreviation.component';
 import {NgcCookieConsentConfig, NgcCookieConsentModule, provideNgcCookieConsent} from 'ngx-cookieconsent';
+import { CommonModule } from '@angular/common';
+import { DuplicateCallnoComponent } from './_component/duplicate-callno/duplicate-callno.component';
 
 const cookieConfig:NgcCookieConsentConfig = {
   cookie: {
@@ -78,8 +79,10 @@ const cookieConfig:NgcCookieConsentConfig = {
     SparqlComponent,
     LandingPageComponent,
     AieglAbbreviationComponent,
+    DuplicateCallnoComponent,
   ],
   imports: [
+    CommonModule,
     BrowserModule,
     BrowserAnimationsModule,
     NgbModule,

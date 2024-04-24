@@ -16,6 +16,7 @@ export class BiblioItemListComponent implements OnInit {
   @Input() biblioData: Array<ZoteroItem> = new Array();
   allBiblioData: Array<ZoteroItem> = new Array();
   @ViewChildren('dynamic', { read: ViewContainerRef }) childView!: QueryList<ViewContainerRef>;
+  @ViewChild('biblioItemMore') biblioItemMore!: any;
 
   start = 0;
   limit = 30;
@@ -25,7 +26,8 @@ export class BiblioItemListComponent implements OnInit {
   @Input() biblioItemInfoComp: any;
   @Input() canActive: boolean = false;
   @Input() searchText: string = '';
-  @Input() mainSearchBar: string = '';
+  mainSearchBar: string = '';
+  citations: any = [];
   @Input() lastCallNumber: string = '';
   isShown = false;
 
@@ -78,6 +80,11 @@ export class BiblioItemListComponent implements OnInit {
       }
     }, 500)
 
+    this.getAllBiblioCitationsStyle();
+  }
+
+  async getAllBiblioCitationsStyle() {
+    this.citations = await this.zoteroAPI.getAllBiblioCitationStyles();
   }
 
   reInit() {
@@ -91,7 +98,11 @@ export class BiblioItemListComponent implements OnInit {
     console.log(obj)
     this.removeHiglightedClass(event.currentTarget as HTMLElement);
     this.biblioItemInfoComp.getSpecificData(obj, this);
+    this.biblioItemMore.getSpecificData(obj);
     this.currentSelectedRecord = obj;
+    let ele = document.getElementById('divMoreItemModal') as HTMLElement;
+    if (window.getComputedStyle(ele).getPropertyValue('display') !== "none")
+      document.getElementById('moreInfoModal')?.click();
   }
 
   removeHiglightedClass(element: HTMLElement) {
@@ -210,6 +221,11 @@ export class BiblioItemListComponent implements OnInit {
     }
   }
 
+
+  takeBackup() {
+    this.zoteroAPI.takeBackup();
+  }
+
   async getRDFData() {
     this.biblAPI.getRDFData(this.currentSelectedRecord).subscribe(resp => {
       //console.log(resp);  
@@ -224,13 +240,13 @@ export class BiblioItemListComponent implements OnInit {
     })
   }
 
- serializeObject(obj:any, seen = new WeakSet()) {
+  serializeObject(obj: any, seen = new WeakSet()) {
     if (typeof obj === 'object' && obj !== null) {
       if (seen.has(obj)) {
         return '[Circular Reference]';
       }
       seen.add(obj);
-      
+
       let result: any = {};
       for (const key in obj) {
         result[key] = this.serializeObject(obj[key], seen);

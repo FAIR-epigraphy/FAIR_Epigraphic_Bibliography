@@ -34,7 +34,7 @@
   <div class="btn-group float-end">
     <i class="bi bi-download ms-2 dropdown dropdown-toggle" id="navbarDropdownDownload" role="button"
       data-bs-toggle="dropdown" aria-expanded="false" title="Download all data"
-      style="font-size:32px;cursor: pointer;margin-top:-9px;">
+      style="font-size:26px;cursor: pointer;margin-top:-9px;">
       <ul class="dropdown-menu" aria-labelledby="navbarDropdownDownload" style="z-index: 2000">
         <li (click)="downloadAll('rdf')"><a class="dropdown-item">All data in RDF</a></li>
         <li (click)="downloadAll('json')"><a class="dropdown-item">All data in JSON</a></li>
@@ -58,6 +58,23 @@
       </div>
     </div>
   </div>
+
+  <div class="d-flex w-100 mb-2 position-relativ">
+    <div class="input-group mb-3">
+      <input class="form-control" type="search" placeholder="Search anything..." aria-label="Search"
+        [(ngModel)]="mainSearchBar">
+      <i class="input-group-text bi bi-search" id="basic-addon2"></i>
+    </div>
+    <a [routerLink]="['/biblio/advance-search']" routerLinkActive="active"
+      class="nav-link position-absolute text-primary" style="font-size: 11px !important;
+      margin-top: 2.6rem;
+      margin-left: 0.3rem;">
+      Advance Search
+    </a>
+  </div>
+
+  <button class="d-none" id="moreInfoModal" type="button" data-bs-toggle="offcanvas"
+    data-bs-target="#divMoreItemModal"></button>
 </div>
 <div class="table-responsive">
   <table class="table" *ngIf="loading">
@@ -93,7 +110,8 @@
         <th scope="col" (click)="sortByCol('creators', $event)">Creator <i class="float-end"></i></th>
       </tr>
     </thead>
-    <tbody *ngFor="let data of biblioData | customFilter: mainSearchBar; let isEven = even; let isOdd = odd">
+    <tbody class="tbl-more-list"
+      *ngFor="let data of biblioData | customFilter: mainSearchBar; let isEven = even; let isOdd = odd">
       <tr style="cursor: pointer;" (click)="getSpecificData(data, $event)" [class]="isEven ? 'bg-white' : 'bg-light'">
         <td>
           <i class="bi bi-plus-circle-fill text-success" *ngIf="data.children.length > 0 && !data.showChild"
@@ -102,26 +120,19 @@
             (click)="expandChild(data, false)"></i>
         </td>
         <td title="{{data.title}}">
-          <p *ngIf="data.title.length < 65">
+          <h6>
             <i [class]="getItemTypeIcon(data.itemType)"></i>
             {{data.title}}
-          </p>
-          <p *ngIf="data.title.length >= 65">
-            <i [class]="getItemTypeIcon(data.itemType)"></i>
-            {{data.title | slice:0:65}}...
-          </p>
+          </h6>
         </td>
-        <td>
-          {{ data.date }}
+        <td title="{{data.date}}">
+          <h6>{{ data.date }}</h6>
         </td>
         <td title="{{data.getCreators()}}">
           <!-- <span *ngFor="let creator of data.creators"> -->
-          <span *ngIf="data.getCreators().length < 30">
+          <h6>
             {{ data.getCreators() }}
-          </span>
-          <span *ngIf="data.getCreators().length >= 30">
-            {{ data.getCreators() | slice:0:30 }}...
-          </span>
+          </h6>
           <!-- </span> -->
         </td>
       </tr>
@@ -140,26 +151,19 @@
                     (click)="expandInnerChild(child, false, $event)"></i>
                 </td>
                 <td title="{{child.title}}" style="width: 49%;">
-                  <p *ngIf="child.title.length < 50">
+                  <h6>
                     <i [class]="getItemTypeIcon(child.itemType)"></i>
                     {{child.title}}
-                  </p>
-                  <p *ngIf="child.title.length >= 50">
-                    <i [class]="getItemTypeIcon(child.itemType)"></i>
-                    {{child.title | slice:0:50}}...
-                  </p>
+                  </h6>
                 </td>
-                <td style="width: 19%;">
-                  {{ child.date }}
+                <td style="width: 19%;" title="{{data.date}}">
+                  <h6>{{ child.date }}</h6>
                 </td>
                 <td title="{{child.getCreators()}}">
                   <!-- <span *ngFor="let creator of data.creators"> -->
-                  <span *ngIf="child.getCreators().length < 30">
+                  <h6 *ngIf="child.getCreators().length < 30">
                     {{ child.getCreators() }}
-                  </span>
-                  <span *ngIf="child.getCreators().length >= 30">
-                    {{ child.getCreators() | slice:0:30 }}...
-                  </span>
+                  </h6>
                   <!-- </span> -->
                 </td>
               </tr>
@@ -170,4 +174,17 @@
       </tr>
     </tbody>
   </table>
+</div>
+
+
+
+<div class="offcanvas offcanvas-end d-block d-sm-block d-md-block d-lg-block d-xl-none d-xxl-none"
+  id="divMoreItemModal" data-bs-backdrop="false">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel"></h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body">
+    <app-biblio-item-more-info #biblioItemMore [citations]="citations" [tabIndex]="2"></app-biblio-item-more-info>
+  </div>
 </div>

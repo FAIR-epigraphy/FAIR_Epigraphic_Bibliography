@@ -1,28 +1,24 @@
-<ul class="nav nav-tabs" id="myTab" role="tablist">
+<ul class="nav nav-tabs" id="myTab-{{tabIndex}}" role="tablist">
   <li class="nav-item" role="presentation">
-    <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab"
+    <button class="nav-link active" id="info-tab-{{tabIndex}}" data-bs-toggle="tab" [attr.data-bs-target]="'#info-'+ tabIndex" type="button" role="tab"
       aria-controls="info" aria-selected="true">Info</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab"
-      aria-controls="notes" aria-selected="false">Notes</button>
+    <button class="nav-link" id="notes-tab-{{tabIndex}}" data-bs-toggle="tab" [attr.data-bs-target]="'#notes-'+ tabIndex" type="button" role="tab" aria-controls="notes" aria-selected="false">Notes</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="tags-tab" data-bs-toggle="tab" data-bs-target="#tags" type="button" role="tab"
-      aria-controls="tags" aria-selected="false">Tags</button>
+    <button class="nav-link" id="tags-tab-{{tabIndex}}" data-bs-toggle="tab" [attr.data-bs-target]="'#tags-'+ tabIndex" type="button" role="tab" aria-controls="tags" aria-selected="false">Tags</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="relations-tab" data-bs-toggle="tab" data-bs-target="#relations" type="button"
-      role="tab" aria-controls="relations" aria-selected="false">Relations</button>
+    <button class="nav-link" id="relations-tab-{{tabIndex}}" data-bs-toggle="tab" [attr.data-bs-target]="'#relations-'+ tabIndex" type="button" role="tab" aria-controls="relations" aria-selected="false">Relations</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="citation-tab" data-bs-toggle="tab" data-bs-target="#citation" type="button" role="tab"
-      aria-controls="citation" aria-selected="false">Citation</button>
+    <button class="nav-link" id="citation-tab-{{tabIndex}}" data-bs-toggle="tab" [attr.data-bs-target]="'#citation-'+ tabIndex" type="button" role="tab" aria-controls="citation" aria-selected="false">Citation</button>
   </li>
 </ul>
 
-<div class="tab-content" id="myTabContent" *ngIf="zoteroObject !== null">
-  <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="home-tab">
+<div class="tab-content" id="myTabContent-{{tabIndex}}" *ngIf="zoteroObject !== null">
+  <div class="tab-pane fade show active tab-info" id="info-{{tabIndex}}" role="tabpanel" aria-labelledby="home-tab">
     <div class="table-responsive">
       <table class="table table-hover mt-2">
         <tbody>
@@ -64,7 +60,7 @@
               {{ getColumnName(item.key) }}
               <span *ngIf="item.key === 'title'">
                 <i class="bi bi-plus-circle" *ngIf="hasPermission" title="Add Alternate" style="cursor: pointer;"
-                  data-bs-toggle="modal" data-bs-target="#modalAddAlternateTitle"></i>
+                  data-bs-toggle="modal" [attr.data-bs-target]="'#modalAddAlternateTitle-'+tabIndex"></i>
               </span>
               <span *ngIf="item.key === 'shortTitle'">
                 <i class="bi bi-plus-circle" *ngIf="hasPermission" title="Add Abbreviation" style="cursor: pointer;"
@@ -101,8 +97,8 @@
             <!-- with creators -->
             <td colspan="2" *ngIf="item.key === 'creators' && getCreators(item.value).length > 0">
               <div class="row w-100" *ngFor="let c of getCreators(item.value); let i = index; trackBy: trackByIdFn;">
-                <div class="col-md-2 offset-md-2">{{c.creatorType}}</div>
-                <div class="col-md-8 text-start text-dark">
+                <div class="col-md-2 col-sm-2 col-2 offset-md-2 offset-sm-2 offset-2">{{c.creatorType}}</div>
+                <div class="col-md-8 col-sm-8 col-8 text-start text-dark">
                   {{c.getFullName(c)}}
                   <a class="accordion-toggle collapsed" data-bs-toggle="collapse" href="#collapseExample{{i}}"
                     role="button" aria-expanded="false" aria-controls="collapseExample" *ngIf="hasPermission">
@@ -206,7 +202,7 @@
       </table>
     </div>
   </div>
-  <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="profile-tab">
+  <div class="tab-pane fade" id="notes-{{tabIndex}}" role="tabpanel" aria-labelledby="profile-tab">
     <div class="mt-2" *ngIf="zoteroObject !== null">
       {{getNotes(zoteroObject).length}} notes
     </div>
@@ -215,7 +211,7 @@
       </li>
     </ul>
   </div>
-  <div class="tab-pane fade" id="tags" role="tabpanel" aria-labelledby="contact-tab">
+  <div class="tab-pane fade" id="tags-{{tabIndex}}" role="tabpanel" aria-labelledby="contact-tab">
     <div class="mt-2" *ngIf="zoteroObject !== null">
       {{zoteroObject.tags.length}} tags
     </div>
@@ -224,7 +220,7 @@
       </li>
     </ul>
   </div>
-  <div class="tab-pane fade" id="relations" role="tabpanel" aria-labelledby="contact-tab">
+  <div class="tab-pane fade" id="relations-{{tabIndex}}" role="tabpanel" aria-labelledby="contact-tab">
     <div class="mt-2" *ngIf="zoteroObject !== null">
       {{getRelationURIs().length}} relations
       <button class="btn btn-primary" *ngIf="hasPermission" (click)="showTextbox(zoteroObject)">Add</button>
@@ -250,7 +246,7 @@
       </li>
     </ul>
   </div>
-  <div class="tab-pane fade" id="citation" role="tabpanel" aria-labelledby="contact-tab" data-bs-spy="scroll">
+  <div class="tab-pane fade" id="citation-{{tabIndex}}" role="tabpanel" aria-labelledby="contact-tab" data-bs-spy="scroll">
     <div class="mt-2 table-responsive" *ngIf="zoteroObject !== null" id="ccc" style="position: relative;">
       <div class="row">
         <div class="col-md-3 text-secondary" style="font-size: 16px;">
@@ -307,7 +303,7 @@
 </div>
 
 <!-- Start Add Alternate title Modal -->
-<div class="modal fade" id="modalAddAlternateTitle" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+<div class="modal fade" id="modalAddAlternateTitle-{{tabIndex}}" data-bs-backdrop="false" data-bs-keyboard="false" tabindex="-1"
   aria-labelledby="modalAddAlternateTitle" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">

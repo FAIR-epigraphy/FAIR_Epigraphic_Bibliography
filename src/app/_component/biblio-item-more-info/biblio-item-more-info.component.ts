@@ -21,6 +21,7 @@ export class BiblioItemMoreInfoComponent {
   @Input() totalNumberOfRecords = 0;
   @Input() lastCallNumber = '';
   @Input() citations: any = [];
+  @Input() tabIndex: any = '';
   resourceTypes: any = [];
   isDisplayedResourceType = false;
   errorMessage: any = '';
@@ -59,7 +60,7 @@ export class BiblioItemMoreInfoComponent {
     document.getElementById('info-tab')?.click();
 
     this.zoteroObject = obj;
-    
+
     await this.updateCallNumber();
 
     this.apiService.getItemAbbr(this.zoteroObject.callNumber, this.zoteroObject.shortTitle[0]['abbr']).subscribe(resp => {
@@ -99,7 +100,7 @@ export class BiblioItemMoreInfoComponent {
     })
 
     this.getAltTitleByCallNo();
-    
+
   }
 
   getItemByCallNo() {
@@ -350,7 +351,7 @@ export class BiblioItemMoreInfoComponent {
   async updateRDFData() {
     //console.log(this.parentComponent.currentSelectedRecord)
     this.apiService.updateRDFData(this.parentComponent.currentSelectedRecord).subscribe(resp => {
-      console.log(resp);  
+      console.log(resp);
     })
   }
 
