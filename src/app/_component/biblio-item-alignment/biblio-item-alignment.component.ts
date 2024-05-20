@@ -3,6 +3,7 @@ import { ZoteroItem } from 'src/app/_models/zotero-item.model';
 import { AuthService } from 'src/app/_service/auth.service';
 import { ZoteroSyncService } from 'src/app/_service/zotero-sync.service';
 import { AppComponent } from 'src/app/app.component';
+import { BiblApiService } from 'src/app/_service/bibl-api.service';
 
 declare var bootstrap: any; // Declare Bootstrap as a global variable
 
@@ -30,6 +31,8 @@ export class BiblioItemAlignmentComponent implements OnInit {
   @ViewChild('zoteroBiblioListMore') zoteroBiblioListMore: any;
   isNotMatchedItem = false;
   isUpdateAllBtn = false;
+  alignmentReport: any = []
+  filteredAlignmentReport: any = [];
 
   txtSearchMatched = '';
   txtSearchNotMatched = '';
@@ -37,7 +40,8 @@ export class BiblioItemAlignmentComponent implements OnInit {
   constructor(
     private authService: AuthService,
     public zoteroAPI: ZoteroSyncService,
-    private appComponent: AppComponent
+    private appComponent: AppComponent,
+    private apiService: BiblApiService,
   ) {
   }
 
@@ -51,6 +55,8 @@ export class BiblioItemAlignmentComponent implements OnInit {
     if (localStorage.getItem('libURL') !== undefined && localStorage.getItem('libURL') !== null) {
       this.zoteroURL = JSON.parse(localStorage.getItem('libURL') || '{}').libURL;
     }
+
+    this.getAlginmentReport()
   }
 
   checkURL() {
@@ -60,6 +66,19 @@ export class BiblioItemAlignmentComponent implements OnInit {
     else {
       this.invalidURL = true;
     }
+  }
+
+  async getAlginmentReport() {
+    let rpt = await this.apiService.getAlginmentReport()
+    this.alignmentReport = rpt;
+    this.filteredAlignmentReport = rpt;
+    this.filteredAlignmentReport.sort((a: any, b: any) => new Date(b.added_on).getTime() - new Date(a.added_on).getTime());
+    //console.log(this.alignmentReport)
+  }
+
+  async filterReportByDate(ele: any) {
+    let d = ele.currentTarget.value;
+    this.filteredAlignmentReport = this.alignmentReport.filter((x:any)=> x.added_on.includes(d))
   }
 
   changeTextMatched() {
@@ -344,6 +363,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
         localStorage.setItem(apiNumber, JSON.stringify(obj));
 
         document.getElementById('btnModalCompareClose')?.click();
+        await this.saveAlignmentChange(zoteroObj.key, callNumber, this.zoteroURL, 'Update')
       }
       else {
         document.getElementById('btnOpenModalAPIKey')?.click();
@@ -425,6 +445,8 @@ export class BiblioItemAlignmentComponent implements OnInit {
       await this.SaveOtherLibCallNumber()
       await this.syncSourceData();
 
+      await this.saveAlignmentChange(item.key, callNumber, this.zoteroURL, 'Insert');
+
       if (!this.isUpdateAllBtn)
         this.isFetching = false;
     }
@@ -497,6 +519,9 @@ export class BiblioItemAlignmentComponent implements OnInit {
           localStorage.setItem(apiNumber, JSON.stringify(obj));
 
           document.getElementById('btnCloseCallNumberModal')?.click();
+
+          await this.saveAlignmentChange(zoteroObj.key, callNumber, this.zoteroURL, 'Update');
+
           if (!this.isUpdateAllBtn)
             this.showToast('callNumber added to your library', 'bg-success');
         }
@@ -537,6 +562,11 @@ export class BiblioItemAlignmentComponent implements OnInit {
 
   moreInfo(item: any) {
     this.zoteroBiblioListMore.getSpecificData(item, 'zotero');
+  }
+
+  async saveAlignmentChange(zoterokey: any, callNumber: any, zoteroURL: any, status: any) {
+    let resp = await this.apiService.saveAlignmentChange(zoterokey, callNumber, zoteroURL, status);
+    //console.log(resp);
   }
 
   showProgress() {

@@ -7,7 +7,6 @@ import { AuthService } from '../_service/auth.service';
   providedIn: 'root'
 })
 export class BiblApiService {
-  
 
   private base_url = 'https://fair.classics.ox.ac.uk/bibl_api';
 
@@ -183,6 +182,15 @@ export class BiblApiService {
 
   getAllAlternateTitle(): Observable<any> {
     return this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { method: 'getAllAlternateTitle' });
+  }
+
+  saveAlignmentChange(zoterokey: any, callNumber: any, zoteroURL: any, status: any) {
+    let userId = JSON.parse(this.authService.getToken() || '{}').id
+    return firstValueFrom(this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { zoterokey: zoterokey, callNumber:callNumber, zoteroURL: zoteroURL, status: status, userId: userId, method: 'saveAlignmentChange' }));
+  }
+
+  getAlginmentReport() {
+    return firstValueFrom(this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { method: 'getAlginmentReport' }));
   }
 
   ////////////////////////////////////////////////////

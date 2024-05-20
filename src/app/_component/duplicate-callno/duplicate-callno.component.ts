@@ -94,41 +94,41 @@ export class DuplicateCallnoComponent implements OnInit {
       let value = item.callNumber;
 
       // If the value is already in the map, it's a duplicate
-      if (map[value]) {
-        let previousItem = this.allBiblioData.find((x: ZoteroItem) => zoteroKeys.includes(x.key) === true)
-        duplicates.push(previousItem);
-        duplicates.push(item);
-      } else {
-        // Add the value to the map
-        map[value] = true;
-        zoteroKeys.push(item.key)
-      }
-
       // if (map[value]) {
-      //   duplicates[map[value]].push(item);
+      //   let previousItem = this.allBiblioData.find((x: ZoteroItem) => zoteroKeys.includes(x.key) === true)
+      //   duplicates.push(previousItem);
+      //   duplicates.push(item);
       // } else {
       //   // Add the value to the map
-      //   map[value] = duplicates.length;
-      //   duplicates.push([item]);
+      //   map[value] = true;
+      //   zoteroKeys.push(item.key)
       // }
+
+      if (map[value]) {
+        duplicates[map[value]].push(item);
+      } else {
+        // Add the value to the map
+        map[value] = duplicates.length;
+        duplicates.push([item]);
+      }
     });
 
     console.log(duplicates);
     //return duplicates;
 
-    // let duplicateEntities = duplicates.filter((dupGroup: any) => dupGroup.length > 1);
+    let duplicateEntities = duplicates.filter((dupGroup: any) => dupGroup.length > 1);
 
-    // let duplicateEntriesList = document.getElementById('duplicateEntries') as HTMLElement;
-    // duplicateEntities.forEach((dupGroup: any) => {
-    //   let listItem = document.createElement('li');
-    //   listItem.classList.add('list-group-item');
-    //   let groupText = '';
-    //   dupGroup.forEach((item:ZoteroItem) => {
-    //     groupText += `${item.callNumber}: ${item.title}, ${item.getCreators()}, ${item.date} <br>`;
-    //   });
-    //   listItem.innerHTML = groupText;
-    //   duplicateEntriesList.appendChild(listItem);
-    // });
+    let duplicateEntriesList = document.getElementById('duplicateEntries') as HTMLElement;
+    duplicateEntities.forEach((dupGroup: any) => {
+      let listItem = document.createElement('li');
+      listItem.classList.add('list-group-item');
+      let groupText = '';
+      dupGroup.forEach((item:ZoteroItem) => {
+        groupText += `${item.callNumber}: ${item.title}, ${item.getCreators()}, ${item.date} <br>`;
+      });
+      listItem.innerHTML = groupText;
+      duplicateEntriesList.appendChild(listItem);
+    });
   }
 
   showToast(msg: any, color: any) {
