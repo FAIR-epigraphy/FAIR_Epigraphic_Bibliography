@@ -520,8 +520,6 @@ export class BiblioItemAlignmentComponent implements OnInit {
 
           document.getElementById('btnCloseCallNumberModal')?.click();
 
-          await this.saveAlignmentChange(zoteroObj.key, callNumber, this.zoteroURL, 'Update');
-
           if (!this.isUpdateAllBtn)
             this.showToast('callNumber added to your library', 'bg-success');
         }
