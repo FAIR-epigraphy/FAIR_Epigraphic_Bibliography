@@ -40,7 +40,7 @@ export class LandingPageComponent implements OnInit {
   async getBibloItemInfo() {
     const id = window.location.href.split('/')[window.location.href.split('/').length - 1]
     if (id !== null && id !== '') {
-      let data = this.syncService.getPreviousVersion();
+      let data = await this.syncService.getPreviousVersion();
       let d: any = {};
       if (Object.keys(data).length > 0) {
         d = data.items.find((x: any) => x.callNumber === id);

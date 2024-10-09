@@ -72,7 +72,7 @@ export class HomeComponent implements OnInit {
     if (this.data !== null) {
       if (typeof this.data === 'string') {
         this.showToast(this.data, 'bg-danger');
-        this.data = this.syncService.getPreviousVersion()
+        this.data = await this.syncService.getPreviousVersion()
       }
       this.apiService.getAllAlternateTitle().subscribe(resp => {
         this.allAltTitles = resp;

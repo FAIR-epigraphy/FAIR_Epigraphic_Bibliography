@@ -26,6 +26,7 @@ export class BiblioItemListComponent implements OnInit {
   @Input() biblioItemInfoComp: any;
   @Input() canActive: boolean = false;
   @Input() searchText: string = '';
+  @Input() totalNumberOfRecords = 0;
   mainSearchBar: string = '';
   citations: any = [];
   @Input() lastCallNumber: string = '';
@@ -81,6 +82,11 @@ export class BiblioItemListComponent implements OnInit {
     }, 500)
 
     this.getAllBiblioCitationsStyle();
+  }
+
+  changeLength(data:any){
+    //console.log( (this.totalNumberOfRecords - this.biblioData.length) + data.length)
+    //this.totalNumberOfRecords = data.length;
   }
 
   async getAllBiblioCitationsStyle() {

@@ -3,17 +3,17 @@
     <div class="row mt-3">
         <div class="col-md-2" id="ccc" style="position: relative;">
             <span>Source</span> <br />
-            <ng-select [items]="sources" appendTo="#ccc" placeholder="Select source..." bindLabel="source"
+            <ng-select [items]="sources" placeholder="Select source..." bindLabel="source"
                 bindValue="name" [(ngModel)]="selectedSource"></ng-select>
         </div>
         <div class="col-md-3" id="ccc" style="position: relative;">
             <span>Citation Style</span> <br />
-            <ng-select [items]="citations" appendTo="#ccc" placeholder="Select citation style..." bindLabel="title"
+            <ng-select [items]="citations" placeholder="Select citation style..." bindLabel="title"
                 bindValue="name" [(ngModel)]="selectedCitationStyle"></ng-select>
         </div>
         <div class="col-md-3">
             <span>Language</span> <br />
-            <ng-select [items]="citationLanguage" appendTo="#ccc" placeholder="Select language.." bindLabel="language"
+            <ng-select [items]="citationLanguage" placeholder="Select language.." bindLabel="language"
                 bindValue="langKey" [(ngModel)]="selectedCitationLanguage"></ng-select>
         </div>
         <div class="col-md-1">
@@ -53,11 +53,11 @@
                             <th scope="col">Citations</th>
                         </tr>
                     </thead>
-                    <tbody *ngFor="let data of filteredCitationData;">
-                        <tr style="cursor: pointer;">
+                    <tbody>
+                        <tr style="cursor: pointer;" *ngFor="let data of filteredCitationData;">
                             <td>
                                 <p>
-                                    <a target="_blank" href="https://biblio.inscriptiones.org/{{data.callNumber}}">{{data.abbr }}</a>
+                                    <a style="white-space: nowrap;" target="_blank" href="https://biblio.inscriptiones.org/{{data.callNumber}}">{{data.abbr }}</a>
                                 </p>
                             </td>
                             <td [innerHTML]="data.citation">

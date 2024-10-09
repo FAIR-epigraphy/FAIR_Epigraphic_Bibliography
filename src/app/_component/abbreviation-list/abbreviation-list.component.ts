@@ -35,16 +35,17 @@ export class AbbreviationListComponent implements OnInit {
     private appComponent: AppComponent
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     if (this.authService.isAuthenticate()) {
       this.loginUser = JSON.parse(this.authService.getToken() || '{}')
     }
     else
       this.loginUser = null;
 
-    this.biblioData = this.syncService.getPreviousVersion().items;
-    this.getAllBiblioCitationsStyle();
+    let jsonData = await this.syncService.getPreviousVersion()
+    this.biblioData = jsonData.items;
     this.getAllSources();
+    await this.getAllBiblioCitationsStyle();
     //this.getAllBiblioData();
   }
 
@@ -61,6 +62,7 @@ export class AbbreviationListComponent implements OnInit {
           this.sources.push({ source: s, name: s });
       }
     });
+    this.sources = [...this.sources];
   }
 
   async getAllBiblioCitationsStyle() {

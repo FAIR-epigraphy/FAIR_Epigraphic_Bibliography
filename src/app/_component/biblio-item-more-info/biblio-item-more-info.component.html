@@ -253,7 +253,7 @@
           <span class="align-middle"> Citation Style</span>
         </div>
         <div class="col-md-9">
-          <ng-select [items]="citations" appendTo="#ccc" placeholder="Select citation style..." bindLabel="title"
+          <ng-select [items]="citations" placeholder="Select citation style..." bindLabel="title"
             bindValue="name" [(ngModel)]="selectedCitationStyle" (change)="getCitation()"></ng-select>
         </div>
       </div>
@@ -262,7 +262,7 @@
           <span class="align-middle"> Language </span>
         </div>
         <div class="col-md-9">
-          <ng-select [items]="citationLanguage" appendTo="#ccc" placeholder="Select language.." bindLabel="language"
+          <ng-select [items]="citationLanguage" placeholder="Select language.." bindLabel="language"
             bindValue="langKey" [(ngModel)]="selectedCitationLanguage" (change)="getCitation()"></ng-select>
         </div>
       </div>
@@ -299,7 +299,7 @@
 </div>
 
 <div *ngIf="zoteroObject === null && totalNumberOfRecords > 0" class="totalItems">
-  {{ totalNumberOfRecords }} items
+  {{ totalNumberOfRecords - 1 }} items
 </div>
 
 <!-- Start Add Alternate title Modal -->
@@ -315,7 +315,7 @@
       <div class="modal-body">
         <div class="row">
           <div class="col-md-12" id="titleLang" style="position: relative;">
-            <ng-select id="selLang" [items]="citationLanguage" appendTo="#titleLang" placeholder="Select language.."
+            <ng-select id="selLang" [items]="citationLanguage" placeholder="Select language.."
               bindLabel="language" bindValue="langKey" [(ngModel)]="selectedTitleLanguage"></ng-select>
           </div>
           <div class="col-md-12 mt-2">

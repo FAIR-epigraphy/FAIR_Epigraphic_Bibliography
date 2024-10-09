@@ -193,6 +193,14 @@ export class BiblApiService {
     return firstValueFrom(this.http.post<any>(`${this.base_url}/bibl-items/bibl-item.php`, { method: 'getAlginmentReport' }));
   }
 
+  getJSONData() {
+    return firstValueFrom(this.http.post<any>(`${this.base_url}/fetchJSONData.php`, { method: 'getData' }));
+  }
+
+  setJSONData(data: any) {
+    return firstValueFrom(this.http.post<any>(`${this.base_url}/fetchJSONData.php`, { json: data, method: 'setData' }));
+  }
+
   ////////////////////////////////////////////////////
   /// Following is the python API
   getRDFData(biblioItem: any): Observable<any> {

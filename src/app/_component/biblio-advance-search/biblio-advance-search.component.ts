@@ -356,7 +356,7 @@ export class BiblioAdvanceSearchComponent implements OnInit {
     // if (this.data !== null) {
     //   if (typeof this.data === 'string') {
     //     this.showToast(this.data, 'bg-danger');
-    this.data = this.syncService.getPreviousVersion()
+    this.data = await this.syncService.getPreviousVersion()
     // }
     this.biblAPI.getAllAlternateTitle().subscribe(resp => {
       this.allAltTitles = resp;

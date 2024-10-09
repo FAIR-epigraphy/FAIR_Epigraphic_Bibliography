@@ -98,7 +98,8 @@ export class BiblioItemAlignmentComponent implements OnInit {
 
         if (items.length > 0) {
           this.allOtherBiblioData = this.convertJSONToArray(items);
-          this.allSourceBiblioData = this.convertJSONToArray(this.zoteroAPI.getPreviousVersion().items)
+          let jsonBibData = await this.zoteroAPI.getPreviousVersion();
+          this.allSourceBiblioData = this.convertJSONToArray(jsonBibData.items)
           this.compareBibliographyItems();
           //this.sortByCol('title', null!);
           this.sortByColMatched('title', null!);

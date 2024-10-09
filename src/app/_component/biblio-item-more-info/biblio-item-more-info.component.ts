@@ -47,6 +47,7 @@ export class BiblioItemMoreInfoComponent {
         Validators.pattern('(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?')
       ]),
     });
+    //console.log(this.citationLanguage)
   }
 
   resetForm(form: FormGroup) {

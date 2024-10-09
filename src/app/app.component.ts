@@ -137,8 +137,8 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   deleteCache(){
-    localStorage.removeItem('allBiblioData');
-    window.location.reload();
+    // localStorage.removeItem('allBiblioData');
+    // window.location.reload();
   }
 
   getPercentage() {

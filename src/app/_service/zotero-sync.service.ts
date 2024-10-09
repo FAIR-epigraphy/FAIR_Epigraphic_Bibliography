@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 const { default: api } = require('zotero-api-client');
+import { BiblApiService } from '../_service/bibl-api.service';
 
 
 @Injectable({
@@ -23,6 +24,7 @@ export class ZoteroSyncService {
 
   constructor(
     private http: HttpClient,
+    private apiService: BiblApiService,
   ) {
   }
   async login() {
@@ -45,13 +47,14 @@ export class ZoteroSyncService {
     return await (await fetch(url, { headers: this.headers })).json()
   }
 
-  load() {
+  async load() {
     let items = [];
     let version = 0;
     let name = '';
 
     try {
-      ({ items, version, name } = JSON.parse(localStorage.getItem(this.storeName) || '{}'));
+      let jsonData = await this.apiService.getJSONData();
+      ({ items, version, name } = JSON.parse(jsonData || '{}'));
       if (items !== undefined) {
         this.items = items;
         this.version = version;
@@ -71,7 +74,8 @@ export class ZoteroSyncService {
     this.items = this.items.filter((item: any) => !(keys.includes(item.key)));
   }
   async save(name: any, version: any) {
-    await localStorage.setItem(this.storeName, JSON.stringify({ items: this.items, name: name, version: version }));
+    //await localStorage.setItem(this.storeName, JSON.stringify({ items: this.items, name: name, version: version }));
+    await this.apiService.setJSONData(JSON.stringify({ items: this.items, name: name, version: version }));
   }
 
   async sync(includeTrashed = false, appComponent: any) {
@@ -93,11 +97,13 @@ export class ZoteroSyncService {
     }
   }
 
-  checkForModifiedByAddedBy() {
+  async checkForModifiedByAddedBy() {
     let items = [];
     let version = 0;
     let name = '';
-    ({ items, version, name } = JSON.parse(localStorage.getItem(this.storeName) || '{}'));
+    //({ items, version, name } = JSON.parse(localStorage.getItem(this.storeName) || '{}'));
+    let jsonData = await this.apiService.getJSONData();
+    ({ items, version, name } = JSON.parse(jsonData || '{}'));
     if (items !== undefined) {
       if (items[0]['addedBy'] === undefined) {
         localStorage.removeItem(this.storeName);
@@ -105,8 +111,9 @@ export class ZoteroSyncService {
     }
   }
 
-  getPreviousVersion() {
-    return JSON.parse(localStorage.getItem(this.storeName) || '{}');
+  async getPreviousVersion() {
+    let data = await this.apiService.getJSONData();
+    return JSON.parse(data);
   }
 
   async getAllBiblioCitationStyles() {
@@ -123,8 +130,9 @@ export class ZoteroSyncService {
     }
   }
 
-  getTotalNumberOfItems() {
-    return JSON.parse(localStorage.getItem(this.storeName) || '{}').items.length;
+  async getTotalNumberOfItems() {
+    let jsonData = await this.apiService.getJSONData();
+    return JSON.parse(jsonData || '{}').items.length;
   }
 
   async get(prefix: any, uri: any) {
@@ -319,8 +327,8 @@ export class ZoteroSyncService {
     return obj;
   }
 
-  takeBackup() {
-    let data = localStorage.getItem(this.storeName);
+  async takeBackup() {
+    let data = await this.apiService.getJSONData();
     let fileName = `Backup_${new Date().toJSON().slice(0, 19).replaceAll(':', '_').replace('T', '-')}.json`;
     this.download(fileName, data);
   }
