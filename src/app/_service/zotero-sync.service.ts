@@ -327,6 +327,24 @@ export class ZoteroSyncService {
     return obj;
   }
 
+  async getTargetZoteroItemByKey(key: any, apiKey: any) {
+    let resp = await this.fetchAPI(`https://api.zotero.org/groups/${apiKey}/items/${key}`);
+    return resp.data
+  }
+
+  async removeCallNumberFromTargetZoteroLibrary(otherLibURL: any, zoterObj: any, apiKey: any, callNumber: any = '') {
+    let other_api_key = apiKey;
+    let zoteroOtherAPI = api(other_api_key).library('group', otherLibURL.replace(/[^0-9]/g, ""));
+    let jsonData = await zoteroOtherAPI.items(zoterObj.key).get();
+    let data = await jsonData.getData();
+    if (data.callNumber !== undefined && data.callNumber.includes('epig'))
+      data.callNumber = '';
+
+    // Use filter to create a new array excluding the 'callNumber: epig10002744' element
+    data.tags = data.tags.filter((item:any) => item.tag !== `callNumber: ${callNumber}`);
+    await zoteroOtherAPI.items(zoterObj.key).patch(data);
+  }
+
   async takeBackup() {
     let data = await this.apiService.getJSONData();
     let fileName = `Backup_${new Date().toJSON().slice(0, 19).replaceAll(':', '_').replace('T', '-')}.json`;

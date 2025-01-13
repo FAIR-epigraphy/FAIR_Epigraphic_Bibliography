@@ -28,7 +28,7 @@
                         item.key !== 'children' && item.key !== 'key' && item.key !== 'creatorsName' &&
                         item.key !== 'resourceTypeId' && item.key !== 'resourceType' &&
                         item.key !== 'addedBy' && item.key !== 'modifiedBy' &&
-                        item.key !== 'dateAdded' && item.key !== 'dateModified' && itemHasValue(item.value)">
+                        item.key !== 'dateAdded' && item.key !== 'dateModified' && itemHasValue(item.value) && item.key !== 'targets'">
                             {{ getColumnName(item.key) }}
                         </td>
                         <td *ngIf="item.key !== 'creators' && item.key !=='tags' && 
@@ -36,7 +36,7 @@
                         item.key !== 'children' && item.key !== 'key' && item.key !== 'creatorsName' &&
                         item.key !== 'resourceTypeId' && item.key !== 'resourceType' &&
                         item.key !== 'addedBy' && item.key !== 'modifiedBy' &&
-                        item.key !== 'dateAdded' && item.key !== 'dateModified' && itemHasValue(item.value)">
+                        item.key !== 'dateAdded' && item.key !== 'dateModified' && itemHasValue(item.value) && item.key !== 'targets'">
                             <span *ngIf="item.key !== 'shortTitle'">{{item.value}}</span>
                             <ul *ngIf="item.key === 'shortTitle'" style="margin-left: -25px;">
                                 <li *ngFor="let obj of getAbbr(item)"

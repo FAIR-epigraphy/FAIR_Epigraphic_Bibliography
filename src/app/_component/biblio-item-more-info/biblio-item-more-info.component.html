@@ -79,7 +79,7 @@
               <ul *ngIf="item.key === 'shortTitle'" style="margin-left: -25px;">
                 <li *ngFor="let obj of getAbbr(item)"
                   [ngStyle]="{'list-style-type': obj.abbr === '' ? 'none' : '\' - \''}">
-                  <span *ngIf="obj.abbr !== ''">{{ obj.abbr }} ({{obj.source }})</span>
+                  <span *ngIf="obj.abbr !== ''">{{ obj.abbr }} <span *ngIf="obj.source">({{obj.source }})</span> </span>
                   <div *ngIf="obj.abbr === '' && hasPermission" (keyup.enter)="addAbbreviation(item, $event)">
                     <div class="input-group input-group-sm p-0">
                       <input [class.is-invalid]="obj.invalid" type="text" class="form-control" style="width: 28%;"

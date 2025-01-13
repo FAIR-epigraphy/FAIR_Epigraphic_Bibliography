@@ -14,6 +14,7 @@ declare var bootstrap: any; // Declare Bootstrap as a global variable
 })
 export class BiblioItemAlignmentComponent implements OnInit {
   loginUser = null;
+  user: any = null;
   zoteroURL = ''
   invalidURL = false;
   isFetching = false;
@@ -23,6 +24,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
   errorMessage = '';
   matchedBibliography: Array<ZoteroItem> = new Array();
   notMatchedBibliography: Array<ZoteroItem> = new Array();
+  matchedCallNumbers: any;
   otherLibAPIKey: string = '';
   currentRowCompareBtn: any = -1;
   otherLibCallNumber: string = '';
@@ -36,6 +38,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
 
   txtSearchMatched = '';
   txtSearchNotMatched = '';
+  txtSearchMatchedCallNumber = '';
 
   constructor(
     private authService: AuthService,
@@ -45,9 +48,14 @@ export class BiblioItemAlignmentComponent implements OnInit {
   ) {
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     if (this.authService.isAuthenticate()) {
       this.loginUser = JSON.parse(this.authService.getToken() || '{}')
+      let id = JSON.parse(this.authService.getToken() || '{}').id;
+      let resp = await this.apiService.getUserInfo(id);
+      if (resp.length > 0) {
+        this.user = resp[0];
+      }
     }
     else
       this.loginUser = null;
@@ -78,7 +86,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
 
   async filterReportByDate(ele: any) {
     let d = ele.currentTarget.value;
-    this.filteredAlignmentReport = this.alignmentReport.filter((x:any)=> x.added_on.includes(d))
+    this.filteredAlignmentReport = this.alignmentReport.filter((x: any) => x.added_on.includes(d))
   }
 
   changeTextMatched() {
@@ -104,6 +112,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
           //this.sortByCol('title', null!);
           this.sortByColMatched('title', null!);
           this.sortByColNotMatched('title', null!);
+          this.sortByMatchedCallNumber('title', null!);
         }
         else {
           this.showToast('No zotero items found', 'bg-danger')
@@ -122,6 +131,7 @@ export class BiblioItemAlignmentComponent implements OnInit {
     let currentTarget: any = null;
     this.matchedBibliography = []
     this.notMatchedBibliography = []
+    this.matchedCallNumbers = []
     let isCallNumberExist: any = null;
     for (let target of this.allOtherBiblioData) {
       if (target.title === '')
@@ -159,8 +169,55 @@ export class BiblioItemAlignmentComponent implements OnInit {
           this.notMatchedBibliography.push(target);
         else if (!matchedBiblio && isCallNumberExist === null)
           this.notMatchedBibliography.push(target);
+        //////////////////////////// Check if callNumber exist in source
+        else if (this.allSourceBiblioData.filter(x => x.callNumber === isCallNumberExist.callNumber).length > 0) {
+          //this.notMatchedBibliography.push(target);
+          let source: any = this.allSourceBiblioData.filter(x => x.callNumber === isCallNumberExist.callNumber)[0];
+          let isExist = this.matchedCallNumbers.filter((x: any) => x.callNumber === source.callNumber);
+          if (isExist.length === 0) {
+            source['targets'] = [];
+            source['targets'].push(target);
+            this.matchedCallNumbers.push(source);
+          } else {
+            let index = this.matchedCallNumbers.findIndex((x: any) => x.callNumber === source.callNumber);
+            this.matchedCallNumbers[index]['targets'].push(target);
+          }
+        }
       }
     }
+
+    //console.log(this.matchedCallNumbers.filter((x: any) => x.targets.length > 1));
+    // Show only matched call numbers with more than 1 target
+    this.matchedCallNumbers = this.matchedCallNumbers.filter((x: any) => x.targets.length > 1);
+  }
+
+  toggleRow(rowId: any) {
+    const childRow: any = document.querySelectorAll(`.targets-${rowId}`);
+    const arrow: any = document.querySelector(`#matchedCallNumber-${rowId} .arrow`);
+
+    if (arrow.classList.contains('bi-plus-circle-fill')) {
+      childRow.forEach((ele: any) => {
+        ele.style.display = 'table-row';
+      });
+      arrow.classList.remove('bi-plus-circle-fill');
+      arrow.classList.add('bi-dash-circle-fill');
+    }
+    else {
+      childRow.forEach((ele: any) => {
+        ele.style.display = 'none';
+      });
+      arrow.classList.remove('bi-dash-circle-fill');
+      arrow.classList.add('bi-plus-circle-fill');
+    }
+    // if (childRow.style.display === 'none' || childRow.style.display === '') {
+    //   childRow.style.display = 'table-row';
+    //   arrow.classList.remove('bi-plus-circle-fill');
+    //   arrow.classList.add('bi-dash-circle-fill');
+    // } else {
+    //   childRow.style.display = 'none';
+    //   arrow.classList.remove('bi-dash-circle-fill');
+    //   arrow.classList.add('bi-plus-circle-fill');
+    // }
   }
 
   getCallNumberExist(tags: any, callNumber: any) {
@@ -287,6 +344,50 @@ export class BiblioItemAlignmentComponent implements OnInit {
     else {
       if (event !== null) this.removeAllSortingIcons();
       this.notMatchedBibliography = this.notMatchedBibliography.sort(function (a: any, b: any) {
+        const nameA = colName !== 'creators' ? a[colName].toUpperCase() : a.getCreators(); // ignore upper and lowercase
+        const nameB = colName !== 'creators' ? b[colName].toUpperCase() : b.getCreators(); // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        // call number must be equal
+        return 0;
+      });
+      element?.classList.add('bi-chevron-up')
+    }
+  }
+
+  sortByMatchedCallNumber(colName: any, event: Event) {
+    let sortDirection = '';
+    let element;
+    if (event !== null) {
+      console.log((event.target as HTMLElement).children);
+      element = ((event.target) as HTMLElement).children[0]
+      sortDirection = element.className;
+    }
+
+    if (sortDirection.indexOf('bi-chevron-up') > -1)  // Descending order
+    {
+      if (event !== null) this.removeAllSortingIcons();
+      this.matchedCallNumbers = this.matchedCallNumbers.sort(function (a: any, b: any) {
+        const nameA = colName !== 'creators' ? a[colName].toUpperCase() : a.getCreators(); // ignore upper and lowercase
+        const nameB = colName !== 'creators' ? b[colName].toUpperCase() : b.getCreators(); // ignore upper and lowercase
+        if (nameA > nameB) {
+          return -1;
+        }
+        if (nameA < nameB) {
+          return 1;
+        }
+        // call number must be equal
+        return 0;
+      });
+      element?.classList.add('bi-chevron-down')
+    }
+    else {
+      if (event !== null) this.removeAllSortingIcons();
+      this.matchedCallNumbers = this.matchedCallNumbers.sort(function (a: any, b: any) {
         const nameA = colName !== 'creators' ? a[colName].toUpperCase() : a.getCreators(); // ignore upper and lowercase
         const nameB = colName !== 'creators' ? b[colName].toUpperCase() : b.getCreators(); // ignore upper and lowercase
         if (nameA < nameB) {
@@ -559,6 +660,75 @@ export class BiblioItemAlignmentComponent implements OnInit {
     document.getElementById('btnCloseCallNumberModal')?.click();
   }
 
+  async removeCallNoFromTargetZoteroLibrary(target: any, data: any) {
+    try {
+      let apiKey = JSON.parse(localStorage.getItem('libURL') || '{}').apiKey;
+      if (apiKey !== '') {
+        this.showSpinner();
+        let callNoObj: any = this.getCallNumberExist(target.tags, target.callNumber);
+        await this.zoteroAPI.removeCallNumberFromTargetZoteroLibrary(this.zoteroURL, target, apiKey, callNoObj.callNumber);
+        // Remove the target from the array
+        // const index = data.targets.indexOf(target);
+        // if (index > -1) {
+        //   data.targets.splice(index, 1);
+        // }
+        await this.fetch();
+        this.showToast('Call number removed from target library', 'bg-success');
+      }
+      else {
+        document.getElementById('btnOpenModalAPIKey')?.click();
+      }
+    } catch (error) {
+      console.log(error)
+      this.hideSpinner();
+    } finally {
+      this.hideSpinner();
+    }
+  }
+
+  async compareWithFAIRBibilio(target: any, data: any) {
+    let matchedBiblio = false;
+    let currentSource: any = null;
+    for (let source of this.allSourceBiblioData) {
+      currentSource = source;
+      if (source.title.includes(target.title)) {
+        for (let c of source.creators) {
+          let creatorFound = target.creators.filter((x: any) => (x.firstName === c.firstName && x.lastName === c.lastName) ||
+            (x.fullName === c.fullName)
+          );
+          if (creatorFound.length > 0) {
+            let splitSourceDate = source.date.split("-");
+            let splitTargetDate = target.date.split("-");
+            if (splitSourceDate[0].trim() === splitTargetDate[0].trim()) {
+              matchedBiblio = true;
+            }
+          }
+        }
+      }
+      if (matchedBiblio)
+        break;
+    }
+
+    if (matchedBiblio) {
+      this.matchedBibliography.push(currentSource);
+      matchedBiblio = false;
+    }
+    else {
+      let callNoObj: any = this.getCallNumberExist(target.tags, target.callNumber);
+      if (target.callNumber.includes('epig'))
+        target.callNumber = '';
+      if (callNoObj !== null)
+        target.tags = target.tags.filter((item: any) => item.tag !== `callNumber: ${callNoObj.callNumber}`);
+
+      this.notMatchedBibliography.push(target);
+    }
+
+    const index = data.targets.indexOf(target);
+    if (index > -1) {
+      data.targets.splice(index, 1);
+    }
+  }
+
   moreInfo(item: any) {
     this.zoteroBiblioListMore.getSpecificData(item, 'zotero');
   }
@@ -577,6 +747,19 @@ export class BiblioItemAlignmentComponent implements OnInit {
   hideProgress() {
     document.getElementById('btnHideModal')?.click();
   }
+
+  showSpinner() {
+    let modalEle = document.getElementById('spinnngLoadingModal')
+    const modal = new bootstrap.Modal(modalEle);
+    modal.show(); // Show the modal when it's fully initialized.
+  }
+
+  hideSpinner() {
+    //document.getElementById('btnHideModal')?.click();
+    var loadingModal = bootstrap.Modal.getInstance(document.getElementById('spinnngLoadingModal'));
+    loadingModal.hide();
+  }
+
 
   cancel(opt: any) {
     if (opt === 'back') {

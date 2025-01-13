@@ -29,7 +29,7 @@ export class SettingComponent implements OnInit{
     });
   }
 
-  getUserInfoForAccount()
+  async getUserInfoForAccount()
   {
     if (this.authService.isAuthenticate()) {
       this.loginUser = JSON.parse(this.authService.getToken() || '{}')
@@ -38,12 +38,16 @@ export class SettingComponent implements OnInit{
       this.loginUser = null;
 
     let id =  JSON.parse(this.authService.getToken() || '{}').id;
-    this.apiService.getUserInfo(id).subscribe(resp => {
-      if (resp !== null) {
-        if (resp.length > 0) {
-          this.user = resp[0];
-        }
-      }
-    })
+    let resp = await this.apiService.getUserInfo(id);
+    if(resp.length > 0){
+      this.user = resp[0];
+    }
+    // this.apiService.getUserInfo(id).subscribe(resp => {
+    //   if (resp !== null) {
+    //     if (resp.length > 0) {
+    //       this.user = resp[0];
+    //     }
+    //   }
+    // })
   }
 }

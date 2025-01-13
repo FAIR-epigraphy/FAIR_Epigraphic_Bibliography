@@ -29,8 +29,8 @@ export class BiblApiService {
     return this.http.get<any>(`${this.base_url}/fetch_aiegl_seg_abbr.php?abbr=${abbr}`);
   }
 
-  getUserInfo(id: any): Observable<any> {
-    return this.http.post<any>(`${this.base_url}/users/user.php`, { userId: parseInt(id), method: 'getUserInfoById' });
+  getUserInfo(id: any) {
+    return firstValueFrom(this.http.post<any>(`${this.base_url}/users/user.php`, { userId: parseInt(id), method: 'getUserInfoById' }));
   }
 
   getAllUsers(): Observable<any> {
