@@ -35,8 +35,13 @@ export class LandingPageComponent implements OnInit {
       this.loginUser = null;
 
     this.getBibloItemInfo();
+    this.getAllBiblioCitationsStyle();
   }
 
+  async getAllBiblioCitationsStyle() {
+    this.citations = await this.syncService.getAllBiblioCitationStyles();
+  }
+  
   async getBibloItemInfo() {
     const id = window.location.href.split('/')[window.location.href.split('/').length - 1]
     if (id !== null && id !== '') {
@@ -56,7 +61,7 @@ export class LandingPageComponent implements OnInit {
       let interval = setInterval(() => {
         if (this.biblioItemMore !== undefined) {
           clearInterval(interval);
-          this.biblioItemMore.getSpecificData(zoteroObject)
+          this.biblioItemMore.getSpecificData(zoteroObject, this)
           document.getElementById('btnOpenModalDetail')?.click();
         }
       }, 100)

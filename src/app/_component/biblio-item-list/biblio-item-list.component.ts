@@ -104,7 +104,7 @@ export class BiblioItemListComponent implements OnInit {
     console.log(obj)
     this.removeHiglightedClass(event.currentTarget as HTMLElement);
     this.biblioItemInfoComp.getSpecificData(obj, this);
-    this.biblioItemMore.getSpecificData(obj);
+    //this.biblioItemMore.getSpecificData(obj);
     this.currentSelectedRecord = obj;
     let ele = document.getElementById('divMoreItemModal') as HTMLElement;
     if (window.getComputedStyle(ele).getPropertyValue('display') !== "none")

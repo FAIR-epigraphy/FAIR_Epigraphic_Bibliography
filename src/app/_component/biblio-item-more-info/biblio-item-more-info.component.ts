@@ -147,26 +147,43 @@ export class BiblioItemMoreInfoComponent {
     this.isCitationLoading = false
   }
 
-  copy(format: any) {
+  copy(format: any, event: any) {
     let value = '';
+    let target = event.target;
 
     if (format !== 'html') {
       value = (document.getElementById('citationContent') as HTMLElement).innerText;
+      target = event.target;
     }
     else {
       value = (document.getElementById('citationContent') as HTMLElement).innerHTML;
+      target = event.target.parentElement.parentElement.parentElement.children[0];
     }
-    const selBox = document.createElement('textarea');
-    selBox.style.position = 'fixed';
-    selBox.style.left = '0';
-    selBox.style.top = '0';
-    selBox.style.opacity = '0';
-    selBox.value = value;
-    document.body.appendChild(selBox);
-    selBox.focus();
-    selBox.select();
-    document.execCommand('copy');
-    document.body.removeChild(selBox);
+    // const selBox = document.createElement('textarea');
+    // selBox.style.position = 'fixed';
+    // selBox.style.left = '0';
+    // selBox.style.top = '0';
+    // selBox.style.opacity = '0';
+    // selBox.value = value;
+    // document.body.appendChild(selBox);
+    // selBox.focus();
+    // selBox.select();
+    // document.execCommand('copy');
+    // document.body.removeChild(selBox);
+    // target.innerHTML = 'Copied!';
+    // setTimeout(() => {
+    //   target.innerHTML = 'Copy to Clipboard';
+    // }, 2000);
+
+    // Use Clipboard API for better reliability
+    navigator.clipboard.writeText(value).then(() => {
+      target.innerHTML = 'Copied!';
+      setTimeout(() => {
+        target.innerHTML = 'Copy to Clipboard';
+      }, 2000);
+    }).catch((err) => {
+      console.error('Clipboard write failed', err);
+    });
   }
 
   async updateCallNumber() {

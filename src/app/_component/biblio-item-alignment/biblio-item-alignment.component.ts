@@ -537,20 +537,31 @@ export class BiblioItemAlignmentComponent implements OnInit {
       let replaced = parseInt(callNumber.replace(/\D/g, ''));
       replaced++;
       callNumber = 'epig' + replaced;
+      
       let otherLibNumber = this.zoteroURL.replace(/[^0-9]/g, "");
       let items = JSON.parse(localStorage.getItem(otherLibNumber) || '{}').items;
       let otherLibItem = items.find((x: any) => x.key === item.key);
+
+      if(otherLibItem.collections.length > 0){
+        otherLibItem.collections = [];
+      }
+
       otherLibItem.callNumber = callNumber;
       let inserted = await this.zoteroAPI.insert(otherLibItem);
-      this.zoteroBiblioList.zoteroObject = item;
-      this.otherLibCallNumber = callNumber;
-      await this.SaveOtherLibCallNumber()
-      await this.syncSourceData();
-
-      await this.saveAlignmentChange(item.key, callNumber, this.zoteroURL, 'Insert');
+      if(Object.keys(inserted.raw.failed).length === 0){
+        this.zoteroBiblioList.zoteroObject = item;
+        this.otherLibCallNumber = callNumber;
+        await this.SaveOtherLibCallNumber()
+        await this.syncSourceData();
+  
+        await this.saveAlignmentChange(item.key, callNumber, this.zoteroURL, 'Insert');
+      }else{
+        this.showToast('Failed to insert item', 'bg-danger');
+      }
 
       if (!this.isUpdateAllBtn)
         this.isFetching = false;
+      
     }
     else {
       document.getElementById('btnOpenModalAPIKey')?.click();

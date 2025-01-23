@@ -281,15 +281,15 @@
 
       <hr />
       <div class="row">
-        <div class="col-md-5 offset-md-7">
+        <div class="col-md-12">
           <div class="input-group mb-3">
-            <button type="button" class="btn btn-primary" (click)="copy('')">Copy to Clipboard</button>
+            <button type="button" class="btn btn-primary" (click)="copy('', $event)">Copy to Clipboard</button>
             <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
               data-bs-toggle="dropdown" aria-expanded="false">
               <span class="visually-hidden"></span>
             </button>
             <ul class="dropdown-menu">
-              <li><button class="dropdown-item" (click)="copy('html')">Copy HTML</button></li>
+              <li><button class="dropdown-item" (click)="copy('html', $event)">Copy HTML</button></li>
             </ul>
           </div>
         </div>
